@@ -1,0 +1,5 @@
+rootProject.name = 'itsm-backend'
+
+include 'itsm-core'
+include 'itsm-api'
+include 'itsm-batch'

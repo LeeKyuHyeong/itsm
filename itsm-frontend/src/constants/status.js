@@ -1,0 +1,114 @@
+// 장애관리 상태
+export const INCIDENT_STATUS = {
+  REGISTERED: 'REGISTERED',     // 접수
+  IN_PROGRESS: 'IN_PROGRESS',   // 처리중
+  COMPLETED: 'COMPLETED',       // 완료
+  CLOSED: 'CLOSED',             // 종료
+  REJECTED: 'REJECTED'          // 반려
+}
+
+export const INCIDENT_STATUS_LABEL = {
+  [INCIDENT_STATUS.REGISTERED]: '접수',
+  [INCIDENT_STATUS.IN_PROGRESS]: '처리중',
+  [INCIDENT_STATUS.COMPLETED]: '완료',
+  [INCIDENT_STATUS.CLOSED]: '종료',
+  [INCIDENT_STATUS.REJECTED]: '반려'
+}
+
+// 장애관리 상태 전이 (현재 상태 → 가능한 다음 상태들)
+export const INCIDENT_STATUS_TRANSITIONS = {
+  [INCIDENT_STATUS.REGISTERED]: [INCIDENT_STATUS.IN_PROGRESS, INCIDENT_STATUS.REJECTED],
+  [INCIDENT_STATUS.IN_PROGRESS]: [INCIDENT_STATUS.COMPLETED],
+  [INCIDENT_STATUS.COMPLETED]: [INCIDENT_STATUS.CLOSED],
+  [INCIDENT_STATUS.REJECTED]: [INCIDENT_STATUS.REGISTERED],
+  [INCIDENT_STATUS.CLOSED]: []
+}
+
+// 서비스요청 상태
+export const SR_STATUS = {
+  REGISTERED: 'REGISTERED',       // 접수
+  ASSIGNED: 'ASSIGNED',           // 담당자배정
+  IN_PROGRESS: 'IN_PROGRESS',     // 처리중
+  PENDING_COMPLETE: 'PENDING_COMPLETE', // 완료대기
+  CLOSED: 'CLOSED',               // 종료
+  CANCELLED: 'CANCELLED',         // 요청취소
+  REJECTED: 'REJECTED'            // 반려
+}
+
+export const SR_STATUS_LABEL = {
+  [SR_STATUS.REGISTERED]: '접수',
+  [SR_STATUS.ASSIGNED]: '담당자배정',
+  [SR_STATUS.IN_PROGRESS]: '처리중',
+  [SR_STATUS.PENDING_COMPLETE]: '완료대기',
+  [SR_STATUS.CLOSED]: '종료',
+  [SR_STATUS.CANCELLED]: '요청취소',
+  [SR_STATUS.REJECTED]: '반려'
+}
+
+// 변경관리 상태
+export const CHANGE_STATUS = {
+  DRAFT: 'DRAFT',                 // 초안
+  APPROVAL_REQUESTED: 'APPROVAL_REQUESTED', // 승인요청
+  APPROVED: 'APPROVED',           // 승인완료
+  IN_PROGRESS: 'IN_PROGRESS',     // 실행중
+  COMPLETED: 'COMPLETED',         // 완료
+  CLOSED: 'CLOSED',               // 종료
+  REJECTED: 'REJECTED'            // 반려
+}
+
+export const CHANGE_STATUS_LABEL = {
+  [CHANGE_STATUS.DRAFT]: '초안',
+  [CHANGE_STATUS.APPROVAL_REQUESTED]: '승인요청',
+  [CHANGE_STATUS.APPROVED]: '승인완료',
+  [CHANGE_STATUS.IN_PROGRESS]: '실행중',
+  [CHANGE_STATUS.COMPLETED]: '완료',
+  [CHANGE_STATUS.CLOSED]: '종료',
+  [CHANGE_STATUS.REJECTED]: '반려'
+}
+
+// 정기점검 상태
+export const INSPECTION_STATUS = {
+  SCHEDULED: 'SCHEDULED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED',
+  CLOSED: 'CLOSED',
+  ON_HOLD: 'ON_HOLD'
+}
+
+export const INSPECTION_STATUS_LABEL = {
+  [INSPECTION_STATUS.SCHEDULED]: '예정',
+  [INSPECTION_STATUS.IN_PROGRESS]: '진행중',
+  [INSPECTION_STATUS.COMPLETED]: '완료',
+  [INSPECTION_STATUS.CLOSED]: '종료',
+  [INSPECTION_STATUS.ON_HOLD]: '보류'
+}
+
+// 우선순위
+export const PRIORITY = {
+  CRITICAL: 'CRITICAL',
+  HIGH: 'HIGH',
+  MEDIUM: 'MEDIUM',
+  LOW: 'LOW'
+}
+
+export const PRIORITY_LABEL = {
+  [PRIORITY.CRITICAL]: '긴급',
+  [PRIORITY.HIGH]: '높음',
+  [PRIORITY.MEDIUM]: '보통',
+  [PRIORITY.LOW]: '낮음'
+}
+
+// 사용자 상태
+export const USER_STATUS = {
+  ACTIVE: 'ACTIVE',
+  INACTIVE: 'INACTIVE',
+  LOCKED: 'LOCKED',
+  DELETED: 'DELETED'
+}
+
+export const USER_STATUS_LABEL = {
+  [USER_STATUS.ACTIVE]: '활성',
+  [USER_STATUS.INACTIVE]: '비활성',
+  [USER_STATUS.LOCKED]: '잠김',
+  [USER_STATUS.DELETED]: '삭제'
+}
