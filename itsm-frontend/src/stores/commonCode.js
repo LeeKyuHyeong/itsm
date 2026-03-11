@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import api from '@/api/index.js'
 
 export const useCommonCodeStore = defineStore('commonCode', () => {
   // { groupCode: [{ code, name, ... }, ...] }
@@ -23,11 +24,23 @@ export const useCommonCodeStore = defineStore('commonCode', () => {
     codeMap.value = {}
   }
 
+  async function fetchCodes(groupCd) {
+    if (codeMap.value[groupCd]) return  // already cached
+    try {
+      const { data } = await api.get(`/common-codes/${groupCd}`)
+      const details = data.data || data || []
+      codeMap.value[groupCd] = details.map(d => ({ code: d.codeVal, name: d.codeNm }))
+    } catch (e) {
+      console.error(`공통코드 로드 실패: ${groupCd}`, e)
+    }
+  }
+
   return {
     codeMap,
     setCodes,
     getCodes,
     getCodeName,
-    clearCodes
+    clearCodes,
+    fetchCodes
   }
 })

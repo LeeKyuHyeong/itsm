@@ -105,50 +105,50 @@
 - [x] 초기 공통코드 데이터 Insert (Phase 0에서 완료)
 
 ### 백엔드 — 공통코드
-- [ ] `CommonCode`, `CommonCodeDetail` 엔티티
-- [ ] `CommonCodeController` — 그룹/상세 CRUD API
-- [ ] 프론트에서 공통코드 캐싱용 조회 API
+- [x] `CommonCode`, `CommonCodeDetail` 엔티티
+- [x] `CommonCodeController` — 그룹/상세 CRUD API
+- [x] 프론트에서 공통코드 캐싱용 조회 API
 
 ### 백엔드 — 시스템 설정
-- [ ] `SystemConfig` 엔티티
-- [ ] `SystemConfigController` — 설정 조회/수정 API
-- [ ] 공지사항, 시스템 점검 배너 설정
+- [x] `SystemConfig` 엔티티
+- [x] `SystemConfigController` — 설정 조회/수정 API
+- [x] 공지사항, 시스템 점검 배너 설정
 
 ### 백엔드 — SLA / 알림 정책
-- [ ] `SlaPolicy` 엔티티
-- [ ] `SlaController` — SLA 정책 CRUD API (고객사별/전체 기본값)
-- [ ] `NotificationPolicy` 엔티티
-- [ ] 알림 정책 CRUD API
+- [x] `SlaPolicy` 엔티티
+- [x] `SlaController` — SLA 정책 CRUD API (고객사별/전체 기본값)
+- [x] `NotificationPolicy` 엔티티
+- [x] 알림 정책 CRUD API
 
 ### 백엔드 — 알림
-- [ ] `Notification` 엔티티
-- [ ] `NotificationController` — 내 알림 목록, 읽음 처리, 전체 읽음
-- [ ] 알림 발송 공통 서비스 (`NotificationService`)
+- [x] `Notification` 엔티티
+- [x] `NotificationController` — 내 알림 목록, 읽음 처리, 전체 읽음
+- [x] 알림 발송 공통 서비스 (`NotificationService`)
 
 ### 백엔드 — 감사 로그
-- [ ] `AuditLogAspect` (AOP 기반 자동 적재)
-- [ ] `AuditLog` 엔티티
+- [x] `AuditLogAspect` (AOP 기반 자동 적재)
+- [x] `AuditLog` 엔티티
 
 ### 프론트엔드 — 설정 관리
-- [ ] `CommonCodeView.vue` — 공통코드 관리 화면
-- [ ] `SlaManageView.vue` — SLA 정책 관리
-- [ ] `NotificationPolicyView.vue` — 알림 정책 관리
-- [ ] `MenuManageView.vue` — 메뉴/권한 관리
-- [ ] `commonCode.js` Pinia store — 공통코드 캐싱
+- [x] `CommonCodeView.vue` — 공통코드 관리 화면
+- [x] `SlaManageView.vue` — SLA 정책 관리
+- [x] `NotificationPolicyView.vue` — 알림 정책 관리
+- [x] `MenuManageView.vue` — 메뉴/권한 관리
+- [x] `commonCode.js` Pinia store — 공통코드 캐싱
 
 ### 프론트엔드 — 알림
-- [ ] `notification.js` Pinia store
-- [ ] `NotificationDropdown.vue` — 헤더 알림 드롭다운
+- [x] `notification.js` Pinia store
+- [x] `NotificationDropdown.vue` — 헤더 알림 드롭다운
 
 ### 프론트엔드 — 공통 컴포넌트
-- [ ] `BaseTable.vue` — 공통 테이블 (정렬, 페이지네이션)
-- [ ] `BasePagination.vue`
-- [ ] `BaseModal.vue`
-- [ ] `BaseConfirm.vue` — 확인/취소 다이얼로그
-- [ ] `BaseFileUpload.vue`
-- [ ] `BaseStatusBadge.vue` — 상태 뱃지 (색상 자동)
-- [ ] `BaseSlaBar.vue` — SLA 경과율 프로그레스바
-- [ ] `DynamicForm.vue` — 동적 폼 렌더러 (JSON 스키마 기반)
+- [x] `BaseTable.vue` — 공통 테이블 (정렬, 페이지네이션)
+- [x] `BasePagination.vue`
+- [x] `BaseModal.vue`
+- [x] `BaseConfirm.vue` — 확인/취소 다이얼로그
+- [x] `BaseFileUpload.vue`
+- [x] `BaseStatusBadge.vue` — 상태 뱃지 (색상 자동)
+- [x] `BaseSlaBar.vue` — SLA 경과율 프로그레스바
+- [x] `DynamicForm.vue` — 동적 폼 렌더러 (JSON 스키마 기반)
 
 ---
 
