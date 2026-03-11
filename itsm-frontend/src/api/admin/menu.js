@@ -1,6 +1,9 @@
 import api from '../index.js'
 
 export const menuApi = {
+  getMyMenus() {
+    return api.get('/admin/menus')
+  },
   getList() {
     return api.get('/admin/menus')
   },

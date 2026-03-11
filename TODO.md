@@ -8,97 +8,101 @@
 ## Phase 0: 프로젝트 초기 세팅
 
 ### 백엔드 (Spring Boot 멀티모듈)
-- [ ] Gradle 멀티모듈 프로젝트 생성 (`itsm-core`, `itsm-api`, `itsm-batch`)
-- [ ] `settings.gradle` / `build.gradle` 구성
-- [ ] Spring Boot 의존성 설정 (Spring Web, JPA, Security, Validation, QueryDSL)
-- [ ] DB 연결 설정 (MySQL/MariaDB + `application.yml`)
-- [ ] JPA 공통 설정 (`JpaConfig.java`, Auditing)
-- [ ] 공통 응답 포맷 구현 (`ApiResponse`, `ErrorResponse`)
-- [ ] 공통 예외 처리 (`BusinessException`, `ErrorCode`, `GlobalExceptionHandler`)
-- [ ] Swagger (SpringDoc) 설정
+- [x] Gradle 멀티모듈 프로젝트 생성 (`itsm-core`, `itsm-api`, `itsm-batch`)
+- [x] `settings.gradle` / `build.gradle` 구성
+- [x] Spring Boot 의존성 설정 (Spring Web, JPA, Security, Validation, QueryDSL)
+- [x] DB 연결 설정 (MySQL/MariaDB + `application.yml`) — local/prod/test 프로파일 분리
+- [x] JPA 공통 설정 (`JpaConfig.java`, Auditing)
+- [x] 공통 응답 포맷 구현 (`ApiResponse`, `ErrorResponse`)
+- [x] 공통 예외 처리 (`BusinessException`, `ErrorCode`, `GlobalExceptionHandler`)
+- [x] Swagger (SpringDoc) 설정
 
 ### 프론트엔드 (Vue.js)
-- [ ] Vite + Vue 3 프로젝트 생성
-- [ ] 의존성 설치 (Vue Router, Pinia, Axios, Chart.js)
-- [ ] 프로젝트 폴더 구조 생성
-- [ ] Axios 인스턴스 및 인터셉터 설정 (JWT 자동 첨부, 에러 핸들링)
-- [ ] 전역 CSS / 변수 파일 세팅
-- [ ] 공통 레이아웃 컴포넌트 (`AppLayout`, `AppHeader`, `AppSidebar`, `AppBreadcrumb`)
+- [x] Vite + Vue 3 프로젝트 생성
+- [x] 의존성 설치 (Vue Router, Pinia, Axios, Chart.js)
+- [x] 프로젝트 폴더 구조 생성
+- [x] Axios 인스턴스 및 인터셉터 설정 (JWT 자동 첨부, 에러 핸들링)
+- [x] 전역 CSS / 변수 파일 세팅
+- [x] 공통 레이아웃 컴포넌트 (`AppLayout`, `AppHeader`, `AppSidebar`, `AppBreadcrumb`)
+
+### DB 스키마
+- [x] 전체 40개 테이블 DDL (`sql/01_ddl.sql`)
+- [x] 초기 데이터 DML (`sql/02_dml.sql`) — 역할, 메뉴, 관리자, 공통코드, SLA, 시스템설정
 
 ---
 
 ## Phase 1: 인증 / 계정 / 조직 (기반 시스템)
 
 ### DB 스키마
-- [ ] `tb_company` / `tb_company_history` 테이블 생성
-- [ ] `tb_department` / `tb_department_history` 테이블 생성
-- [ ] `tb_user` / `tb_user_history` 테이블 생성
-- [ ] `tb_role` / `tb_user_role` 테이블 생성
-- [ ] `tb_menu` / `tb_role_menu` 테이블 생성
-- [ ] `tb_access_log` 테이블 생성
-- [ ] 초기 데이터 Insert (역할, 메뉴, 슈퍼관리자 계정, 공통코드)
+- [x] `tb_company` / `tb_company_history` 테이블 생성 (Phase 0에서 완료)
+- [x] `tb_department` / `tb_department_history` 테이블 생성 (Phase 0에서 완료)
+- [x] `tb_user` / `tb_user_history` 테이블 생성 (Phase 0에서 완료)
+- [x] `tb_role` / `tb_user_role` 테이블 생성 (Phase 0에서 완료)
+- [x] `tb_menu` / `tb_role_menu` 테이블 생성 (Phase 0에서 완료)
+- [x] `tb_access_log` 테이블 생성 (Phase 0에서 완료)
+- [x] 초기 데이터 Insert (역할, 메뉴, 슈퍼관리자 계정, 공통코드) (Phase 0에서 완료)
 
 ### 백엔드 — 엔티티 / 리포지토리
-- [ ] `User`, `UserHistory` 엔티티 (Temporal Data Modeling — valid_from/valid_to)
-- [ ] `Role`, `UserRole` 엔티티
-- [ ] `Company`, `CompanyHistory`, `Department`, `DepartmentHistory` 엔티티
-- [ ] `Menu`, `RoleMenu` 엔티티 (자기참조 구조)
-- [ ] 각 엔티티 JPA Repository
+- [x] `User`, `UserHistory` 엔티티 (Temporal Data Modeling — valid_from/valid_to)
+- [x] `Role`, `UserRole` 엔티티
+- [x] `Company`, `CompanyHistory`, `Department`, `DepartmentHistory` 엔티티
+- [x] `Menu`, `RoleMenu` 엔티티 (자기참조 구조)
+- [x] 각 엔티티 JPA Repository
 
 ### 백엔드 — 인증 (JWT + Spring Security)
-- [ ] `SecurityConfig` (Spring Security 설정, 필터 체인)
-- [ ] `JwtTokenProvider` (Access Token / Refresh Token 생성, 검증, 파싱)
-- [ ] `JwtAuthFilter` (요청마다 JWT 검증 필터)
-- [ ] `CustomUserDetailsService` (DB 기반 인증)
-- [ ] `AuthController` — 로그인, 로그아웃, 토큰 갱신, 내 정보 조회, 비밀번호 변경
-- [ ] 비밀번호 정책 검증 (8자 이상, 영문대소문자+숫자+특수문자)
-- [ ] 로그인 실패 5회 제한 → 계정 잠금 (LOCKED) → 30분 자동 해제
-- [ ] Refresh Token HttpOnly Cookie 저장
-- [ ] `tb_access_log` 로그인/로그아웃/실패 이력 적재
+- [x] `SecurityConfig` (Spring Security 설정, 필터 체인)
+- [x] `JwtTokenProvider` (Access Token / Refresh Token 생성, 검증, 파싱)
+- [x] `JwtAuthFilter` (요청마다 JWT 검증 필터)
+- [x] `CustomUserDetailsService` (DB 기반 인증)
+- [x] `AuthController` — 로그인, 로그아웃, 토큰 갱신, 내 정보 조회, 비밀번호 변경
+- [x] 비밀번호 정책 검증 (8자 이상, 영문대소문자+숫자+특수문자)
+- [x] 로그인 실패 5회 제한 → 계정 잠금 (LOCKED) → 30분 자동 해제
+- [x] Refresh Token HttpOnly Cookie 저장
+- [x] `tb_access_log` 로그인/로그아웃/실패 이력 적재
 
 ### 백엔드 — 권한 (RBAC)
-- [ ] `AuthInterceptor` (URL별 역할 검증 — 백엔드 이중 방어)
-- [ ] `MenuAccessInterceptor` (메뉴 접근 로그 — `tb_menu_access_log`)
-- [ ] 역할별 메뉴 조회 API (`GET /api/v1/admin/menus`)
+- [x] `AuthInterceptor` (URL별 역할 검증 — 백엔드 이중 방어)
+- [x] `MenuAccessInterceptor` (메뉴 접근 로그 — `tb_menu_access_log`)
+- [x] 역할별 메뉴 조회 API (`GET /api/v1/admin/menus`)
 
 ### 백엔드 — 사용자 / 조직 CRUD
-- [ ] `UserController` + `UserService` — 목록, 등록, 상세, 수정, 상태변경, 이력조회
-- [ ] `CompanyController` + `CompanyService` — 회사 CRUD + 이력
-- [ ] 부서 CRUD (회사 하위)
-- [ ] 역할 부여/회수 API
-- [ ] 사용자 변경 시 `tb_user_history` 자동 적재 (Temporal 방식)
-- [ ] 회사/부서 변경 시 이력 테이블 적재 (단순 이력 방식)
-- [ ] login_id 마스킹 처리 (DELETED 시 `DELETED_{userId}_{loginId}`)
+- [x] `UserController` + `UserService` — 목록, 등록, 상세, 수정, 상태변경, 이력조회
+- [x] `CompanyController` + `CompanyService` — 회사 CRUD + 이력
+- [x] 부서 CRUD (회사 하위)
+- [x] 역할 부여/회수 API
+- [x] 사용자 변경 시 `tb_user_history` 자동 적재 (Temporal 방식)
+- [x] 회사/부서 변경 시 이력 테이블 적재 (단순 이력 방식)
+- [x] login_id 마스킹 처리 (DELETED 시 `DELETED_{userId}_{loginId}`)
 
 ### 프론트엔드 — 인증
-- [ ] `LoginView.vue` (로그인 화면)
-- [ ] `auth.js` Pinia store (JWT, 사용자 정보 관리)
-- [ ] `guards.js` Vue Router 네비게이션 가드 (인증/권한 체크)
-- [ ] Axios 인터셉터 — Access Token 만료 시 Refresh Token 자동 갱신
-- [ ] 최초 로그인 시 비밀번호 강제 변경 화면
-- [ ] 90일 초과 비밀번호 변경 안내 팝업
+- [x] `LoginView.vue` (로그인 화면)
+- [x] `auth.js` Pinia store (JWT, 사용자 정보 관리)
+- [x] `guards.js` Vue Router 네비게이션 가드 (인증/권한 체크)
+- [x] Axios 인터셉터 — Access Token 만료 시 Refresh Token 자동 갱신
+- [x] 최초 로그인 시 비밀번호 강제 변경 화면
+- [x] 90일 초과 비밀번호 변경 안내 팝업
 
 ### 프론트엔드 — 레이아웃 / 메뉴
-- [ ] `AppSidebar.vue` — 역할 기반 동적 메뉴 렌더링 (API 조회)
-- [ ] `AppHeader.vue` — 알림 아이콘, 사용자 정보
-- [ ] `AppBreadcrumb.vue`
+- [x] `AppSidebar.vue` — 역할 기반 동적 메뉴 렌더링 (API 조회)
+- [x] `AppHeader.vue` — 알림 아이콘, 사용자 정보
+- [x] `AppBreadcrumb.vue`
 
 ### 프론트엔드 — 계정 / 조직 관리
-- [ ] `AccountManageView.vue` — 사용자 목록, 등록, 수정, 상태 변경, 역할 관리
-- [ ] `OrgManageView.vue` — 회사/부서 관리
+- [x] `AccountManageView.vue` — 사용자 목록, 등록, 수정, 상태 변경, 역할 관리
+- [x] `OrgManageView.vue` — 회사/부서 관리
 
 ---
 
 ## Phase 2: 공통코드 / 설정 관리
 
 ### DB 스키마
-- [ ] `tb_common_code` / `tb_common_code_detail` 테이블 생성
-- [ ] `tb_system_config` 테이블 생성
-- [ ] `tb_sla_policy` 테이블 생성
-- [ ] `tb_notification_policy` 테이블 생성
-- [ ] `tb_notification` 테이블 생성
-- [ ] `tb_audit_log` / `tb_menu_access_log` 테이블 생성
-- [ ] 초기 공통코드 데이터 Insert (장애유형, 우선순위, 상태값, 부서코드 등)
+- [x] `tb_common_code` / `tb_common_code_detail` 테이블 생성 (Phase 0에서 완료)
+- [x] `tb_system_config` 테이블 생성 (Phase 0에서 완료)
+- [x] `tb_sla_policy` 테이블 생성 (Phase 0에서 완료)
+- [x] `tb_notification_policy` 테이블 생성 (Phase 0에서 완료)
+- [x] `tb_notification` 테이블 생성 (Phase 0에서 완료)
+- [x] `tb_audit_log` / `tb_menu_access_log` 테이블 생성 (Phase 0에서 완료)
+- [x] 초기 공통코드 데이터 Insert (Phase 0에서 완료)
 
 ### 백엔드 — 공통코드
 - [ ] `CommonCode`, `CommonCodeDetail` 엔티티
@@ -151,9 +155,9 @@
 ## Phase 3: 자산관리 (CMDB)
 
 ### DB 스키마
-- [ ] `tb_asset_hw` / `tb_asset_hw_history` 테이블 생성
-- [ ] `tb_asset_sw` / `tb_asset_sw_history` 테이블 생성
-- [ ] `tb_asset_relation` 테이블 생성
+- [x] `tb_asset_hw` / `tb_asset_hw_history` 테이블 생성 (Phase 0에서 완료)
+- [x] `tb_asset_sw` / `tb_asset_sw_history` 테이블 생성 (Phase 0에서 완료)
+- [x] `tb_asset_relation` 테이블 생성 (Phase 0에서 완료)
 
 ### 백엔드
 - [ ] `AssetHw`, `AssetSw`, `AssetRelation` 엔티티 + History 엔티티
@@ -173,12 +177,12 @@
 ## Phase 4: 장애관리 (완성도 있게 구현)
 
 ### DB 스키마
-- [ ] `tb_incident` 테이블 생성
-- [ ] `tb_incident_asset` 테이블 생성
-- [ ] `tb_incident_assignee` 테이블 생성
-- [ ] `tb_incident_comment` 테이블 생성
-- [ ] `tb_incident_history` 테이블 생성
-- [ ] `tb_incident_report` 테이블 생성
+- [x] `tb_incident` 테이블 생성 (Phase 0에서 완료)
+- [x] `tb_incident_asset` 테이블 생성 (Phase 0에서 완료)
+- [x] `tb_incident_assignee` 테이블 생성 (Phase 0에서 완료)
+- [x] `tb_incident_comment` 테이블 생성 (Phase 0에서 완료)
+- [x] `tb_incident_history` 테이블 생성 (Phase 0에서 완료)
+- [x] `tb_incident_report` 테이블 생성 (Phase 0에서 완료)
 
 ### 백엔드
 - [ ] `Incident`, `IncidentAsset`, `IncidentAssignee` 엔티티
@@ -222,11 +226,11 @@
 ## Phase 5: 서비스요청 (MVP)
 
 ### DB 스키마
-- [ ] `tb_service_request` 테이블 생성
-- [ ] `tb_service_request_asset` 테이블 생성
-- [ ] `tb_service_request_assignee` 테이블 생성
-- [ ] `tb_service_request_process` 테이블 생성
-- [ ] `tb_service_request_history` 테이블 생성
+- [x] `tb_service_request` 테이블 생성 (Phase 0에서 완료)
+- [x] `tb_service_request_asset` 테이블 생성 (Phase 0에서 완료)
+- [x] `tb_service_request_assignee` 테이블 생성 (Phase 0에서 완료)
+- [x] `tb_service_request_process` 테이블 생성 (Phase 0에서 완료)
+- [x] `tb_service_request_history` 테이블 생성 (Phase 0에서 완료)
 
 ### 백엔드
 - [ ] 엔티티: `ServiceRequest`, `ServiceRequestAsset`, `ServiceRequestAssignee`, `ServiceRequestProcess`, `ServiceRequestHistory`
@@ -258,11 +262,11 @@
 ## Phase 6: 변경관리 (MVP)
 
 ### DB 스키마
-- [ ] `tb_change` 테이블 생성
-- [ ] `tb_change_asset` 테이블 생성
-- [ ] `tb_change_approver` 테이블 생성
-- [ ] `tb_change_history` 테이블 생성
-- [ ] `tb_change_comment` 테이블 생성
+- [x] `tb_change` 테이블 생성 (Phase 0에서 완료)
+- [x] `tb_change_asset` 테이블 생성 (Phase 0에서 완료)
+- [x] `tb_change_approver` 테이블 생성 (Phase 0에서 완료)
+- [x] `tb_change_history` 테이블 생성 (Phase 0에서 완료)
+- [x] `tb_change_comment` 테이블 생성 (Phase 0에서 완료)
 
 ### 백엔드
 - [ ] 엔티티: `Change`, `ChangeAsset`, `ChangeApprover`, `ChangeHistory`, `ChangeComment`
@@ -289,10 +293,10 @@
 ## Phase 7: 정기점검 / 보고관리
 
 ### DB 스키마
-- [ ] `tb_inspection` / `tb_inspection_asset` 테이블 생성
-- [ ] `tb_inspection_item` / `tb_inspection_result` 테이블 생성
-- [ ] `tb_inspection_history` 테이블 생성
-- [ ] `tb_report_form` / `tb_report` 테이블 생성
+- [x] `tb_inspection` / `tb_inspection_asset` 테이블 생성 (Phase 0에서 완료)
+- [x] `tb_inspection_item` / `tb_inspection_result` 테이블 생성 (Phase 0에서 완료)
+- [x] `tb_inspection_history` 테이블 생성 (Phase 0에서 완료)
+- [x] `tb_report_form` / `tb_report` 테이블 생성 (Phase 0에서 완료)
 
 ### 백엔드 — 정기점검
 - [ ] 엔티티: `Inspection`, `InspectionAsset`, `InspectionItem`, `InspectionResult`, `InspectionHistory`
@@ -323,10 +327,10 @@
 ## Phase 8: 게시판
 
 ### DB 스키마
-- [ ] `tb_board_config` 테이블 생성
-- [ ] `tb_board_post` 테이블 생성
-- [ ] `tb_board_comment` 테이블 생성
-- [ ] `tb_board_file` 테이블 생성
+- [x] `tb_board_config` 테이블 생성 (Phase 0에서 완료)
+- [x] `tb_board_post` 테이블 생성 (Phase 0에서 완료)
+- [x] `tb_board_comment` 테이블 생성 (Phase 0에서 완료)
+- [x] `tb_board_file` 테이블 생성 (Phase 0에서 완료)
 
 ### 백엔드
 - [ ] `BoardConfig`, `BoardPost`, `BoardComment`, `BoardFile` 엔티티

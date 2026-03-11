@@ -19,6 +19,11 @@ export function setupGuards(router) {
       return next({ path: '/login' })
     }
 
+    // 비밀번호 변경 필수 확인
+    if (authStore.mustChangePassword && to.name !== 'ChangePassword') {
+      return next({ path: '/change-password' })
+    }
+
     // 역할 기반 접근 제어
     const requiredRoles = to.meta.roles
     if (requiredRoles && requiredRoles.length > 0) {
