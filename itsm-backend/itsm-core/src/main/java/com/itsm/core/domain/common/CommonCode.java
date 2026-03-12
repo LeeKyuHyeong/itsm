@@ -33,7 +33,7 @@ public class CommonCode {
     @Column(name = "description", length = 200)
     private String description;
 
-    @Column(name = "is_active", nullable = false, length = 1)
+    @Column(name = "is_active", nullable = false, columnDefinition = "char(1)")
     private String isActive;
 
     @CreatedDate

@@ -41,7 +41,7 @@ public class Menu extends BaseEntity {
     @Column(name = "sort_order", nullable = false)
     private int sortOrder;
 
-    @Column(name = "is_visible", nullable = false, length = 1)
+    @Column(name = "is_visible", nullable = false, columnDefinition = "char(1)")
     private String isVisible;
 
     @Column(name = "status", nullable = false, length = 20)

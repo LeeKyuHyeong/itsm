@@ -36,7 +36,7 @@ public class CommonCodeDetail {
     @Column(name = "sort_order", nullable = false)
     private Integer sortOrder;
 
-    @Column(name = "is_active", nullable = false, length = 1)
+    @Column(name = "is_active", nullable = false, columnDefinition = "char(1)")
     private String isActive;
 
     @CreatedDate

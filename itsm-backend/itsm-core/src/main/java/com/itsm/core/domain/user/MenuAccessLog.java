@@ -35,8 +35,8 @@ public class MenuAccessLog {
     private String ipAddress;
 
     @CreatedDate
-    @Column(name = "accessed_at", nullable = false, updatable = false)
-    private LocalDateTime accessedAt;
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
     @Builder
     public MenuAccessLog(Long userId, Long menuId, String roleCd, String ipAddress) {

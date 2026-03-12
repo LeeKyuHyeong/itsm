@@ -33,10 +33,10 @@ public class RoleMenu {
     @JoinColumn(name = "menu_id", insertable = false, updatable = false)
     private Menu menu;
 
-    @Column(name = "can_read", nullable = false, length = 1)
+    @Column(name = "can_read", nullable = false, columnDefinition = "char(1)")
     private String canRead;
 
-    @Column(name = "can_write", nullable = false, length = 1)
+    @Column(name = "can_write", nullable = false, columnDefinition = "char(1)")
     private String canWrite;
 
     @CreatedDate

@@ -31,7 +31,7 @@ public class NotificationPolicy {
     @Column(name = "target_role_cd", nullable = false, length = 50)
     private String targetRoleCd;
 
-    @Column(name = "is_active", nullable = false, length = 1)
+    @Column(name = "is_active", nullable = false, columnDefinition = "char(1)")
     private String isActive;
 
     @CreatedDate

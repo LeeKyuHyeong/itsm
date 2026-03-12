@@ -34,7 +34,7 @@ public class AccessLog {
     @Column(name = "ip_address", nullable = false, length = 50)
     private String ipAddress;
 
-    @Column(name = "success_yn", nullable = false, length = 1)
+    @Column(name = "success_yn", nullable = false, columnDefinition = "char(1)")
     private String successYn;
 
     @Column(name = "fail_reason", length = 200)
