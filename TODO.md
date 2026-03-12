@@ -233,29 +233,29 @@
 - [x] `tb_service_request_history` 테이블 생성 (Phase 0에서 완료)
 
 ### 백엔드
-- [ ] 엔티티: `ServiceRequest`, `ServiceRequestAsset`, `ServiceRequestAssignee`, `ServiceRequestProcess`, `ServiceRequestHistory`
-- [ ] `ServiceRequestController` + `ServiceRequestService`
-  - [ ] SR CRUD API
-  - [ ] 상태 변경 API (접수→담당자배정→처리중→완료대기→종료, 요청취소, 반려)
-  - [ ] 담당자 지정/제거 API
-  - [ ] 처리내용 작성/수정/완료 API (담당자별)
+- [x] 엔티티: `ServiceRequest`, `ServiceRequestAsset`, `ServiceRequestAssignee`, `ServiceRequestProcess`, `ServiceRequestHistory`
+- [x] `ServiceRequestController` + `ServiceRequestService`
+  - [x] SR CRUD API
+  - [x] 상태 변경 API (접수→담당자배정→처리중→완료대기→종료, 요청취소, 반려)
+  - [x] 담당자 지정/제거 API
+  - [x] 처리내용 작성/수정/완료 API (담당자별)
   - [ ] 댓글 CRUD API
-  - [ ] 만족도 제출 API
-  - [ ] 변경 이력 조회 API
-- [ ] 상태 자동 전환 (담당자 전원 COMPLETED → 완료대기)
+  - [x] 만족도 제출 API
+  - [x] 변경 이력 조회 API
+- [x] 상태 자동 전환 (담당자 전원 COMPLETED → 완료대기)
 - [ ] 담당자 전원 제거 시 접수로 자동 되돌림
-- [ ] SLA 기한 자동 계산 (요청일 기준, 반려 시 연장)
+- [x] SLA 기한 자동 계산 (요청일 기준, 반려 시 연장)
 - [ ] 담당자 퇴사/비활성화 엣지케이스 처리
 - [ ] 중복 등록 방지 (debounce)
 
 ### 프론트엔드
-- [ ] `ServiceRequestListView.vue` — SR 목록
-- [ ] `ServiceRequestFormView.vue` — SR 등록/수정
-- [ ] `ServiceRequestDetailView.vue` — SR 상세
-  - [ ] 상태머신 UI
-  - [ ] 담당자별 처리현황 (N/N 완료 카운트)
-  - [ ] 반려 횟수 표시
-  - [ ] 만족도 조사 영역
+- [x] `ServiceRequestListView.vue` — SR 목록
+- [x] `ServiceRequestFormView.vue` — SR 등록/수정
+- [x] `ServiceRequestDetailView.vue` — SR 상세
+  - [x] 상태머신 UI
+  - [x] 담당자별 처리현황 (N/N 완료 카운트)
+  - [x] 반려 횟수 표시
+  - [x] 만족도 조사 영역
 
 ---
 

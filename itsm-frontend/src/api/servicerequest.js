@@ -16,11 +16,23 @@ export const serviceRequestApi = {
   changeStatus(id, data) {
     return api.patch(`/service-requests/${id}/status`, data)
   },
+  getAssignees(id) {
+    return api.get(`/service-requests/${id}/assignees`)
+  },
   assignUser(id, data) {
     return api.post(`/service-requests/${id}/assignees`, data)
   },
-  removeAssignee(id, assigneeId) {
-    return api.delete(`/service-requests/${id}/assignees/${assigneeId}`)
+  removeAssignee(id, userId) {
+    return api.delete(`/service-requests/${id}/assignees/${userId}`)
+  },
+  getProcesses(id) {
+    return api.get(`/service-requests/${id}/processes`)
+  },
+  addProcess(id, data) {
+    return api.post(`/service-requests/${id}/processes`, data)
+  },
+  completeProcess(id, processId) {
+    return api.patch(`/service-requests/${id}/processes/${processId}/complete`)
   },
   submitSatisfaction(id, data) {
     return api.post(`/service-requests/${id}/satisfaction`, data)
