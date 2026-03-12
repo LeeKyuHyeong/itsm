@@ -37,6 +37,7 @@ const STATUS_COLOR_MAP = {
   PENDING: 'blue',
   '대기': 'blue',
   '접수': 'blue',
+  RECEIVED: 'blue',
   IN_PROGRESS: 'blue',
   '처리중': 'blue',
   '진행중': 'blue'

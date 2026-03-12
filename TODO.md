@@ -185,40 +185,40 @@
 - [x] `tb_incident_report` 테이블 생성 (Phase 0에서 완료)
 
 ### 백엔드
-- [ ] `Incident`, `IncidentAsset`, `IncidentAssignee` 엔티티
-- [ ] `IncidentComment`, `IncidentHistory`, `IncidentReport` 엔티티
-- [ ] `IncidentController` + `IncidentService`
-  - [ ] 장애 CRUD API
-  - [ ] 상태 변경 API (상태머신: 접수→처리중→완료→종료, 반려)
-  - [ ] 담당자 지정/해제 API
-  - [ ] 댓글 CRUD API
-  - [ ] 변경 이력 조회 API
-  - [ ] 장애보고서 작성/수정 API
-- [ ] 상태머신 검증 (유효하지 않은 상태 전이 차단)
+- [x] `Incident`, `IncidentAsset`, `IncidentAssignee` 엔티티
+- [x] `IncidentComment`, `IncidentHistory`, `IncidentReport` 엔티티
+- [x] `IncidentController` + `IncidentService`
+  - [x] 장애 CRUD API
+  - [x] 상태 변경 API (상태머신: 접수→처리중→완료→종료, 반려)
+  - [x] 담당자 지정/해제 API
+  - [x] 댓글 CRUD API
+  - [x] 변경 이력 조회 API
+  - [x] 장애보고서 작성/수정 API
+- [x] 상태머신 검증 (유효하지 않은 상태 전이 차단)
 - [ ] 수정 권한 검증 (상태별 + 역할별 권한 매트릭스)
-- [ ] SLA 기한 자동 계산 (`sla_deadline_at = 접수일시 + deadline_hours`)
-- [ ] 수정 시 `tb_incident_history` 자동 적재
-- [ ] 연관 자산 매핑 (HW/SW)
-- [ ] `SlaCalculator` — 경과율 실시간 계산, 반려 시 기한 연장
+- [x] SLA 기한 자동 계산 (`sla_deadline_at = 접수일시 + deadline_hours`)
+- [x] 수정 시 `tb_incident_history` 자동 적재
+- [x] 연관 자산 매핑 (HW/SW)
+- [x] `SlaCalculator` — 경과율 실시간 계산, 반려 시 기한 연장
 
 ### 프론트엔드
-- [ ] `IncidentListView.vue` — 장애 목록 (상태필터, 우선순위필터, 검색, SLA 경과율 표시)
-- [ ] `IncidentFormView.vue` — 장애 등록/수정 (자산 연결, 우선순위 선택)
-- [ ] `IncidentDetailView.vue` — 장애 상세
-  - [ ] 상태머신 버튼 (현재 상태에 따라 활성/비활성)
-  - [ ] 담당자 배정 영역
-  - [ ] 처리내용 작성 영역 (주담당자만)
-  - [ ] 댓글 영역
-  - [ ] 변경 이력 타임라인
-  - [ ] SLA 카운트다운 / 프로그레스바
-  - [ ] 장애보고서 작성 (동적 폼 — `DynamicForm.vue` 활용)
+- [x] `IncidentListView.vue` — 장애 목록 (상태필터, 우선순위필터, 검색, SLA 경과율 표시)
+- [x] `IncidentFormView.vue` — 장애 등록/수정 (자산 연결, 우선순위 선택)
+- [x] `IncidentDetailView.vue` — 장애 상세
+  - [x] 상태머신 버튼 (현재 상태에 따라 활성/비활성)
+  - [x] 담당자 배정 영역
+  - [x] 처리내용 작성 영역 (주담당자만)
+  - [x] 댓글 영역
+  - [x] 변경 이력 타임라인
+  - [x] SLA 카운트다운 / 프로그레스바
+  - [x] 장애보고서 작성 (동적 폼 — `DynamicForm.vue` 활용)
 
 ### 대시보드
-- [ ] `DashboardView.vue`
-  - [ ] 상태별 장애 건수 (도넛/파이 차트)
-  - [ ] 우선순위별 미처리 건수
-  - [ ] SLA 초과/임박 건수
-  - [ ] 최근 장애 목록
+- [x] `DashboardView.vue`
+  - [x] 상태별 장애 건수 (도넛/파이 차트)
+  - [x] 우선순위별 미처리 건수
+  - [x] SLA 초과/임박 건수
+  - [x] 최근 장애 목록
   - [ ] 월별 장애 추이 (라인 차트)
 
 ---
