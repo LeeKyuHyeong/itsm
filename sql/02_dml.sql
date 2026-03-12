@@ -15,7 +15,7 @@ INSERT INTO tb_department (dept_id, dept_nm, company_id, status, created_at)
 VALUES (1, '시스템관리', 1, 'ACTIVE', NOW());
 
 INSERT INTO tb_user (user_id, login_id, password, user_nm, employee_no, dept_id, email, tel, status, valid_from, created_at)
-VALUES (1, 'admin', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVKIUi', '슈퍼관리자', 'EMP0001', 1, 'admin@itsm.local', '000-0000-0000', 'ACTIVE', NOW(), NOW());
+VALUES (1, 'admin', '$2a$10$c5Jwkaus0cKAjnVAyj8mrOAEWAdvJuXbeKYEcV5fGzYz7Y0TGcYsG', '슈퍼관리자', 'EMP0001', 1, 'admin@itsm.local', '000-0000-0000', 'ACTIVE', NOW(), NOW());
 
 -- ============================================================
 -- 2. 역할 (11개)
