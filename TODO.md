@@ -299,28 +299,28 @@
 - [x] `tb_report_form` / `tb_report` 테이블 생성 (Phase 0에서 완료)
 
 ### 백엔드 — 정기점검
-- [ ] 엔티티: `Inspection`, `InspectionAsset`, `InspectionItem`, `InspectionResult`, `InspectionHistory`
-- [ ] `InspectionController` + `InspectionService`
-  - [ ] 점검 CRUD API
-  - [ ] 상태 변경 API (예정→진행중→완료→종료, 보류)
-  - [ ] 체크리스트 항목 등록/수정 API
-  - [ ] 점검 결과 입력/수정 API
+- [x] 엔티티: `Inspection`, `InspectionAsset`, `InspectionItem`, `InspectionResult`, `InspectionHistory`
+- [x] `InspectionController` + `InspectionService`
+  - [x] 점검 CRUD API
+  - [x] 상태 변경 API (예정→진행중→완료→종료, 보류)
+  - [x] 체크리스트 항목 등록/수정 API
+  - [x] 점검 결과 입력/수정 API
 
 ### 백엔드 — 보고관리
-- [ ] `ReportForm`, `Report` 엔티티
-- [ ] `ReportController` — 양식 CRUD, 보고서 작성/조회/수정 API
-- [ ] 보고서 양식 관리 (JSON 스키마 기반 동적 폼)
-- [ ] 참조유형별(INCIDENT/SR/CHANGE/INSPECTION) 연결
+- [x] `ReportForm`, `Report` 엔티티
+- [x] `ReportController` — 양식 CRUD, 보고서 작성/조회/수정 API
+- [x] 보고서 양식 관리 (JSON 스키마 기반 동적 폼)
+- [x] 참조유형별(INCIDENT/SR/CHANGE/INSPECTION) 연결
 
 ### 프론트엔드 — 정기점검
-- [ ] `InspectionListView.vue` — 점검 목록/일정
-- [ ] `InspectionFormView.vue` — 점검 등록
-- [ ] `InspectionDetailView.vue` — 점검 상세 (체크리스트 결과 입력)
+- [x] `InspectionListView.vue` — 점검 목록/일정
+- [x] `InspectionFormView.vue` — 점검 등록
+- [x] `InspectionDetailView.vue` — 점검 상세 (체크리스트 결과 입력)
 
 ### 프론트엔드 — 보고관리
-- [ ] `ReportListView.vue` — 보고서 목록
-- [ ] `ReportDetailView.vue` — 보고서 상세/출력/PDF 다운로드
-- [ ] 보고서 양식 관리 화면 (설정관리 내)
+- [x] `ReportListView.vue` — 보고서 목록
+- [x] `ReportDetailView.vue` — 보고서 상세/출력/PDF 다운로드
+- [x] 보고서 양식 관리 화면 (설정관리 내)
 
 ---
 
@@ -333,18 +333,18 @@
 - [x] `tb_board_file` 테이블 생성 (Phase 0에서 완료)
 
 ### 백엔드
-- [ ] `BoardConfig`, `BoardPost`, `BoardComment`, `BoardFile` 엔티티
-- [ ] `BoardController` — 게시판 목록, 게시글 CRUD, 댓글 CRUD API
-- [ ] 게시판 빌더 API (`/api/v1/admin/boards` — 생성/수정/설정)
+- [x] `BoardConfig`, `BoardPost`, `BoardComment`, `BoardFile` 엔티티
+- [x] `BoardController` — 게시판 목록, 게시글 CRUD, 댓글 CRUD API
+- [x] 게시판 빌더 API (`/api/v1/admin/boards` — 생성/수정/설정)
 - [ ] 역할별 읽기/쓰기 권한 검증 (role_permission JSON 기반)
 - [ ] 파일 업로드 — 허용 확장자 화이트리스트, UUID 파일명, 용량 제한
 - [ ] 게시판 생성 시 사이드바 메뉴 자동 반영
 
 ### 프론트엔드
-- [ ] `BoardListView.vue` — 게시글 목록 (게시판별)
-- [ ] `BoardPostFormView.vue` — 게시글 작성/수정 (첨부파일)
-- [ ] `BoardPostDetailView.vue` — 게시글 상세/댓글
-- [ ] `BoardManageView.vue` — 게시판 빌더 (관리자)
+- [x] `BoardListView.vue` — 게시글 목록 (게시판별)
+- [x] `BoardPostFormView.vue` — 게시글 작성/수정 (첨부파일)
+- [x] `BoardPostDetailView.vue` — 게시글 상세/댓글
+- [x] `BoardManageView.vue` — 게시판 빌더 (관리자)
 - [ ] 사이드바 게시판 메뉴 동적 렌더링
 
 ---
