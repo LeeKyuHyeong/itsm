@@ -269,24 +269,24 @@
 - [x] `tb_change_comment` 테이블 생성 (Phase 0에서 완료)
 
 ### 백엔드
-- [ ] 엔티티: `Change`, `ChangeAsset`, `ChangeApprover`, `ChangeHistory`, `ChangeComment`
-- [ ] `ChangeController` + `ChangeService`
-  - [ ] 변경 CRUD API
-  - [ ] 상태 변경 API (초안→승인요청→승인완료→실행중→완료→종료, 반려)
-  - [ ] 승인자 지정 API
-  - [ ] 승인/반려 처리 API (순차 승인)
-  - [ ] 댓글 CRUD API
-  - [ ] 변경 이력 조회 API
-- [ ] 순차 승인 로직 (approve_order 기반)
-- [ ] 승인자 전원 승인 시 자동 상태 전환
+- [x] 엔티티: `Change`, `ChangeAsset`, `ChangeApprover`, `ChangeHistory`, `ChangeComment`
+- [x] `ChangeController` + `ChangeService`
+  - [x] 변경 CRUD API
+  - [x] 상태 변경 API (초안→승인요청→승인완료→실행중→완료→종료, 반려)
+  - [x] 승인자 지정 API
+  - [x] 승인/반려 처리 API (순차 승인)
+  - [x] 댓글 CRUD API
+  - [x] 변경 이력 조회 API
+- [x] 순차 승인 로직 (approve_order 기반)
+- [x] 승인자 전원 승인 시 자동 상태 전환
 
 ### 프론트엔드
-- [ ] `ChangeListView.vue` — 변경 목록
-- [ ] `ChangeFormView.vue` — 변경 등록/수정 (롤백 계획 포함)
-- [ ] `ChangeDetailView.vue` — 변경 상세
-  - [ ] 승인 현황 (승인자별 상태)
-  - [ ] 상태머신 UI
-  - [ ] 댓글 영역
+- [x] `ChangeListView.vue` — 변경 목록
+- [x] `ChangeFormView.vue` — 변경 등록/수정 (롤백 계획 포함)
+- [x] `ChangeDetailView.vue` — 변경 상세
+  - [x] 승인 현황 (승인자별 상태)
+  - [x] 상태머신 UI
+  - [x] 댓글 영역
 
 ---
 
