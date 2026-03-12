@@ -160,17 +160,17 @@
 - [x] `tb_asset_relation` 테이블 생성 (Phase 0에서 완료)
 
 ### 백엔드
-- [ ] `AssetHw`, `AssetSw`, `AssetRelation` 엔티티 + History 엔티티
-- [ ] `AssetHwController` — HW 자산 CRUD + 이력 조회 API
-- [ ] `AssetSwController` — SW 자산 CRUD + 이력 조회 API
-- [ ] 자산 연관관계 등록/삭제 API
-- [ ] 자산 수정 시 `tb_asset_hw_history` / `tb_asset_sw_history` 자동 적재
+- [x] `AssetHw`, `AssetSw`, `AssetRelation` 엔티티 + History 엔티티
+- [x] `AssetHwController` — HW 자산 CRUD + 이력 조회 API
+- [x] `AssetSwController` — SW 자산 CRUD + 이력 조회 API
+- [x] 자산 연관관계 등록/삭제 API
+- [x] 자산 수정 시 `tb_asset_hw_history` / `tb_asset_sw_history` 자동 적재
 
 ### 프론트엔드
-- [ ] `AssetHwListView.vue` — HW 자산 목록 (검색, 필터, 페이지네이션)
-- [ ] `AssetHwDetailView.vue` — HW 자산 상세 (연관 SW, 변경이력, 관련 장애/변경)
-- [ ] `AssetSwListView.vue` — SW 자산 목록
-- [ ] `AssetSwDetailView.vue` — SW 자산 상세
+- [x] `AssetHwListView.vue` — HW 자산 목록 (검색, 필터, 페이지네이션)
+- [x] `AssetHwDetailView.vue` — HW 자산 상세 (연관 SW, 변경이력, 관련 장애/변경)
+- [x] `AssetSwListView.vue` — SW 자산 목록
+- [x] `AssetSwDetailView.vue` — SW 자산 상세
 
 ---
 
