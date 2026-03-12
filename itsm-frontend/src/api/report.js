@@ -11,9 +11,21 @@ export const reportApi = {
     return api.get(`/reports/${id}`)
   },
   update(id, data) {
-    return api.patch(`/reports/${id}`, data)
+    return api.put(`/reports/${id}`, data)
+  },
+  delete(id) {
+    return api.delete(`/reports/${id}`)
   },
   getForms(params) {
     return api.get('/report-forms', { params })
+  },
+  createForm(data) {
+    return api.post('/report-forms', data)
+  },
+  updateForm(id, data) {
+    return api.put(`/report-forms/${id}`, data)
+  },
+  deleteForm(id) {
+    return api.delete(`/report-forms/${id}`)
   }
 }

@@ -16,7 +16,22 @@ export const inspectionApi = {
   changeStatus(id, data) {
     return api.patch(`/inspections/${id}/status`, data)
   },
-  saveResults(id, data) {
+  getItems(id) {
+    return api.get(`/inspections/${id}/items`)
+  },
+  addItem(id, data) {
+    return api.post(`/inspections/${id}/items`, data)
+  },
+  deleteItem(id, itemId) {
+    return api.delete(`/inspections/${id}/items/${itemId}`)
+  },
+  getResults(id) {
+    return api.get(`/inspections/${id}/results`)
+  },
+  saveResult(id, data) {
     return api.post(`/inspections/${id}/results`, data)
+  },
+  getHistory(id) {
+    return api.get(`/inspections/${id}/history`)
   }
 }
