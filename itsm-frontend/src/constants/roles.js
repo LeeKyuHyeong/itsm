@@ -1,15 +1,15 @@
 export const ROLES = {
-  SUPER_ADMIN: 'SUPER_ADMIN',         // 슈퍼관리자
-  ITSM_ADMIN: 'ITSM_ADMIN',           // ITSM관리자
-  PM: 'PM',                           // 유지보수팀 - PM
-  DEVELOPER: 'DEVELOPER',             // 유지보수팀 - 개발자
-  SECURITY: 'SECURITY',               // 유지보수팀 - 보안담당자
-  DBA: 'DBA',                         // 유지보수팀 - DB담당자
-  NETWORK: 'NETWORK',                 // 유지보수팀 - 네트워크담당자
-  SERVER: 'SERVER',                   // 유지보수팀 - 서버담당자
-  CUSTOMER: 'CUSTOMER',               // 고객사 인원
-  EXTERNAL: 'EXTERNAL',               // 외부사용자
-  AUDITOR: 'AUDITOR'                  // 감사자
+  SUPER_ADMIN: 'ROLE_SUPER_ADMIN',     // 슈퍼관리자
+  ITSM_ADMIN: 'ROLE_ITSM_ADMIN',       // ITSM관리자
+  PM: 'ROLE_PM',                       // 유지보수팀 - PM
+  DEVELOPER: 'ROLE_DEVELOPER',         // 유지보수팀 - 개발자
+  SECURITY: 'ROLE_SECURITY',           // 유지보수팀 - 보안담당자
+  DBA: 'ROLE_DBA',                     // 유지보수팀 - DB담당자
+  NETWORK: 'ROLE_NETWORK',             // 유지보수팀 - 네트워크담당자
+  SERVER: 'ROLE_SERVER',               // 유지보수팀 - 서버담당자
+  CUSTOMER: 'ROLE_CUSTOMER',           // 고객사 인원
+  EXTERNAL: 'ROLE_EXTERNAL',           // 외부사용자
+  AUDITOR: 'ROLE_AUDITOR'              // 감사자
 }
 
 export const ROLE_LABEL = {
