@@ -60,66 +60,45 @@ INSERT INTO tb_menu (menu_id, parent_menu_id, menu_nm, menu_url, icon, sort_orde
 
 -- 2레벨 메뉴: 장애관리
 INSERT INTO tb_menu (menu_id, parent_menu_id, menu_nm, menu_url, icon, sort_order, is_visible, status, created_at, created_by) VALUES
-(11, 2, '장애 목록',     '/incident/list',    NULL, 1, 'Y', 'ACTIVE', NOW(), 1),
-(12, 2, '장애 등록',     '/incident/create',  NULL, 2, 'Y', 'ACTIVE', NOW(), 1),
-(13, 2, '장애보고서',    '/incident/report',  NULL, 3, 'Y', 'ACTIVE', NOW(), 1);
+(11, 2, '장애 목록',     '/incidents',        NULL, 1, 'Y', 'ACTIVE', NOW(), 1),
+(12, 2, '장애 등록',     '/incidents/new',    NULL, 2, 'Y', 'ACTIVE', NOW(), 1);
 
 -- 2레벨 메뉴: 서비스요청
 INSERT INTO tb_menu (menu_id, parent_menu_id, menu_nm, menu_url, icon, sort_order, is_visible, status, created_at, created_by) VALUES
-(14, 3, '요청 목록',     '/service-request/list',   NULL, 1, 'Y', 'ACTIVE', NOW(), 1),
-(15, 3, '요청 등록',     '/service-request/create',  NULL, 2, 'Y', 'ACTIVE', NOW(), 1);
+(14, 3, '요청 목록',     '/service-requests',       NULL, 1, 'Y', 'ACTIVE', NOW(), 1),
+(15, 3, '요청 등록',     '/service-requests/new',   NULL, 2, 'Y', 'ACTIVE', NOW(), 1);
 
 -- 2레벨 메뉴: 변경관리
 INSERT INTO tb_menu (menu_id, parent_menu_id, menu_nm, menu_url, icon, sort_order, is_visible, status, created_at, created_by) VALUES
-(16, 4, '변경 목록',     '/change/list',    NULL, 1, 'Y', 'ACTIVE', NOW(), 1),
-(17, 4, '변경 등록',     '/change/create',  NULL, 2, 'Y', 'ACTIVE', NOW(), 1);
+(16, 4, '변경 목록',     '/changes',        NULL, 1, 'Y', 'ACTIVE', NOW(), 1),
+(17, 4, '변경 등록',     '/changes/new',    NULL, 2, 'Y', 'ACTIVE', NOW(), 1);
 
 -- 2레벨 메뉴: 자산관리 (CMDB)
 INSERT INTO tb_menu (menu_id, parent_menu_id, menu_nm, menu_url, icon, sort_order, is_visible, status, created_at, created_by) VALUES
-(18, 5, 'HW 자산 목록',   '/asset/hw/list',      NULL, 1, 'Y', 'ACTIVE', NOW(), 1),
-(19, 5, 'SW 자산 목록',   '/asset/sw/list',      NULL, 2, 'Y', 'ACTIVE', NOW(), 1),
-(20, 5, 'HW-SW 연관관계', '/asset/relation',     NULL, 3, 'Y', 'ACTIVE', NOW(), 1);
+(18, 5, 'HW 자산 목록',   '/assets/hw',          NULL, 1, 'Y', 'ACTIVE', NOW(), 1),
+(19, 5, 'SW 자산 목록',   '/assets/sw',          NULL, 2, 'Y', 'ACTIVE', NOW(), 1);
 
 -- 2레벨 메뉴: 정기점검관리
 INSERT INTO tb_menu (menu_id, parent_menu_id, menu_nm, menu_url, icon, sort_order, is_visible, status, created_at, created_by) VALUES
-(21, 6, '점검 일정',       '/inspection/schedule',  NULL, 1, 'Y', 'ACTIVE', NOW(), 1),
-(22, 6, '점검 체크리스트', '/inspection/checklist', NULL, 2, 'Y', 'ACTIVE', NOW(), 1);
+(21, 6, '점검 목록',       '/inspections',          NULL, 1, 'Y', 'ACTIVE', NOW(), 1),
+(22, 6, '점검 등록',       '/inspections/new',      NULL, 2, 'Y', 'ACTIVE', NOW(), 1);
 
 -- 2레벨 메뉴: 보고관리
 INSERT INTO tb_menu (menu_id, parent_menu_id, menu_nm, menu_url, icon, sort_order, is_visible, status, created_at, created_by) VALUES
-(23, 7, '보고서 목록',         '/report/list',      NULL, 1, 'Y', 'ACTIVE', NOW(), 1),
-(24, 7, '보고서 출력 / PDF',   '/report/export',    NULL, 2, 'Y', 'ACTIVE', NOW(), 1);
+(23, 7, '보고서 목록',         '/reports',          NULL, 1, 'Y', 'ACTIVE', NOW(), 1);
 
 -- 2레벨 메뉴: 설정관리
 INSERT INTO tb_menu (menu_id, parent_menu_id, menu_nm, menu_url, icon, sort_order, is_visible, status, created_at, created_by) VALUES
-(25, 9, '메뉴 / 권한 관리',     '/settings/menu-role',       NULL, 1, 'Y', 'ACTIVE', NOW(), 1),
-(26, 9, '보고서 양식 관리',     '/settings/report-form',     NULL, 2, 'Y', 'ACTIVE', NOW(), 1),
-(27, 9, '공통코드 관리',        '/settings/common-code',     NULL, 3, 'Y', 'ACTIVE', NOW(), 1),
-(28, 9, '알림 / 정책 관리',     NULL,                        NULL, 4, 'Y', 'ACTIVE', NOW(), 1),
-(29, 9, '시스템 설정',          NULL,                        NULL, 5, 'Y', 'ACTIVE', NOW(), 1),
-(30, 9, '게시판 관리',          '/settings/board',           NULL, 6, 'Y', 'ACTIVE', NOW(), 1),
-(31, 9, '조직 관리',            NULL,                        NULL, 7, 'Y', 'ACTIVE', NOW(), 1);
-
--- 3레벨 메뉴: 알림 / 정책 관리
-INSERT INTO tb_menu (menu_id, parent_menu_id, menu_nm, menu_url, icon, sort_order, is_visible, status, created_at, created_by) VALUES
-(32, 28, 'SLA 기준값',         '/settings/sla',             NULL, 1, 'Y', 'ACTIVE', NOW(), 1),
-(33, 28, '알림 발송 조건',     '/settings/notification',    NULL, 2, 'Y', 'ACTIVE', NOW(), 1),
-(34, 28, '알림 수신 대상',     '/settings/noti-target',     NULL, 3, 'Y', 'ACTIVE', NOW(), 1);
-
--- 3레벨 메뉴: 시스템 설정
-INSERT INTO tb_menu (menu_id, parent_menu_id, menu_nm, menu_url, icon, sort_order, is_visible, status, created_at, created_by) VALUES
-(35, 29, '공지사항 관리',      '/settings/notice',          NULL, 1, 'Y', 'ACTIVE', NOW(), 1),
-(36, 29, '시스템 점검 공지',   '/settings/maintenance',     NULL, 2, 'Y', 'ACTIVE', NOW(), 1);
-
--- 3레벨 메뉴: 조직 관리
-INSERT INTO tb_menu (menu_id, parent_menu_id, menu_nm, menu_url, icon, sort_order, is_visible, status, created_at, created_by) VALUES
-(37, 31, '회사 관리',          '/settings/company',         NULL, 1, 'Y', 'ACTIVE', NOW(), 1),
-(38, 31, '부서 관리',          '/settings/department',      NULL, 2, 'Y', 'ACTIVE', NOW(), 1);
+(25, 9, '메뉴 관리',            '/admin/menus',                  NULL, 1, 'Y', 'ACTIVE', NOW(), 1),
+(27, 9, '공통코드 관리',        '/admin/common-codes',           NULL, 2, 'Y', 'ACTIVE', NOW(), 1),
+(30, 9, '게시판 관리',          '/admin/boards',                 NULL, 3, 'Y', 'ACTIVE', NOW(), 1),
+(32, 9, 'SLA 관리',             '/admin/sla',                    NULL, 4, 'Y', 'ACTIVE', NOW(), 1),
+(33, 9, '알림 정책 관리',       '/admin/notification-policy',    NULL, 5, 'Y', 'ACTIVE', NOW(), 1);
 
 -- 2레벨 메뉴: 계정관리
 INSERT INTO tb_menu (menu_id, parent_menu_id, menu_nm, menu_url, icon, sort_order, is_visible, status, created_at, created_by) VALUES
-(39, 10, '사용자 목록',        '/account/user/list',        NULL, 1, 'Y', 'ACTIVE', NOW(), 1),
-(40, 10, '역할 관리',          '/account/role',             NULL, 2, 'Y', 'ACTIVE', NOW(), 1);
+(39, 10, '사용자 관리',        '/admin/accounts',           NULL, 1, 'Y', 'ACTIVE', NOW(), 1),
+(40, 10, '조직 관리',          '/admin/organizations',      NULL, 2, 'Y', 'ACTIVE', NOW(), 1);
 
 -- ============================================================
 -- 5. 역할-메뉴 매핑 (RBAC)
