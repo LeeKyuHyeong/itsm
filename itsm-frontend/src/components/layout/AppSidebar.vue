@@ -131,7 +131,7 @@ onMounted(async () => {
     // Auto-open parent menus for current route
     autoExpandCurrentRoute()
   } catch (error) {
-    console.error('메뉴 로드 실패:', error)
+    console.error('Menu load failed:', error)
   }
 })
 
