@@ -574,7 +574,7 @@ async function removeRoleFromUser(role) {
 }
 
 .data-table th {
-  background-color: #f8f9fa;
+  background-color: var(--color-table-header);
   padding: 10px 12px;
   font-size: var(--font-size-sm);
   font-weight: 600;
@@ -587,16 +587,16 @@ async function removeRoleFromUser(role) {
 .data-table td {
   padding: 10px 12px;
   font-size: var(--font-size-sm);
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--color-border-light);
   color: var(--color-text);
 }
 
 .data-table tbody tr:nth-child(even) {
-  background-color: #fafbfc;
+  background-color: var(--color-table-row-even);
 }
 
 .data-table tbody tr:hover {
-  background-color: #f0f5ff;
+  background-color: var(--color-table-row-hover);
 }
 
 /* Status Badge */
@@ -609,27 +609,27 @@ async function removeRoleFromUser(role) {
 }
 
 .status-active {
-  background-color: #e6f4ea;
+  background-color: var(--color-badge-green-bg);
   color: var(--color-success);
 }
 
 .status-inactive {
-  background-color: #f1f3f4;
+  background-color: var(--color-badge-gray-bg);
   color: var(--color-text-secondary);
 }
 
 .status-locked {
-  background-color: #fce8e6;
+  background-color: var(--color-badge-red-bg);
   color: var(--color-danger);
 }
 
 .status-resigned {
-  background-color: #fef7e0;
-  color: #b45309;
+  background-color: var(--color-badge-orange-bg);
+  color: var(--color-badge-orange);
 }
 
 .status-deleted {
-  background-color: #f1f3f4;
+  background-color: var(--color-badge-gray-bg);
   color: var(--color-text-disabled);
 }
 
@@ -643,7 +643,7 @@ async function removeRoleFromUser(role) {
 .role-tag {
   display: inline-block;
   padding: 1px 6px;
-  background-color: #e8f0fe;
+  background-color: var(--color-primary-bg);
   color: var(--color-primary);
   border-radius: 4px;
   font-size: var(--font-size-xs);
@@ -677,7 +677,7 @@ async function removeRoleFromUser(role) {
 
 .btn-primary {
   background-color: var(--color-primary);
-  color: white;
+  color: var(--color-text-inverse);
 }
 
 .btn-primary:hover {
@@ -691,7 +691,7 @@ async function removeRoleFromUser(role) {
 
 .btn-danger {
   background-color: var(--color-danger);
-  color: white;
+  color: var(--color-text-inverse);
   border-color: var(--color-danger);
 }
 
@@ -700,7 +700,7 @@ async function removeRoleFromUser(role) {
 }
 
 .btn-default {
-  background-color: white;
+  background-color: var(--color-bg-white);
   color: var(--color-text);
   border-color: var(--color-border);
 }
@@ -734,7 +734,7 @@ async function removeRoleFromUser(role) {
 
 .page-btn.active {
   background-color: var(--color-primary);
-  color: white;
+  color: var(--color-text-inverse);
   border-color: var(--color-primary);
 }
 
@@ -750,7 +750,7 @@ async function removeRoleFromUser(role) {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: var(--color-overlay);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -835,8 +835,8 @@ async function removeRoleFromUser(role) {
 
 .error-message {
   padding: 8px 12px;
-  background-color: #fef2f2;
-  border: 1px solid #fecaca;
+  background-color: var(--color-notice-error-bg);
+  border: 1px solid var(--color-notice-error-border);
   border-radius: var(--radius-sm);
   color: var(--color-danger);
   font-size: var(--font-size-sm);

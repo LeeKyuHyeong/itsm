@@ -174,15 +174,15 @@ onMounted(async () => {
   display: inline-block; padding: 2px 8px; border-radius: 10px;
   font-size: var(--font-size-xs); font-weight: 600;
 }
-.priority-CRITICAL { background: #fee2e2; color: #dc2626; }
-.priority-HIGH { background: #fff7ed; color: #ea580c; }
-.priority-MEDIUM { background: #fefce8; color: #ca8a04; }
-.priority-LOW { background: #f0fdf4; color: #16a34a; }
+.priority-CRITICAL { background: var(--color-priority-critical-bg); color: var(--color-priority-critical); }
+.priority-HIGH { background: var(--color-priority-high-bg); color: var(--color-priority-high); }
+.priority-MEDIUM { background: var(--color-priority-medium-bg); color: var(--color-priority-medium); }
+.priority-LOW { background: var(--color-priority-low-bg); color: var(--color-priority-low); }
 .btn {
   padding: 6px 16px; border: none; border-radius: 4px;
   cursor: pointer; font-size: var(--font-size-sm);
 }
-.btn-primary { background: var(--color-primary); color: #fff; }
+.btn-primary { background: var(--color-primary); color: var(--color-text-inverse); }
 .btn-sm {
   padding: 6px 12px; background: var(--color-bg-secondary);
   border: 1px solid var(--color-border);

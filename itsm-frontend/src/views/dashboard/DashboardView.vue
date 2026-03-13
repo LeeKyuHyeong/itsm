@@ -264,7 +264,7 @@ onMounted(() => {
   margin-bottom: var(--spacing-lg);
 }
 .summary-card {
-  background: #fff;
+  background: var(--color-bg-white);
   border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: var(--spacing-lg);
@@ -275,7 +275,7 @@ onMounted(() => {
   transition: box-shadow 0.2s, transform 0.2s;
 }
 .summary-card:hover {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: var(--shadow-hover);
   transform: translateY(-2px);
 }
 .summary-icon {
@@ -294,10 +294,10 @@ onMounted(() => {
   font-size: var(--font-size-sm);
   color: var(--color-text-muted);
 }
-.summary-incident { border-left: 4px solid #dc2626; }
-.summary-sr { border-left: 4px solid #2563eb; }
-.summary-change { border-left: 4px solid #7c3aed; }
-.summary-inspection { border-left: 4px solid #059669; }
+.summary-incident { border-left: 4px solid var(--color-dashboard-incident); }
+.summary-sr { border-left: 4px solid var(--color-dashboard-sr); }
+.summary-change { border-left: 4px solid var(--color-dashboard-change); }
+.summary-inspection { border-left: 4px solid var(--color-dashboard-inspection); }
 
 /* Stats grid */
 .stats-grid {
@@ -316,7 +316,7 @@ onMounted(() => {
 }
 
 .stat-card {
-  background: #fff;
+  background: var(--color-bg-white);
   border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: var(--spacing-lg);
@@ -355,10 +355,10 @@ onMounted(() => {
   font-weight: 700;
 }
 .sla-item.danger .sla-number {
-  color: #dc2626;
+  color: var(--color-dashboard-incident);
 }
 .sla-item.warning .sla-number {
-  color: #ea580c;
+  color: var(--color-dashboard-change);
 }
 .sla-label {
   font-size: var(--font-size-xs);
@@ -375,19 +375,19 @@ onMounted(() => {
   text-align: center;
   padding: var(--spacing-sm) var(--spacing-md);
   border-radius: 8px;
-  background: #f8fafc;
+  background: var(--color-stats-row-bg);
 }
 .monitoring-item.alert {
-  background: #fef2f2;
+  background: var(--color-notice-error-bg);
 }
 .monitoring-number {
   display: block;
   font-size: 28px;
   font-weight: 700;
-  color: #16a34a;
+  color: var(--color-dashboard-inspection);
 }
 .monitoring-item.alert .monitoring-number {
-  color: #dc2626;
+  color: var(--color-dashboard-incident);
 }
 .monitoring-label {
   font-size: var(--font-size-xs);
@@ -402,14 +402,14 @@ onMounted(() => {
   font-size: var(--font-size-xs);
   font-weight: 600;
 }
-.priority-CRITICAL { background: #fee2e2; color: #dc2626; }
-.priority-HIGH { background: #fff7ed; color: #ea580c; }
-.priority-MEDIUM { background: #fefce8; color: #ca8a04; }
-.priority-LOW { background: #f0fdf4; color: #16a34a; }
+.priority-CRITICAL { background: var(--color-priority-critical-bg); color: var(--color-priority-critical); }
+.priority-HIGH { background: var(--color-priority-high-bg); color: var(--color-priority-high); }
+.priority-MEDIUM { background: var(--color-priority-medium-bg); color: var(--color-priority-medium); }
+.priority-LOW { background: var(--color-priority-low-bg); color: var(--color-priority-low); }
 
 /* Priority card */
 .priority-card {
-  background: #fff;
+  background: var(--color-bg-white);
   border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: var(--spacing-lg);
@@ -422,7 +422,7 @@ onMounted(() => {
 
 /* Trend table */
 .trend-card {
-  background: #fff;
+  background: var(--color-bg-white);
   border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: var(--spacing-lg);
@@ -458,13 +458,13 @@ onMounted(() => {
   min-width: 2px;
   transition: width 0.3s;
 }
-.bar-incident { background: #dc2626; }
-.bar-sr { background: #2563eb; }
-.bar-change { background: #7c3aed; }
+.bar-incident { background: var(--color-dashboard-chart-bar-incident); }
+.bar-sr { background: var(--color-dashboard-sr); }
+.bar-change { background: var(--color-dashboard-change); }
 
 /* Recent card */
 .recent-card {
-  background: #fff;
+  background: var(--color-bg-white);
   border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: var(--spacing-lg);

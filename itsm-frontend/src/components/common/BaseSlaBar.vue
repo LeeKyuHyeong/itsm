@@ -50,7 +50,7 @@ const barColorClass = computed(() => {
 .sla-track {
   flex: 1;
   height: 8px;
-  background-color: #f1f3f4;
+  background-color: var(--color-badge-gray-bg);
   border-radius: 4px;
   overflow: hidden;
 }
@@ -75,12 +75,12 @@ const barColorClass = computed(() => {
 
 .sla-yellow {
   background-color: var(--color-warning);
-  color: #b8860b;
+  color: var(--color-sla-warning);
 }
 
 .sla-orange {
-  background-color: #e8710a;
-  color: #e8710a;
+  background-color: var(--color-sla-danger);
+  color: var(--color-sla-danger);
 }
 
 .sla-red {

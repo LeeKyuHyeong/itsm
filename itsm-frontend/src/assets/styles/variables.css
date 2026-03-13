@@ -3,6 +3,8 @@
   --color-primary: #1a73e8;
   --color-primary-light: #4a90d9;
   --color-primary-dark: #1557b0;
+  --color-primary-bg: #e8f0fe;
+  --color-primary-focus: rgba(26, 115, 232, 0.1);
 
   /* Status */
   --color-success: #34a853;
@@ -10,13 +12,93 @@
   --color-danger: #ea4335;
   --color-info: #4285f4;
 
-  /* Neutral */
+  /* Neutral / Surface */
   --color-bg: #f5f6fa;
   --color-bg-white: #ffffff;
+  --color-bg-elevated: #ffffff;
   --color-border: #dadce0;
+  --color-border-light: #f0f0f0;
   --color-text: #202124;
   --color-text-secondary: #5f6368;
   --color-text-disabled: #9aa0a6;
+  --color-text-inverse: #ffffff;
+
+  /* Table */
+  --color-table-header: #f8f9fa;
+  --color-table-row-even: #fafbfc;
+  --color-table-row-hover: #f0f5ff;
+
+  /* Overlay / Modal */
+  --color-overlay: rgba(0, 0, 0, 0.5);
+
+  /* Priority */
+  --color-priority-critical-bg: #fee2e2;
+  --color-priority-critical: #dc2626;
+  --color-priority-high-bg: #fff7ed;
+  --color-priority-high: #ea580c;
+  --color-priority-medium-bg: #fefce8;
+  --color-priority-medium: #ca8a04;
+  --color-priority-low-bg: #f0fdf4;
+  --color-priority-low: #16a34a;
+
+  /* Badge / Status */
+  --color-badge-green-bg: #e6f4ea;
+  --color-badge-green: #1e7e34;
+  --color-badge-gray-bg: #f1f3f4;
+  --color-badge-red-bg: #fce8e6;
+  --color-badge-blue-bg: #e8f0fe;
+  --color-badge-yellow-bg: #fef3cd;
+  --color-badge-yellow: #856404;
+  --color-badge-pink-bg: #f8d7da;
+  --color-badge-pink: #721c24;
+  --color-badge-orange: #b45309;
+  --color-badge-orange-bg: #fef7e0;
+
+  /* Buttons */
+  --color-btn-success: #16a34a;
+  --color-btn-success-bg: #dcfce7;
+  --color-btn-danger: #dc2626;
+  --color-btn-danger-bg: #fee2e2;
+  --color-btn-danger-border: #fca5a5;
+  --color-btn-default-hover: #f1f3f4;
+
+  /* Notice / Alert */
+  --color-notice-error-bg: #fef2f2;
+  --color-notice-error-border: #fecaca;
+  --color-notice-success-bg: #f0fdf4;
+  --color-notice-success-border: #bbf7d0;
+
+  /* Sidebar */
+  --color-sidebar-bg: #1e293b;
+  --color-sidebar-text: #cbd5e1;
+  --color-sidebar-text-muted: #94a3b8;
+  --color-sidebar-border: #334155;
+  --color-sidebar-hover: #334155;
+  --color-sidebar-submenu-bg: #162032;
+  --color-sidebar-submenu-deep-bg: #0f172a;
+  --color-sidebar-active-bg: rgba(26, 115, 232, 0.1);
+
+  /* Form */
+  --color-form-bg: #ffffff;
+  --color-form-border: #dadce0;
+
+  /* SLA */
+  --color-sla-warning: #b8860b;
+  --color-sla-danger: #e8710a;
+  --color-scrollbar-thumb: #475569;
+
+  /* Misc */
+  --color-star: #f59e0b;
+  --color-spinner-border: rgba(255, 255, 255, 0.3);
+  --color-logout-hover: #fef2f2;
+  --color-stats-row-bg: #f8fafc;
+
+  /* Dashboard */
+  --color-dashboard-incident: #dc2626;
+  --color-dashboard-sr: #1a73e8;
+  --color-dashboard-change: #ea580c;
+  --color-dashboard-inspection: #16a34a;
+  --color-dashboard-chart-bar-incident: #dc2626;
 
   /* Layout */
   --sidebar-width: 240px;
@@ -46,4 +128,115 @@
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1);
   --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.12);
   --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.15);
+  --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* ========== Dark Theme ========== */
+[data-theme="dark"] {
+  /* Primary */
+  --color-primary: #5b9bf5;
+  --color-primary-light: #7db4f7;
+  --color-primary-dark: #3d7ce8;
+  --color-primary-bg: #1e3a5f;
+  --color-primary-focus: rgba(91, 155, 245, 0.2);
+
+  /* Status */
+  --color-success: #4ade80;
+  --color-warning: #fbbf24;
+  --color-danger: #f87171;
+  --color-info: #60a5fa;
+
+  /* Neutral / Surface */
+  --color-bg: #0f172a;
+  --color-bg-white: #1e293b;
+  --color-bg-elevated: #1e293b;
+  --color-border: #334155;
+  --color-border-light: #1e293b;
+  --color-text: #e2e8f0;
+  --color-text-secondary: #94a3b8;
+  --color-text-disabled: #64748b;
+  --color-text-inverse: #ffffff;
+
+  /* Table */
+  --color-table-header: #1e293b;
+  --color-table-row-even: #162032;
+  --color-table-row-hover: #1e3a5f;
+
+  /* Overlay / Modal */
+  --color-overlay: rgba(0, 0, 0, 0.7);
+
+  /* Priority */
+  --color-priority-critical-bg: #450a0a;
+  --color-priority-critical: #fca5a5;
+  --color-priority-high-bg: #431407;
+  --color-priority-high: #fdba74;
+  --color-priority-medium-bg: #422006;
+  --color-priority-medium: #fde68a;
+  --color-priority-low-bg: #052e16;
+  --color-priority-low: #86efac;
+
+  /* Badge / Status */
+  --color-badge-green-bg: #052e16;
+  --color-badge-green: #4ade80;
+  --color-badge-gray-bg: #334155;
+  --color-badge-red-bg: #450a0a;
+  --color-badge-blue-bg: #1e3a5f;
+  --color-badge-yellow-bg: #422006;
+  --color-badge-yellow: #fde68a;
+  --color-badge-pink-bg: #450a0a;
+  --color-badge-pink: #fca5a5;
+  --color-badge-orange: #fdba74;
+  --color-badge-orange-bg: #431407;
+
+  /* Buttons */
+  --color-btn-success: #4ade80;
+  --color-btn-success-bg: #052e16;
+  --color-btn-danger: #fca5a5;
+  --color-btn-danger-bg: #450a0a;
+  --color-btn-danger-border: #7f1d1d;
+  --color-btn-default-hover: #334155;
+
+  /* Notice / Alert */
+  --color-notice-error-bg: #450a0a;
+  --color-notice-error-border: #7f1d1d;
+  --color-notice-success-bg: #052e16;
+  --color-notice-success-border: #166534;
+
+  /* Sidebar */
+  --color-sidebar-bg: #0f172a;
+  --color-sidebar-text: #cbd5e1;
+  --color-sidebar-text-muted: #94a3b8;
+  --color-sidebar-border: #1e293b;
+  --color-sidebar-hover: #1e293b;
+  --color-sidebar-submenu-bg: #0b1120;
+  --color-sidebar-submenu-deep-bg: #060d1b;
+  --color-sidebar-active-bg: rgba(91, 155, 245, 0.15);
+
+  /* Form */
+  --color-form-bg: #1e293b;
+  --color-form-border: #334155;
+
+  /* Misc */
+  --color-star: #fbbf24;
+  --color-spinner-border: rgba(255, 255, 255, 0.3);
+  --color-logout-hover: #450a0a;
+  --color-stats-row-bg: #162032;
+
+  /* Dashboard */
+  --color-dashboard-incident: #f87171;
+  --color-dashboard-sr: #60a5fa;
+  --color-dashboard-change: #fdba74;
+  --color-dashboard-inspection: #4ade80;
+  --color-dashboard-chart-bar-incident: #f87171;
+
+  /* SLA */
+  --color-sla-warning: #fde68a;
+  --color-sla-danger: #fdba74;
+  --color-scrollbar-thumb: #475569;
+
+  /* Shadow */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.5);
+  --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.3);
 }

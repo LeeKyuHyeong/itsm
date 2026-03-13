@@ -75,7 +75,7 @@ onMounted(async () => {
 .header-actions { display: flex; gap: var(--spacing-xs); }
 .detail-grid { display: flex; flex-direction: column; gap: var(--spacing-lg); }
 .detail-section {
-  background: #fff; border: 1px solid var(--color-border);
+  background: var(--color-bg-white); border: 1px solid var(--color-border);
   border-radius: 8px; padding: var(--spacing-md);
 }
 .detail-section h3 { margin: 0 0 var(--spacing-sm); font-size: var(--font-size-md); }

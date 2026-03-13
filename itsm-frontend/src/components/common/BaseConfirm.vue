@@ -83,7 +83,7 @@ const confirmButtonClass = computed(() => {
 }
 
 .btn-default {
-  background-color: white;
+  background-color: var(--color-bg-white);
   color: var(--color-text);
   border-color: var(--color-border);
 }
@@ -94,7 +94,7 @@ const confirmButtonClass = computed(() => {
 
 .btn-primary {
   background-color: var(--color-primary);
-  color: white;
+  color: var(--color-text-inverse);
 }
 
 .btn-primary:hover {
@@ -103,7 +103,7 @@ const confirmButtonClass = computed(() => {
 
 .btn-danger {
   background-color: var(--color-danger);
-  color: white;
+  color: var(--color-text-inverse);
 }
 
 .btn-danger:hover {

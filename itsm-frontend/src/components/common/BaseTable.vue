@@ -95,7 +95,7 @@ function cellStyle(col) {
 }
 
 .data-table th {
-  background-color: #f8f9fa;
+  background-color: var(--color-table-header);
   padding: 8px 12px;
   font-size: var(--font-size-sm);
   font-weight: 600;
@@ -108,16 +108,16 @@ function cellStyle(col) {
 .data-table td {
   padding: 8px 12px;
   font-size: var(--font-size-sm);
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--color-border-light);
   color: var(--color-text);
 }
 
 .data-table tbody tr:nth-child(even) {
-  background-color: #fafbfc;
+  background-color: var(--color-table-row-even);
 }
 
 .data-table tbody tr:hover {
-  background-color: #f0f5ff;
+  background-color: var(--color-table-row-hover);
 }
 
 .clickable-row {

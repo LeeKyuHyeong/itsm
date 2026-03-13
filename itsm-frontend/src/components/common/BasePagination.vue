@@ -122,7 +122,7 @@ const visiblePages = computed(() => {
 .pagination-btn.active {
   background-color: var(--color-primary);
   border-color: var(--color-primary);
-  color: white;
+  color: var(--color-text-inverse);
   font-weight: 600;
 }
 

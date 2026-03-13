@@ -71,22 +71,22 @@ const badgeClass = computed(() => {
 }
 
 .badge-green {
-  background-color: #e6f4ea;
+  background-color: var(--color-badge-green-bg);
   color: var(--color-success);
 }
 
 .badge-gray {
-  background-color: #f1f3f4;
+  background-color: var(--color-badge-gray-bg);
   color: var(--color-text-secondary);
 }
 
 .badge-red {
-  background-color: #fce8e6;
+  background-color: var(--color-badge-red-bg);
   color: var(--color-danger);
 }
 
 .badge-blue {
-  background-color: #e8f0fe;
+  background-color: var(--color-badge-blue-bg);
   color: var(--color-info);
 }
 </style>

@@ -361,7 +361,7 @@ onMounted(async () => {
 }
 .status-buttons { display: flex; gap: var(--spacing-sm); }
 .detail-card {
-  background: #fff; border: 1px solid var(--color-border);
+  background: var(--color-bg-white); border: 1px solid var(--color-border);
   border-radius: 8px; padding: var(--spacing-lg); margin-bottom: var(--spacing-md);
 }
 .detail-card h3 { margin: 0 0 var(--spacing-md) 0; font-size: var(--font-size-lg); }
@@ -384,10 +384,10 @@ onMounted(async () => {
   display: inline-block; padding: 2px 8px; border-radius: 10px;
   font-size: var(--font-size-xs); font-weight: 600;
 }
-.priority-CRITICAL { background: #fee2e2; color: #dc2626; }
-.priority-HIGH { background: #fff7ed; color: #ea580c; }
-.priority-MEDIUM { background: #fefce8; color: #ca8a04; }
-.priority-LOW { background: #f0fdf4; color: #16a34a; }
+.priority-CRITICAL { background: var(--color-priority-critical-bg); color: var(--color-priority-critical); }
+.priority-HIGH { background: var(--color-priority-high-bg); color: var(--color-priority-high); }
+.priority-MEDIUM { background: var(--color-priority-medium-bg); color: var(--color-priority-medium); }
+.priority-LOW { background: var(--color-priority-low-bg); color: var(--color-priority-low); }
 .approver-list { display: flex; flex-direction: column; gap: var(--spacing-xs); }
 .approver-item {
   display: flex; align-items: center; gap: var(--spacing-md);
@@ -402,9 +402,9 @@ onMounted(async () => {
   padding: 2px 8px; border-radius: 10px;
   font-size: var(--font-size-xs); font-weight: 600;
 }
-.status-PENDING { background: #f3f4f6; color: #6b7280; }
-.status-APPROVED { background: #dcfce7; color: #16a34a; }
-.status-REJECTED { background: #fee2e2; color: #dc2626; }
+.status-PENDING { background: var(--color-badge-gray-bg); color: var(--color-text-secondary); }
+.status-APPROVED { background: var(--color-btn-success-bg); color: var(--color-btn-success); }
+.status-REJECTED { background: var(--color-priority-critical-bg); color: var(--color-priority-critical); }
 .approver-date {
   color: var(--color-text-muted); font-size: var(--font-size-xs);
 }
@@ -446,8 +446,8 @@ onMounted(async () => {
 .timeline-change {
   font-size: var(--font-size-sm); display: flex; gap: var(--spacing-xs); align-items: center;
 }
-.timeline-change .before { color: #dc2626; text-decoration: line-through; }
-.timeline-change .after { color: #16a34a; font-weight: 600; }
+.timeline-change .before { color: var(--color-priority-critical); text-decoration: line-through; }
+.timeline-change .after { color: var(--color-priority-low); font-weight: 600; }
 .timeline-change .arrow { color: var(--color-text-muted); }
 .timeline-date { font-size: var(--font-size-xs); color: var(--color-text-muted); margin-top: 2px; }
 .empty-state {
@@ -467,14 +467,14 @@ onMounted(async () => {
   padding: 6px 16px; border: none; border-radius: 4px;
   cursor: pointer; font-size: var(--font-size-sm);
 }
-.btn-primary { background: var(--color-primary); color: #fff; }
+.btn-primary { background: var(--color-primary); color: var(--color-text-inverse); }
 .btn-secondary { background: var(--color-bg-secondary); border: 1px solid var(--color-border); }
-.btn-success { background: #16a34a; color: #fff; }
-.btn-danger { background: #dc2626; color: #fff; }
+.btn-success { background: var(--color-btn-success); color: var(--color-text-inverse); }
+.btn-danger { background: var(--color-btn-danger); color: var(--color-text-inverse); }
 .btn-sm { padding: 4px 12px; font-size: var(--font-size-xs); }
 .btn-link {
   background: none; border: none; color: var(--color-primary);
   cursor: pointer; font-size: var(--font-size-xs); padding: 0;
 }
-.btn-link.danger { color: #dc2626; }
+.btn-link.danger { color: var(--color-btn-danger); }
 </style>

@@ -212,8 +212,8 @@ function getMenuIcon(icon) {
 .app-sidebar {
   width: var(--sidebar-width);
   height: 100vh;
-  background-color: #1e293b;
-  color: #cbd5e1;
+  background-color: var(--color-sidebar-bg);
+  color: var(--color-sidebar-text);
   display: flex;
   flex-direction: column;
   position: fixed;
@@ -235,7 +235,7 @@ function getMenuIcon(icon) {
   gap: var(--spacing-sm);
   padding: var(--spacing-md);
   height: var(--header-height);
-  border-bottom: 1px solid #334155;
+  border-bottom: 1px solid var(--color-sidebar-border);
   flex-shrink: 0;
 }
 
@@ -246,7 +246,7 @@ function getMenuIcon(icon) {
   width: 32px;
   height: 32px;
   background: var(--color-primary);
-  color: white;
+  color: var(--color-text-inverse);
   border-radius: var(--radius-sm);
   font-weight: 700;
   font-size: var(--font-size-lg);
@@ -256,7 +256,7 @@ function getMenuIcon(icon) {
 .brand-text {
   font-size: var(--font-size-lg);
   font-weight: 700;
-  color: white;
+  color: var(--color-text-inverse);
   letter-spacing: 1px;
 }
 
@@ -276,7 +276,7 @@ function getMenuIcon(icon) {
   align-items: center;
   gap: var(--spacing-sm);
   padding: 10px var(--spacing-md);
-  color: #94a3b8;
+  color: var(--color-sidebar-text-muted);
   cursor: pointer;
   transition: all 0.2s;
   user-select: none;
@@ -284,12 +284,12 @@ function getMenuIcon(icon) {
 }
 
 .menu-link:hover {
-  color: white;
-  background-color: #334155;
+  color: var(--color-text-inverse);
+  background-color: var(--color-sidebar-hover);
 }
 
 .menu-link.active {
-  color: white;
+  color: var(--color-text-inverse);
   background-color: var(--color-primary);
 }
 
@@ -324,11 +324,11 @@ function getMenuIcon(icon) {
   list-style: none;
   padding: 0;
   margin: 0;
-  background-color: #162032;
+  background-color: var(--color-sidebar-submenu-bg);
 }
 
 .submenu-list.depth-3 {
-  background-color: #0f172a;
+  background-color: var(--color-sidebar-submenu-deep-bg);
 }
 
 .submenu-link {
@@ -336,7 +336,7 @@ function getMenuIcon(icon) {
   align-items: center;
   gap: var(--spacing-sm);
   padding: 8px var(--spacing-md) 8px 48px;
-  color: #94a3b8;
+  color: var(--color-sidebar-text-muted);
   cursor: pointer;
   transition: all 0.2s;
   font-size: var(--font-size-sm);
@@ -349,13 +349,13 @@ function getMenuIcon(icon) {
 }
 
 .submenu-link:hover {
-  color: white;
-  background-color: #334155;
+  color: var(--color-text-inverse);
+  background-color: var(--color-sidebar-hover);
 }
 
 .submenu-link.active {
   color: var(--color-primary-light);
-  background-color: rgba(26, 115, 232, 0.1);
+  background-color: var(--color-sidebar-active-bg);
 }
 
 .submenu-link.has-children {
@@ -376,7 +376,7 @@ function getMenuIcon(icon) {
 }
 
 .app-sidebar::-webkit-scrollbar-thumb {
-  background-color: #475569;
+  background-color: var(--color-scrollbar-thumb);
   border-radius: 4px;
 }
 </style>

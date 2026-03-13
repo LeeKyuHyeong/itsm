@@ -149,7 +149,7 @@ function formatTimeAgo(dateStr) {
   height: 16px;
   padding: 0 4px;
   background-color: var(--color-danger);
-  color: white;
+  color: var(--color-text-inverse);
   font-size: 10px;
   font-weight: 600;
   border-radius: 8px;
@@ -215,7 +215,7 @@ function formatTimeAgo(dateStr) {
 
 .noti-item {
   padding: var(--spacing-sm) var(--spacing-md);
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--color-border-light);
   cursor: pointer;
   transition: background-color 0.15s;
 }
@@ -225,11 +225,11 @@ function formatTimeAgo(dateStr) {
 }
 
 .noti-item.unread {
-  background-color: #f0f5ff;
+  background-color: var(--color-table-row-hover);
 }
 
 .noti-item.unread:hover {
-  background-color: #e8f0fe;
+  background-color: var(--color-primary-bg);
 }
 
 .noti-title {

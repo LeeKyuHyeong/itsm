@@ -171,7 +171,7 @@ onMounted(async () => {
   font-size: var(--font-size-xl);
 }
 .form-card {
-  background: #fff;
+  background: var(--color-bg-white);
   border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: var(--spacing-lg);
@@ -187,7 +187,7 @@ onMounted(async () => {
 }
 .form-group label.required::after {
   content: ' *';
-  color: #dc2626;
+  color: var(--color-priority-critical);
 }
 .form-group input,
 .form-group select,
@@ -224,7 +224,7 @@ onMounted(async () => {
 }
 .btn-primary {
   background: var(--color-primary);
-  color: #fff;
+  color: var(--color-text-inverse);
 }
 .btn-primary:disabled {
   opacity: 0.6;

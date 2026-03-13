@@ -142,7 +142,7 @@ async function changeStatus(status) {
 .page-header-right { display: flex; gap: var(--spacing-sm); }
 .page-title { font-size: var(--font-size-xl); font-weight: 700; color: var(--color-text); }
 .loading-text { text-align: center; padding: var(--spacing-xl); color: var(--color-text-secondary); }
-.detail-card { background: var(--color-bg-white); border-radius: var(--radius-md); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.detail-card { background: var(--color-bg-white); border-radius: var(--radius-md); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); box-shadow: var(--shadow-sm); }
 .card-title { font-size: var(--font-size-lg); font-weight: 700; margin-bottom: var(--spacing-md); }
 .detail-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); }
 .detail-item { display: flex; flex-direction: column; gap: 2px; }
@@ -150,14 +150,14 @@ async function changeStatus(status) {
 .detail-label { font-size: var(--font-size-xs); color: var(--color-text-secondary); font-weight: 500; }
 .detail-value { font-size: var(--font-size-sm); color: var(--color-text); }
 .status-badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: var(--font-size-xs); font-weight: 600; }
-.status-active { background: #e6f4ea; color: #1e7e34; }
-.status-inactive { background: #fef3cd; color: #856404; }
-.status-disposed { background: #f8d7da; color: #721c24; }
+.status-active { background: var(--color-badge-green-bg); color: var(--color-badge-green); }
+.status-inactive { background: var(--color-badge-yellow-bg); color: var(--color-badge-yellow); }
+.status-disposed { background: var(--color-badge-pink-bg); color: var(--color-badge-pink); }
 .data-table { width: 100%; border-collapse: collapse; }
 .data-table th, .data-table td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--color-border); font-size: var(--font-size-sm); }
-.data-table th { background: #f8f9fa; font-weight: 600; color: var(--color-text-secondary); }
+.data-table th { background: var(--color-table-header); font-weight: 600; color: var(--color-text-secondary); }
 .text-center { text-align: center; }
 .btn { padding: 6px 16px; border: 1px solid var(--color-border); border-radius: var(--radius-sm); cursor: pointer; font-size: var(--font-size-sm); background: var(--color-bg-white); }
-.btn-danger { background: var(--color-danger); color: #fff; border-color: var(--color-danger); }
-.btn-default:hover { background: #f1f3f4; }
+.btn-danger { background: var(--color-danger); color: var(--color-text-inverse); border-color: var(--color-danger); }
+.btn-default:hover { background: var(--color-btn-default-hover); }
 </style>

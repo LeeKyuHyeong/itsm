@@ -198,7 +198,7 @@ onMounted(loadBoards)
   margin-bottom: var(--spacing-lg);
 }
 .page-header h2 { margin: 0; font-size: var(--font-size-xl); }
-.data-table { width: 100%; border-collapse: collapse; background: #fff; }
+.data-table { width: 100%; border-collapse: collapse; background: var(--color-bg-white); }
 .data-table th, .data-table td {
   padding: 8px 12px; text-align: left;
   border-bottom: 1px solid var(--color-border); font-size: var(--font-size-sm);
@@ -208,15 +208,15 @@ onMounted(loadBoards)
   display: inline-block; padding: 2px 8px; border-radius: 10px;
   font-size: var(--font-size-xs); font-weight: 600;
 }
-.status-badge.active { background: #dcfce7; color: #16a34a; }
-.status-badge.inactive { background: #f3f4f6; color: #6b7280; }
+.status-badge.active { background: var(--color-btn-success-bg); color: var(--color-btn-success); }
+.status-badge.inactive { background: var(--color-badge-gray-bg); color: var(--color-text-secondary); }
 .modal-overlay {
   position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center;
+  background: var(--color-overlay); display: flex; align-items: center; justify-content: center;
   z-index: 1000;
 }
 .modal {
-  background: #fff; border-radius: 8px; padding: var(--spacing-lg);
+  background: var(--color-form-bg); border-radius: 8px; padding: var(--spacing-lg);
   width: 600px; max-height: 80vh; overflow-y: auto;
 }
 .modal h3 { margin: 0 0 var(--spacing-md); }
@@ -224,7 +224,7 @@ onMounted(loadBoards)
 .form-group label {
   display: block; margin-bottom: 4px; font-weight: 600; font-size: var(--font-size-sm);
 }
-.form-group label.required::after { content: ' *'; color: #dc2626; }
+.form-group label.required::after { content: ' *'; color: var(--color-btn-danger); }
 .form-group input, .form-group select, .form-group textarea {
   width: 100%; padding: 6px 10px; border: 1px solid var(--color-border);
   border-radius: 4px; font-size: var(--font-size-sm); box-sizing: border-box;
@@ -241,11 +241,11 @@ onMounted(loadBoards)
   padding: 6px 16px; border: none; border-radius: 4px;
   cursor: pointer; font-size: var(--font-size-sm);
 }
-.btn-primary { background: var(--color-primary); color: #fff; }
+.btn-primary { background: var(--color-primary); color: var(--color-text-inverse); }
 .btn-secondary { background: var(--color-bg-secondary); border: 1px solid var(--color-border); }
 .btn-link {
   background: none; border: none; cursor: pointer;
   color: var(--color-primary); font-size: var(--font-size-xs); padding: 2px 4px;
 }
-.text-danger { color: #dc2626; }
+.text-danger { color: var(--color-btn-danger); }
 </style>

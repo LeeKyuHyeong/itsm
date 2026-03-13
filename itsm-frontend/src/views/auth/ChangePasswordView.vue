@@ -157,7 +157,7 @@ async function handleChangePassword() {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #1e293b 100%);
+  background: linear-gradient(135deg, var(--color-sidebar-bg) 0%, var(--color-sidebar-border) 50%, var(--color-sidebar-bg) 100%);
 }
 
 .change-password-card {
@@ -216,7 +216,7 @@ async function handleChangePassword() {
 
 .form-input:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+  box-shadow: 0 0 0 3px var(--color-primary-focus);
 }
 
 .form-input.input-error {
@@ -272,8 +272,8 @@ async function handleChangePassword() {
 
 .error-message {
   padding: 10px 12px;
-  background-color: #fef2f2;
-  border: 1px solid #fecaca;
+  background-color: var(--color-notice-error-bg);
+  border: 1px solid var(--color-notice-error-border);
   border-radius: var(--radius-sm);
   color: var(--color-danger);
   font-size: var(--font-size-sm);
@@ -281,8 +281,8 @@ async function handleChangePassword() {
 
 .success-message {
   padding: 10px 12px;
-  background-color: #f0fdf4;
-  border: 1px solid #bbf7d0;
+  background-color: var(--color-notice-success-bg);
+  border: 1px solid var(--color-notice-success-border);
   border-radius: var(--radius-sm);
   color: var(--color-success);
   font-size: var(--font-size-sm);
@@ -292,7 +292,7 @@ async function handleChangePassword() {
   width: 100%;
   padding: 12px;
   background-color: var(--color-primary);
-  color: white;
+  color: var(--color-text-inverse);
   border: none;
   border-radius: var(--radius-sm);
   font-size: var(--font-size-base);
@@ -316,8 +316,8 @@ async function handleChangePassword() {
 .spinner {
   width: 20px;
   height: 20px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: white;
+  border: 2px solid var(--color-spinner-border);
+  border-top-color: var(--color-text-inverse);
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
 }

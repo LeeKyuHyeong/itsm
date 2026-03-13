@@ -164,7 +164,7 @@ onMounted(async () => {
   margin-bottom: var(--spacing-sm);
 }
 .page-header h2 { margin: 0; font-size: var(--font-size-xl); }
-.notice-badge { color: #dc2626; font-weight: 600; }
+.notice-badge { color: var(--color-btn-danger); font-weight: 600; }
 .header-actions { display: flex; gap: var(--spacing-xs); flex-shrink: 0; }
 .post-meta {
   display: flex; gap: var(--spacing-md); color: var(--color-text-muted);
@@ -172,14 +172,14 @@ onMounted(async () => {
   padding-bottom: var(--spacing-sm); border-bottom: 1px solid var(--color-border);
 }
 .post-content {
-  background: #fff; border: 1px solid var(--color-border);
+  background: var(--color-bg-white); border: 1px solid var(--color-border);
   border-radius: 8px; padding: var(--spacing-lg);
   margin-bottom: var(--spacing-lg); min-height: 200px;
   white-space: pre-wrap; word-break: break-word;
 }
 .post-content p { margin: 0; }
 .comments-section {
-  background: #fff; border: 1px solid var(--color-border);
+  background: var(--color-bg-white); border: 1px solid var(--color-border);
   border-radius: 8px; padding: var(--spacing-md);
 }
 .comments-section h3 { margin: 0 0 var(--spacing-md); font-size: var(--font-size-md); }
@@ -210,14 +210,14 @@ onMounted(async () => {
   padding: 6px 16px; border: none; border-radius: 4px;
   cursor: pointer; font-size: var(--font-size-sm);
 }
-.btn-primary { background: var(--color-primary); color: #fff; }
+.btn-primary { background: var(--color-primary); color: var(--color-text-inverse); }
 .btn-secondary { background: var(--color-bg-secondary); border: 1px solid var(--color-border); }
-.btn-danger { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
+.btn-danger { background: var(--color-btn-danger-bg); color: var(--color-btn-danger); border: 1px solid var(--color-btn-danger-border); }
 .btn-sm { padding: 4px 12px; font-size: var(--font-size-xs); }
 .btn-xs { padding: 3px 8px; font-size: var(--font-size-xs); }
 .btn-link {
   background: none; border: none; cursor: pointer;
   color: var(--color-primary); font-size: var(--font-size-xs); padding: 0;
 }
-.text-danger { color: #dc2626; }
+.text-danger { color: var(--color-btn-danger); }
 </style>

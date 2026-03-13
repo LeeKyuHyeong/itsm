@@ -104,12 +104,12 @@ onMounted(async () => {
 }
 .page-header h2 { margin: 0; font-size: var(--font-size-xl); }
 .notice-badge {
-  display: inline-block; color: #dc2626; font-weight: 600;
+  display: inline-block; color: var(--color-btn-danger); font-weight: 600;
   font-size: var(--font-size-xs); margin-right: 4px;
 }
 .btn {
   padding: 6px 16px; border: none; border-radius: 4px;
   cursor: pointer; font-size: var(--font-size-sm);
 }
-.btn-primary { background: var(--color-primary); color: #fff; }
+.btn-primary { background: var(--color-primary); color: var(--color-text-inverse); }
 </style>

@@ -127,7 +127,7 @@ function formatSize(bytes) {
 .drop-zone:hover,
 .drop-zone.dragging {
   border-color: var(--color-primary);
-  background-color: #f0f5ff;
+  background-color: var(--color-table-row-hover);
 }
 
 .file-input-hidden {

@@ -414,7 +414,7 @@ onMounted(async () => {
   gap: var(--spacing-sm);
 }
 .sla-section {
-  background: #fff;
+  background: var(--color-bg-white);
   border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: var(--spacing-md);
@@ -428,11 +428,11 @@ onMounted(async () => {
 }
 .sla-label { font-weight: 600; font-size: var(--font-size-sm); }
 .sla-countdown { font-weight: 700; font-size: var(--font-size-sm); }
-.sla-countdown.critical { color: #dc2626; }
-.sla-countdown.warning { color: #ea580c; }
-.sla-countdown.normal { color: #16a34a; }
+.sla-countdown.critical { color: var(--color-priority-critical); }
+.sla-countdown.warning { color: var(--color-priority-high); }
+.sla-countdown.normal { color: var(--color-priority-low); }
 .detail-card {
-  background: #fff;
+  background: var(--color-bg-white);
   border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: var(--spacing-lg);
@@ -485,10 +485,10 @@ onMounted(async () => {
   font-size: var(--font-size-xs);
   font-weight: 600;
 }
-.priority-CRITICAL { background: #fee2e2; color: #dc2626; }
-.priority-HIGH { background: #fff7ed; color: #ea580c; }
-.priority-MEDIUM { background: #fefce8; color: #ca8a04; }
-.priority-LOW { background: #f0fdf4; color: #16a34a; }
+.priority-CRITICAL { background: var(--color-priority-critical-bg); color: var(--color-priority-critical); }
+.priority-HIGH { background: var(--color-priority-high-bg); color: var(--color-priority-high); }
+.priority-MEDIUM { background: var(--color-priority-medium-bg); color: var(--color-priority-medium); }
+.priority-LOW { background: var(--color-priority-low-bg); color: var(--color-priority-low); }
 .assignee-list {
   display: flex;
   flex-direction: column;
@@ -510,9 +510,9 @@ onMounted(async () => {
   font-size: var(--font-size-xs);
   font-weight: 600;
 }
-.status-PENDING { background: #f3f4f6; color: #6b7280; }
-.status-IN_PROGRESS { background: #dbeafe; color: #2563eb; }
-.status-COMPLETED { background: #dcfce7; color: #16a34a; }
+.status-PENDING { background: var(--color-badge-gray-bg); color: var(--color-text-secondary); }
+.status-IN_PROGRESS { background: var(--color-primary-bg); color: var(--color-primary); }
+.status-COMPLETED { background: var(--color-btn-success-bg); color: var(--color-btn-success); }
 .assignee-date {
   color: var(--color-text-muted);
   font-size: var(--font-size-xs);
@@ -542,8 +542,8 @@ onMounted(async () => {
   border-radius: 8px;
   font-size: var(--font-size-xs);
 }
-.process-badge.completed { background: #dcfce7; color: #16a34a; }
-.process-badge.pending { background: #dbeafe; color: #2563eb; }
+.process-badge.completed { background: var(--color-btn-success-bg); color: var(--color-btn-success); }
+.process-badge.pending { background: var(--color-primary-bg); color: var(--color-primary); }
 .process-date {
   color: var(--color-text-muted);
   flex: 1;
@@ -600,8 +600,8 @@ onMounted(async () => {
   gap: 4px;
   font-size: 24px;
 }
-.star { color: #d1d5db; }
-.star.filled { color: #f59e0b; }
+.star { color: var(--color-text-disabled); }
+.star.filled { color: var(--color-star); }
 .timeline {
   position: relative;
   padding-left: 20px;
@@ -640,8 +640,8 @@ onMounted(async () => {
   gap: var(--spacing-xs);
   align-items: center;
 }
-.timeline-change .before { color: #dc2626; text-decoration: line-through; }
-.timeline-change .after { color: #16a34a; font-weight: 600; }
+.timeline-change .before { color: var(--color-priority-critical); text-decoration: line-through; }
+.timeline-change .after { color: var(--color-priority-low); font-weight: 600; }
 .timeline-change .arrow { color: var(--color-text-muted); }
 .timeline-date {
   font-size: var(--font-size-xs);
@@ -678,10 +678,10 @@ onMounted(async () => {
   cursor: pointer;
   font-size: var(--font-size-sm);
 }
-.btn-primary { background: var(--color-primary); color: #fff; }
+.btn-primary { background: var(--color-primary); color: var(--color-text-inverse); }
 .btn-secondary { background: var(--color-bg-secondary); border: 1px solid var(--color-border); }
-.btn-success { background: #16a34a; color: #fff; }
-.btn-danger { background: #dc2626; color: #fff; }
+.btn-success { background: var(--color-btn-success); color: var(--color-text-inverse); }
+.btn-danger { background: var(--color-btn-danger); color: var(--color-text-inverse); }
 .btn-sm { padding: 4px 12px; font-size: var(--font-size-xs); }
 .btn-link {
   background: none;
@@ -691,5 +691,5 @@ onMounted(async () => {
   font-size: var(--font-size-xs);
   padding: 0;
 }
-.btn-link.danger { color: #dc2626; }
+.btn-link.danger { color: var(--color-btn-danger); }
 </style>

@@ -267,7 +267,7 @@ onMounted(loadAll)
 .header-actions { display: flex; gap: var(--spacing-xs); }
 .detail-grid { display: flex; flex-direction: column; gap: var(--spacing-lg); }
 .detail-section {
-  background: #fff; border: 1px solid var(--color-border);
+  background: var(--color-bg-white); border: 1px solid var(--color-border);
   border-radius: 8px; padding: var(--spacing-md);
 }
 .detail-section h3 { margin: 0 0 var(--spacing-sm); font-size: var(--font-size-md); }
@@ -295,18 +295,18 @@ onMounted(loadAll)
 .field-name { font-weight: 600; font-size: var(--font-size-sm); }
 .time { font-size: var(--font-size-xs); color: var(--color-text-muted); }
 .timeline-body { font-size: var(--font-size-sm); }
-.before { color: #dc2626; }
+.before { color: var(--color-priority-critical); }
 .arrow { margin: 0 4px; }
-.after { color: #16a34a; }
-.text-danger { color: #dc2626; font-weight: 600; }
+.after { color: var(--color-priority-low); }
+.text-danger { color: var(--color-btn-danger); font-weight: 600; }
 .empty-msg { color: var(--color-text-muted); font-size: var(--font-size-sm); padding: 8px 0; }
 .btn {
   padding: 6px 16px; border: none; border-radius: 4px;
   cursor: pointer; font-size: var(--font-size-sm);
 }
-.btn-primary { background: var(--color-primary); color: #fff; }
+.btn-primary { background: var(--color-primary); color: var(--color-text-inverse); }
 .btn-secondary { background: var(--color-bg-secondary); border: 1px solid var(--color-border); }
 .btn-sm { padding: 4px 12px; font-size: var(--font-size-xs); background: var(--color-bg-secondary); border: 1px solid var(--color-border); }
 .btn-xs { padding: 3px 8px; font-size: var(--font-size-xs); }
-.btn-icon { background: none; border: none; cursor: pointer; color: #dc2626; font-weight: 600; }
+.btn-icon { background: none; border: none; cursor: pointer; color: var(--color-btn-danger); font-weight: 600; }
 </style>

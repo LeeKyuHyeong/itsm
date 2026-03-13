@@ -372,7 +372,7 @@ async function saveDetail() {
   align-items: center;
   justify-content: space-between;
   padding: var(--spacing-md) var(--spacing-lg);
-  background-color: #f8f9fa;
+  background-color: var(--color-table-header);
   border-bottom: 1px solid var(--color-border);
 }
 
@@ -398,7 +398,7 @@ async function saveDetail() {
 }
 
 .data-table th {
-  background-color: #f8f9fa;
+  background-color: var(--color-table-header);
   padding: 8px 12px;
   font-size: var(--font-size-sm);
   font-weight: 600;
@@ -411,16 +411,16 @@ async function saveDetail() {
 .data-table td {
   padding: 8px 12px;
   font-size: var(--font-size-sm);
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--color-border-light);
   color: var(--color-text);
 }
 
 .data-table tbody tr:nth-child(even) {
-  background-color: #fafbfc;
+  background-color: var(--color-table-row-even);
 }
 
 .data-table tbody tr:hover {
-  background-color: #f0f5ff;
+  background-color: var(--color-table-row-hover);
 }
 
 .clickable-row {
@@ -428,7 +428,7 @@ async function saveDetail() {
 }
 
 .clickable-row.selected {
-  background-color: #e8f0fe !important;
+  background-color: var(--color-primary-bg) !important;
 }
 
 .status-badge {
@@ -440,12 +440,12 @@ async function saveDetail() {
 }
 
 .status-active {
-  background-color: #e6f4ea;
+  background-color: var(--color-badge-green-bg);
   color: var(--color-success);
 }
 
 .status-inactive {
-  background-color: #f1f3f4;
+  background-color: var(--color-badge-gray-bg);
   color: var(--color-text-secondary);
 }
 
@@ -479,7 +479,7 @@ async function saveDetail() {
 
 .btn-primary {
   background-color: var(--color-primary);
-  color: white;
+  color: var(--color-text-inverse);
 }
 
 .btn-primary:hover:not(:disabled) {
@@ -492,7 +492,7 @@ async function saveDetail() {
 }
 
 .btn-default {
-  background-color: white;
+  background-color: var(--color-bg-white);
   color: var(--color-text);
   border-color: var(--color-border);
 }
@@ -508,7 +508,7 @@ async function saveDetail() {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: var(--color-overlay);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -593,8 +593,8 @@ async function saveDetail() {
 
 .error-message {
   padding: 8px 12px;
-  background-color: #fef2f2;
-  border: 1px solid #fecaca;
+  background-color: var(--color-notice-error-bg);
+  border: 1px solid var(--color-notice-error-border);
   border-radius: var(--radius-sm);
   color: var(--color-danger);
   font-size: var(--font-size-sm);

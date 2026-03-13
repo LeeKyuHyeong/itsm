@@ -162,7 +162,7 @@ onMounted(async () => {
   padding: 6px 16px; border: none; border-radius: 4px;
   cursor: pointer; font-size: var(--font-size-sm);
 }
-.btn-primary { background: var(--color-primary); color: #fff; }
+.btn-primary { background: var(--color-primary); color: var(--color-text-inverse); }
 .btn-sm {
   padding: 6px 12px; background: var(--color-bg-secondary);
   border: 1px solid var(--color-border);

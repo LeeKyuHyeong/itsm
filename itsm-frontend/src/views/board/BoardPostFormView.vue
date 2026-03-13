@@ -98,7 +98,7 @@ onMounted(loadDetail)
 .page-header { margin-bottom: var(--spacing-lg); }
 .page-header h2 { margin: 0; font-size: var(--font-size-xl); }
 .form-card {
-  background: #fff; border: 1px solid var(--color-border);
+  background: var(--color-form-bg); border: 1px solid var(--color-border);
   border-radius: 8px; padding: var(--spacing-lg);
 }
 .form-group { margin-bottom: var(--spacing-md); }
@@ -106,7 +106,7 @@ onMounted(loadDetail)
   display: block; margin-bottom: var(--spacing-xs);
   font-weight: 600; font-size: var(--font-size-sm);
 }
-.form-group label.required::after { content: ' *'; color: #dc2626; }
+.form-group label.required::after { content: ' *'; color: var(--color-btn-danger); }
 .form-group input[type="text"], .form-group textarea {
   width: 100%; padding: 8px 12px; border: 1px solid var(--color-border);
   border-radius: 4px; font-size: var(--font-size-sm); box-sizing: border-box;
@@ -122,7 +122,7 @@ onMounted(loadDetail)
   padding: 8px 20px; border: none; border-radius: 4px;
   cursor: pointer; font-size: var(--font-size-sm);
 }
-.btn-primary { background: var(--color-primary); color: #fff; }
+.btn-primary { background: var(--color-primary); color: var(--color-text-inverse); }
 .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
 .btn-secondary { background: var(--color-bg-secondary); border: 1px solid var(--color-border); }
 </style>
