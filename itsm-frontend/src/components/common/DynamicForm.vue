@@ -62,7 +62,7 @@
         :disabled="readonly"
         @change="updateField(field.key, $event.target.value)"
       >
-        <option value="">{{ field.placeholder || '선택하세요' }}</option>
+        <option value="">{{ field.placeholder || t('common.selectPlaceholder') }}</option>
         <option
           v-for="opt in field.options"
           :key="opt.value"
@@ -87,6 +87,10 @@
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
 const props = defineProps({
   schema: {
     type: Array,

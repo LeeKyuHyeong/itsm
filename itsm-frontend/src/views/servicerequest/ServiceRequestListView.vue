@@ -7,24 +7,24 @@
 
     <div class="filter-bar">
       <select v-model="filters.statusCd" @change="search">
-        <option value="">{{ t('common.all') }} {{ t('incident.status') }}</option>
+        <option value="">{{ t('common.allStatus') }}</option>
         <option value="RECEIVED">{{ t('status.RECEIVED') }}</option>
-        <option value="ASSIGNED"><!-- 배정 -->배정</option>
+        <option value="ASSIGNED">{{ t('status.ASSIGNED') }}</option>
         <option value="IN_PROGRESS">{{ t('status.IN_PROGRESS') }}</option>
-        <option value="PENDING_COMPLETE"><!-- 처리완료대기 -->처리완료대기</option>
+        <option value="PENDING_COMPLETE">{{ t('status.PENDING_COMPLETE') }}</option>
         <option value="CLOSED">{{ t('status.CLOSED') }}</option>
         <option value="CANCELLED">{{ t('status.CANCELLED') }}</option>
         <option value="REJECTED">{{ t('status.REJECTED') }}</option>
       </select>
       <select v-model="filters.priorityCd" @change="search">
-        <option value="">{{ t('common.all') }} {{ t('incident.priority') }}</option>
+        <option value="">{{ t('common.allPriority') }}</option>
         <option value="CRITICAL">{{ t('priority.CRITICAL') }}</option>
         <option value="HIGH">{{ t('priority.HIGH') }}</option>
         <option value="MEDIUM">{{ t('priority.MEDIUM') }}</option>
         <option value="LOW">{{ t('priority.LOW') }}</option>
       </select>
       <select v-model="filters.requestTypeCd" @change="search">
-        <option value="">{{ t('common.all') }} {{ t('incident.assetType', '유형') }}</option>
+        <option value="">{{ t('common.allType') }}</option>
         <option v-for="tp in requestTypes" :key="tp.code" :value="tp.code">{{ tp.name }}</option>
       </select>
       <div class="search-box">
@@ -87,9 +87,9 @@ const filters = reactive({
 })
 
 const columns = computed(() => [
-  { key: 'requestId', label: 'ID', width: '60px', align: 'center' },
+  { key: 'requestId', label: t('incident.id'), width: '60px', align: 'center' },
   { key: 'title', label: t('incident.incidentTitle'), width: undefined },
-  { key: 'requestTypeCd', label: t('asset.assetType', '유형'), width: '120px' },
+  { key: 'requestTypeCd', label: t('serviceRequest.type'), width: '120px' },
   { key: 'priorityCd', label: t('incident.priority'), width: '100px', align: 'center' },
   { key: 'statusCd', label: t('incident.status'), width: '120px', align: 'center' },
   { key: 'companyNm', label: t('incident.company'), width: '120px' },

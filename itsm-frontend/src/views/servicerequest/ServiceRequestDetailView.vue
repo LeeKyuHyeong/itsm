@@ -11,7 +11,7 @@
     <!-- 상태머신 버튼 -->
     <div class="status-actions">
       <span class="current-status">
-        {{ t('incident.status') }}: <BaseStatusBadge :status="sr.statusCd" />
+        {{ t('incident.currentStatus') }}: <BaseStatusBadge :status="sr.statusCd" />
       </span>
       <div class="status-buttons">
         <button v-for="s in availableTransitions" :key="s.status"
@@ -32,14 +32,14 @@
 
     <!-- 기본 정보 -->
     <div class="detail-card">
-      <h3><!-- 기본 정보 -->기본 정보</h3>
+      <h3>{{ t('serviceRequest.basicInfo') }}</h3>
       <div class="info-grid">
         <div class="info-item">
           <label>{{ t('incident.incidentTitle') }}</label>
           <span>{{ sr.title }}</span>
         </div>
         <div class="info-item">
-          <label><!-- 요청 유형 -->요청 유형</label>
+          <label>{{ t('serviceRequest.type') }}</label>
           <span>{{ commonCodeStore.getCodeName('REQUEST_TYPE', sr.requestTypeCd) || sr.requestTypeCd }}</span>
         </div>
         <div class="info-item">
@@ -55,11 +55,11 @@
           <span>{{ formatDate(sr.occurredAt) }}</span>
         </div>
         <div class="info-item">
-          <label><!-- 반려 횟수 -->반려 횟수</label>
-          <span>{{ sr.rejectCnt }}<!-- 회 -->회</span>
+          <label>{{ t('serviceRequest.rejectCount') }}</label>
+          <span>{{ sr.rejectCnt }}{{ t('serviceRequest.countUnit') }}</span>
         </div>
         <div class="info-item full-width">
-          <label><!-- 요청 내용 -->요청 내용</label>
+          <label>{{ t('serviceRequest.content') }}</label>
           <div class="content-box">{{ sr.content }}</div>
         </div>
       </div>
@@ -80,7 +80,7 @@
           <span class="assignee-name">{{ a.userNm }}</span>
           <span :class="['process-status', `status-${a.processStatus}`]">{{ processStatusLabel(a.processStatus) }}</span>
           <span class="assignee-date">{{ formatDate(a.grantedAt) }}</span>
-          <button class="btn-link danger" @click="handleRemoveAssignee(a.userId)"><!-- 해제 -->해제</button>
+          <button class="btn-link danger" @click="handleRemoveAssignee(a.userId)">{{ t('serviceRequest.release') }}</button>
         </div>
       </div>
     </div>
@@ -88,18 +88,18 @@
     <!-- 처리내용 -->
     <div class="detail-card">
       <div class="card-header">
-        <h3><!-- 처리내용 -->처리내용</h3>
+        <h3>{{ t('serviceRequest.processContent') }}</h3>
       </div>
       <div v-if="processes.length === 0" class="empty-state">{{ t('common.noData') }}</div>
       <div v-else class="process-list">
         <div v-for="p in processes" :key="p.processId" class="process-item">
           <div class="process-header">
-            <span class="process-user"><!-- 사용자 -->사용자#{{ p.userId }}</span>
+            <span class="process-user">{{ t('common.user') }}#{{ p.userId }}</span>
             <span :class="['process-badge', p.isCompleted === 'Y' ? 'completed' : 'pending']">
               {{ p.isCompleted === 'Y' ? t('status.COMPLETED') : t('status.IN_PROGRESS') }}
             </span>
             <span class="process-date">{{ formatDate(p.createdAt) }}</span>
-            <button v-if="p.isCompleted !== 'Y'" class="btn-link" @click="handleCompleteProcess(p.processId)"><!-- 완료처리 -->완료처리</button>
+            <button v-if="p.isCompleted !== 'Y'" class="btn-link" @click="handleCompleteProcess(p.processId)">{{ t('serviceRequest.completeProcess') }}</button>
           </div>
           <div class="process-content">{{ p.processContent }}</div>
         </div>
@@ -115,7 +115,7 @@
 
     <!-- 만족도 -->
     <div class="detail-card" v-if="sr.statusCd === 'CLOSED'">
-      <h3><!-- 만족도 -->만족도</h3>
+      <h3>{{ t('serviceRequest.satisfaction') }}</h3>
       <div v-if="sr.satisfactionScore != null" class="satisfaction-result">
         <div class="stars">
           <span v-for="i in 5" :key="i" :class="['star', i <= sr.satisfactionScore ? 'filled' : '']">&#9733;</span>
@@ -128,13 +128,13 @@
                 @click="satisfactionScore = i" style="cursor:pointer">&#9733;</span>
         </div>
         <textarea v-model="satisfactionComment" rows="2"></textarea>
-        <button class="btn btn-primary btn-sm" @click="handleSubmitSatisfaction" :disabled="!satisfactionScore"><!-- 만족도 제출 -->만족도 제출</button>
+        <button class="btn btn-primary btn-sm" @click="handleSubmitSatisfaction" :disabled="!satisfactionScore">{{ t('serviceRequest.submitSatisfaction') }}</button>
       </div>
     </div>
 
     <!-- 변경 이력 타임라인 -->
     <div class="detail-card">
-      <h3><!-- 변경 이력 -->변경 이력</h3>
+      <h3>{{ t('serviceRequest.changeHistory') }}</h3>
       <div v-if="histories.length === 0" class="empty-state">{{ t('common.noData') }}</div>
       <div v-else class="timeline">
         <div v-for="h in histories" :key="h.historyId" class="timeline-item">
@@ -195,7 +195,7 @@ const showAssigneeModal = ref(false)
 
 const STATUS_TRANSITIONS = {
   RECEIVED: [
-    { status: 'ASSIGNED', label: '배정', class: 'btn-primary' },
+    { status: 'ASSIGNED', label: t('status.ASSIGNED'), class: 'btn-primary' },
     { status: 'CANCELLED', label: t('status.CANCELLED'), class: 'btn-secondary' },
     { status: 'REJECTED', label: t('status.REJECTED'), class: 'btn-danger' }
   ],
@@ -204,7 +204,7 @@ const STATUS_TRANSITIONS = {
     { status: 'REJECTED', label: t('status.REJECTED'), class: 'btn-danger' }
   ],
   IN_PROGRESS: [
-    { status: 'PENDING_COMPLETE', label: '처리완료대기', class: 'btn-success' },
+    { status: 'PENDING_COMPLETE', label: t('status.PENDING_COMPLETE'), class: 'btn-success' },
     { status: 'REJECTED', label: t('status.REJECTED'), class: 'btn-danger' }
   ],
   PENDING_COMPLETE: [
@@ -297,7 +297,7 @@ const loadHistory = async () => {
 }
 
 const handleChangeStatus = async (status) => {
-  if (!confirm(`${status}?`)) return
+  if (!confirm(t('serviceRequest.confirmStatusChange', { status }))) return
   try {
     await serviceRequestApi.changeStatus(requestId.value, { status })
     await loadDetail()
@@ -346,7 +346,7 @@ const handleAddProcess = async () => {
 }
 
 const handleCompleteProcess = async (processId) => {
-  if (!confirm(t('message.deleteConfirm'))) return
+  if (!confirm(t('serviceRequest.confirmCompleteProcess'))) return
   try {
     await serviceRequestApi.completeProcess(requestId.value, processId)
     await loadProcesses()

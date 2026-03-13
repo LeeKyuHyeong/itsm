@@ -9,31 +9,31 @@
       <table class="data-table">
         <thead>
           <tr>
-            <th>번호</th>
-            <th>우선순위</th>
-            <th>처리기한(시간)</th>
-            <th>경고기준(%)</th>
+            <th>{{ t('admin.number') }}</th>
+            <th>{{ t('admin.priority') }}</th>
+            <th>{{ t('admin.resolutionTime') }}</th>
+            <th>{{ t('admin.warningThreshold') }}</th>
             <th>{{ t('asset.company') }}</th>
-            <th>사용여부</th>
-            <th>관리</th>
+            <th>{{ t('admin.useYn') }}</th>
+            <th>{{ t('admin.manage') }}</th>
           </tr>
         </thead>
         <tbody>
           <tr v-if="loading">
-            <td colspan="7" class="text-center">로딩 중...</td>
+            <td colspan="7" class="text-center">{{ t('common.loading') }}</td>
           </tr>
           <tr v-else-if="slaList.length === 0">
-            <td colspan="7" class="text-center">등록된 SLA 정책이 없습니다.</td>
+            <td colspan="7" class="text-center">{{ t('admin.noSla') }}</td>
           </tr>
           <tr v-for="(sla, index) in slaList" :key="sla.id">
             <td>{{ index + 1 }}</td>
             <td>{{ sla.priorityName || sla.priorityCd || '-' }}</td>
             <td>{{ sla.resolutionTimeHours }}</td>
             <td>{{ sla.warningThresholdPercent }}%</td>
-            <td>{{ sla.companyName || '공통' }}</td>
+            <td>{{ sla.companyName || t('admin.commonLabel') }}</td>
             <td>
               <span class="status-badge" :class="sla.active !== false ? 'status-active' : 'status-inactive'">
-                {{ sla.active !== false ? '사용' : '미사용' }}
+                {{ sla.active !== false ? t('admin.inUse') : t('admin.notInUse') }}
               </span>
             </td>
             <td>
@@ -48,34 +48,34 @@
     <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
       <div class="modal-card">
         <div class="modal-header">
-          <h2 class="modal-title">{{ editing ? 'SLA 정책 수정' : 'SLA 정책 추가' }}</h2>
+          <h2 class="modal-title">{{ editing ? t('admin.slaEdit') : t('admin.slaAdd') }}</h2>
           <button class="modal-close" @click="closeModal">&times;</button>
         </div>
         <form class="modal-body" @submit.prevent="save">
           <div class="form-group">
-            <label class="form-label">{{ t('asset.company') }} (선택)</label>
+            <label class="form-label">{{ t('asset.company') }} {{ t('admin.companyOptional') }}</label>
             <select v-model="form.companyId" class="form-input">
-              <option value="">공통 (전체 적용)</option>
+              <option value="">{{ t('admin.commonAllApply') }}</option>
               <option v-for="c in companies" :key="c.id" :value="c.id">{{ c.name }}</option>
             </select>
           </div>
           <div class="form-group">
-            <label class="form-label">우선순위코드</label>
+            <label class="form-label">{{ t('admin.priorityCode') }}</label>
             <input v-model="form.priorityCd" type="text" class="form-input" required />
           </div>
           <div class="form-group">
-            <label class="form-label">처리기한 (시간)</label>
+            <label class="form-label">{{ t('admin.resolutionTimeHours') }}</label>
             <input v-model.number="form.resolutionTimeHours" type="number" class="form-input" required />
           </div>
           <div class="form-group">
-            <label class="form-label">경고기준 (%)</label>
+            <label class="form-label">{{ t('admin.warningThresholdPercent') }}</label>
             <input v-model.number="form.warningThresholdPercent" type="number" class="form-input" min="0" max="100" required />
           </div>
           <div v-if="saveError" class="error-message">{{ saveError }}</div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default" @click="closeModal">{{ t('common.cancel') }}</button>
             <button type="submit" class="btn btn-primary" :disabled="saving">
-              {{ saving ? '저장 중...' : t('common.save') }}
+              {{ saving ? t('common.saving') : t('common.save') }}
             </button>
           </div>
         </form>

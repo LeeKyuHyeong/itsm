@@ -9,18 +9,18 @@
 
     <div class="detail-grid">
       <div class="detail-section">
-        <h3>기본 정보</h3>
+        <h3>{{ t('report.basicInfo') }}</h3>
         <div class="info-table">
-          <div class="info-row"><span class="label">양식명</span><span>{{ report.formNm }}</span></div>
-          <div class="info-row"><span class="label">양식유형</span><span>{{ report.formTypeCd }}</span></div>
-          <div class="info-row"><span class="label">참조유형</span><span>{{ report.refType }}</span></div>
-          <div class="info-row"><span class="label">참조ID</span><span>{{ report.refId }}</span></div>
-          <div class="info-row"><span class="label">등록일시</span><span>{{ formatDate(report.createdAt) }}</span></div>
+          <div class="info-row"><span class="label">{{ t('report.formNm') }}</span><span>{{ report.formNm }}</span></div>
+          <div class="info-row"><span class="label">{{ t('report.formTypeCd') }}</span><span>{{ report.formTypeCd }}</span></div>
+          <div class="info-row"><span class="label">{{ t('report.refType') }}</span><span>{{ report.refType }}</span></div>
+          <div class="info-row"><span class="label">{{ t('report.refId') }}</span><span>{{ report.refId }}</span></div>
+          <div class="info-row"><span class="label">{{ t('report.createdAt') }}</span><span>{{ formatDate(report.createdAt) }}</span></div>
         </div>
       </div>
 
       <div class="detail-section">
-        <h3>보고서 내용</h3>
+        <h3>{{ t('report.reportContent') }}</h3>
         <pre class="report-content">{{ formattedContent }}</pre>
       </div>
     </div>
@@ -59,7 +59,7 @@ onMounted(async () => {
     const res = await reportApi.getDetail(route.params.id)
     report.value = res.data.data || res.data
   } catch (e) {
-    console.error('보고서 조회 실패:', e)
+    console.error('loadReport failed:', e)
     alert(t('message.loadFail'))
   }
 })

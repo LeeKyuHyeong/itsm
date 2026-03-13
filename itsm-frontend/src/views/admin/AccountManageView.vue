@@ -13,11 +13,11 @@
         <label class="filter-label">{{ t('asset.status') }}</label>
         <select v-model="filters.status" class="filter-select" @change="loadUsers">
           <option value="">{{ t('common.all') }}</option>
-          <option value="ACTIVE">활성</option>
-          <option value="INACTIVE">비활성</option>
-          <option value="LOCKED">잠김</option>
-          <option value="RESIGNED">퇴사</option>
-          <option value="DELETED">삭제</option>
+          <option value="ACTIVE">{{ t('status.ACTIVE') }}</option>
+          <option value="INACTIVE">{{ t('status.INACTIVE') }}</option>
+          <option value="LOCKED">{{ t('status.LOCKED') }}</option>
+          <option value="RESIGNED">{{ t('admin.resigned') }}</option>
+          <option value="DELETED">{{ t('status.DELETED') }}</option>
         </select>
       </div>
       <div class="filter-group search-group">
@@ -25,7 +25,7 @@
           v-model="filters.keyword"
           type="text"
           class="filter-input"
-          placeholder="이름 또는 아이디로 검색"
+          :placeholder="t('admin.searchByNameOrId')"
           @keyup.enter="loadUsers"
         />
         <button class="btn btn-default" @click="loadUsers">{{ t('common.search') }}</button>
@@ -37,22 +37,22 @@
       <table class="data-table">
         <thead>
           <tr>
-            <th>번호</th>
-            <th>아이디</th>
-            <th>이름</th>
-            <th>이메일</th>
-            <th>부서</th>
+            <th>{{ t('admin.number') }}</th>
+            <th>{{ t('admin.loginId') }}</th>
+            <th>{{ t('admin.name') }}</th>
+            <th>{{ t('admin.email') }}</th>
+            <th>{{ t('admin.department') }}</th>
             <th>{{ t('asset.status') }}</th>
-            <th>역할</th>
-            <th>관리</th>
+            <th>{{ t('admin.role') }}</th>
+            <th>{{ t('admin.manage') }}</th>
           </tr>
         </thead>
         <tbody>
           <tr v-if="loading">
-            <td colspan="8" class="text-center">로딩 중...</td>
+            <td colspan="8" class="text-center">{{ t('common.loading') }}</td>
           </tr>
           <tr v-else-if="users.length === 0">
-            <td colspan="8" class="text-center">데이터가 없습니다.</td>
+            <td colspan="8" class="text-center">{{ t('common.noData') }}</td>
           </tr>
           <tr v-for="(user, index) in users" :key="user.id">
             <td>{{ (pagination.page - 1) * pagination.size + index + 1 }}</td>
@@ -80,20 +80,20 @@
             <td>
               <div class="action-buttons">
                 <button class="btn btn-sm btn-default" @click="openEditDialog(user)">{{ t('common.edit') }}</button>
-                <button class="btn btn-sm btn-default" @click="openRoleDialog(user)">역할</button>
+                <button class="btn btn-sm btn-default" @click="openRoleDialog(user)">{{ t('admin.role') }}</button>
                 <button
                   v-if="user.status === 'ACTIVE'"
                   class="btn btn-sm btn-danger"
                   @click="changeUserStatus(user, 'INACTIVE')"
                 >
-                  비활성화
+                  {{ t('admin.deactivate') }}
                 </button>
                 <button
                   v-if="user.status === 'INACTIVE' || user.status === 'LOCKED'"
                   class="btn btn-sm btn-primary"
                   @click="changeUserStatus(user, 'ACTIVE')"
                 >
-                  활성화
+                  {{ t('admin.activate') }}
                 </button>
               </div>
             </td>
@@ -109,7 +109,7 @@
         :disabled="pagination.page <= 1"
         @click="goToPage(pagination.page - 1)"
       >
-        이전
+        {{ t('common.prev') }}
       </button>
       <button
         v-for="p in visiblePages"
@@ -125,7 +125,7 @@
         :disabled="pagination.page >= totalPages"
         @click="goToPage(pagination.page + 1)"
       >
-        다음
+        {{ t('common.next') }}
       </button>
     </div>
 
@@ -133,12 +133,12 @@
     <div v-if="showUserModal" class="modal-overlay" @click.self="closeUserModal">
       <div class="modal-card">
         <div class="modal-header">
-          <h2 class="modal-title">{{ isEditing ? '사용자 수정' : '사용자 추가' }}</h2>
+          <h2 class="modal-title">{{ isEditing ? t('admin.userEdit') : t('admin.userAdd') }}</h2>
           <button class="modal-close" @click="closeUserModal">&times;</button>
         </div>
         <form class="modal-body" @submit.prevent="saveUser">
           <div class="form-group">
-            <label class="form-label">아이디</label>
+            <label class="form-label">{{ t('admin.loginId') }}</label>
             <input
               v-model="userForm.loginId"
               type="text"
@@ -148,32 +148,32 @@
             />
           </div>
           <div class="form-group">
-            <label class="form-label">이름</label>
+            <label class="form-label">{{ t('admin.name') }}</label>
             <input v-model="userForm.name" type="text" class="form-input" required />
           </div>
           <div class="form-group">
-            <label class="form-label">이메일</label>
+            <label class="form-label">{{ t('admin.email') }}</label>
             <input v-model="userForm.email" type="email" class="form-input" required />
           </div>
           <div v-if="!isEditing" class="form-group">
-            <label class="form-label">비밀번호</label>
+            <label class="form-label">{{ t('admin.password') }}</label>
             <input v-model="userForm.password" type="password" class="form-input" required />
           </div>
           <div class="form-group">
-            <label class="form-label">전화번호</label>
+            <label class="form-label">{{ t('admin.phone') }}</label>
             <input v-model="userForm.phone" type="text" class="form-input" />
           </div>
           <div class="form-group">
-            <label class="form-label">회사</label>
+            <label class="form-label">{{ t('admin.company') }}</label>
             <select v-model="userForm.companyId" class="form-input" @change="loadDepartments">
-              <option value="">선택</option>
+              <option value="">{{ t('common.select') }}</option>
               <option v-for="c in companies" :key="c.id" :value="c.id">{{ c.name }}</option>
             </select>
           </div>
           <div class="form-group">
-            <label class="form-label">부서</label>
+            <label class="form-label">{{ t('admin.department') }}</label>
             <select v-model="userForm.departmentId" class="form-input">
-              <option value="">선택</option>
+              <option value="">{{ t('common.select') }}</option>
               <option v-for="d in departments" :key="d.id" :value="d.id">{{ d.name }}</option>
             </select>
           </div>
@@ -181,7 +181,7 @@
           <div class="modal-footer">
             <button type="button" class="btn btn-default" @click="closeUserModal">{{ t('common.cancel') }}</button>
             <button type="submit" class="btn btn-primary" :disabled="saving">
-              {{ saving ? '저장 중...' : t('common.save') }}
+              {{ saving ? t('common.saving') : t('common.save') }}
             </button>
           </div>
         </form>
@@ -192,26 +192,26 @@
     <div v-if="showRoleModal" class="modal-overlay" @click.self="closeRoleModal">
       <div class="modal-card">
         <div class="modal-header">
-          <h2 class="modal-title">역할 관리 - {{ roleTarget?.name }}</h2>
+          <h2 class="modal-title">{{ t('admin.roleManage') }} - {{ roleTarget?.name }}</h2>
           <button class="modal-close" @click="closeRoleModal">&times;</button>
         </div>
         <div class="modal-body">
           <div class="role-section">
-            <h3 class="role-section-title">현재 역할</h3>
+            <h3 class="role-section-title">{{ t('admin.currentRoles') }}</h3>
             <div v-if="roleTarget?.roles?.length" class="role-list">
               <div v-for="role in roleTarget.roles" :key="role" class="role-item">
                 <span class="role-tag">{{ roleLabel(role) }}</span>
                 <button class="btn btn-sm btn-danger" @click="removeRoleFromUser(role)">{{ t('common.delete') }}</button>
               </div>
             </div>
-            <p v-else class="text-secondary">할당된 역할이 없습니다.</p>
+            <p v-else class="text-secondary">{{ t('admin.noRolesAssigned') }}</p>
           </div>
 
           <div class="role-section">
-            <h3 class="role-section-title">역할 추가</h3>
+            <h3 class="role-section-title">{{ t('admin.addRole') }}</h3>
             <div class="role-add-row">
               <select v-model="newRole" class="form-input">
-                <option value="">역할 선택</option>
+                <option value="">{{ t('admin.selectRole') }}</option>
                 <option
                   v-for="(label, key) in availableRoles"
                   :key="key"
@@ -296,16 +296,10 @@ const roleTarget = ref(null)
 const newRole = ref('')
 const roleError = ref('')
 
-const STATUS_LABELS = {
-  ACTIVE: '활성',
-  INACTIVE: '비활성',
-  LOCKED: '잠김',
-  RESIGNED: '퇴사',
-  DELETED: '삭제'
-}
-
 function statusLabel(status) {
-  return STATUS_LABELS[status] || status || '-'
+  if (!status) return '-'
+  if (status === 'RESIGNED') return t('admin.resigned')
+  return t(`status.${status}`, status)
 }
 
 function roleLabel(role) {
@@ -442,14 +436,14 @@ async function saveUser() {
 }
 
 async function changeUserStatus(user, newStatus) {
-  const statusText = STATUS_LABELS[newStatus] || newStatus
-  if (!confirm(`${user.name}을(를) ${statusText}(으)로 변경하시겠습니까?`)) return
+  const statusText = statusLabel(newStatus)
+  if (!confirm(t('admin.confirmStatusChange', { name: user.name, status: statusText }))) return
 
   try {
     await userApi.changeStatus(user.id, { status: newStatus })
     loadUsers()
   } catch (error) {
-    alert(error.response?.data?.message || '상태 변경 중 오류가 발생했습니다.')
+    alert(error.response?.data?.message || t('admin.statusChangeError'))
   }
 }
 
@@ -476,7 +470,7 @@ async function addRoleToUser() {
     newRole.value = ''
     loadUsers()
   } catch (error) {
-    roleError.value = error.response?.data?.message || '역할 추가 중 오류가 발생했습니다.'
+    roleError.value = error.response?.data?.message || t('admin.roleAddError')
   }
 }
 
@@ -489,7 +483,7 @@ async function removeRoleFromUser(role) {
     roleTarget.value.roles = roleTarget.value.roles.filter(r => r !== role)
     loadUsers()
   } catch (error) {
-    roleError.value = error.response?.data?.message || '역할 제거 중 오류가 발생했습니다.'
+    roleError.value = error.response?.data?.message || t('admin.roleRemoveError')
   }
 }
 </script>

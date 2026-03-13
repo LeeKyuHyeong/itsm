@@ -6,54 +6,54 @@
         <h1 class="page-title">{{ t('asset.swDetail') }}</h1>
       </div>
       <div class="page-header-right">
-        <button v-if="asset && asset.status === 'ACTIVE'" class="btn btn-default" @click="changeStatus('INACTIVE')">비활성화</button>
-        <button v-if="asset && asset.status === 'INACTIVE'" class="btn btn-default" @click="changeStatus('ACTIVE')">활성화</button>
-        <button v-if="asset && asset.status !== 'DISPOSED'" class="btn btn-danger" @click="changeStatus('DISPOSED')">폐기</button>
+        <button v-if="asset && asset.status === 'ACTIVE'" class="btn btn-default" @click="changeStatus('INACTIVE')">{{ t('asset.deactivate') }}</button>
+        <button v-if="asset && asset.status === 'INACTIVE'" class="btn btn-default" @click="changeStatus('ACTIVE')">{{ t('asset.activate') }}</button>
+        <button v-if="asset && asset.status !== 'DISPOSED'" class="btn btn-danger" @click="changeStatus('DISPOSED')">{{ t('asset.dispose') }}</button>
       </div>
     </div>
 
-    <div v-if="loading" class="loading-text">로딩 중...</div>
+    <div v-if="loading" class="loading-text">{{ t('common.loading') }}</div>
 
     <template v-if="asset">
       <!-- 기본 정보 -->
       <div class="detail-card">
-        <h2 class="card-title">기본 정보</h2>
+        <h2 class="card-title">{{ t('asset.basicInfo') }}</h2>
         <div class="detail-grid">
-          <div class="detail-item"><span class="detail-label">소프트웨어명</span><span class="detail-value">{{ asset.swNm }}</span></div>
-          <div class="detail-item"><span class="detail-label">SW유형</span><span class="detail-value">{{ getCodeName('ASSET_SW_TYPE', asset.swTypeCd) }}</span></div>
-          <div class="detail-item"><span class="detail-label">버전</span><span class="detail-value">{{ asset.version || '-' }}</span></div>
-          <div class="detail-item"><span class="detail-label">라이선스키</span><span class="detail-value">{{ asset.licenseKey || '-' }}</span></div>
-          <div class="detail-item"><span class="detail-label">라이선스 수량</span><span class="detail-value">{{ asset.licenseCnt != null ? `${asset.licenseCnt}건` : '-' }}</span></div>
-          <div class="detail-item"><span class="detail-label">설치일</span><span class="detail-value">{{ asset.installedAt || '-' }}</span></div>
-          <div class="detail-item"><span class="detail-label">라이선스 만료일</span><span class="detail-value">{{ asset.expiredAt || '-' }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ t('asset.swNm') }}</span><span class="detail-value">{{ asset.swNm }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ t('asset.swType') }}</span><span class="detail-value">{{ getCodeName('ASSET_SW_TYPE', asset.swTypeCd) }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ t('asset.version') }}</span><span class="detail-value">{{ asset.version || '-' }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ t('asset.licenseKey') }}</span><span class="detail-value">{{ asset.licenseKey || '-' }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ t('asset.licenseCnt') }}</span><span class="detail-value">{{ asset.licenseCnt != null ? t('asset.countUnit', { n: asset.licenseCnt }) : '-' }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ t('asset.installedAt') }}</span><span class="detail-value">{{ asset.installedAt || '-' }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ t('asset.expiredAt') }}</span><span class="detail-value">{{ asset.expiredAt || '-' }}</span></div>
           <div class="detail-item"><span class="detail-label">{{ t('asset.company') }}</span><span class="detail-value">{{ asset.companyNm || '-' }}</span></div>
-          <div class="detail-item"><span class="detail-label">담당자</span><span class="detail-value">{{ asset.managerNm || '-' }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ t('asset.manager') }}</span><span class="detail-value">{{ asset.managerNm || '-' }}</span></div>
           <div class="detail-item"><span class="detail-label">{{ t('asset.status') }}</span>
             <span :class="['status-badge', `status-${asset.status?.toLowerCase()}`]">{{ statusLabel(asset.status) }}</span>
           </div>
-          <div class="detail-item"><span class="detail-label">등록일</span><span class="detail-value">{{ formatDate(asset.createdAt) }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ t('asset.createdAt') }}</span><span class="detail-value">{{ formatDate(asset.createdAt) }}</span></div>
         </div>
         <div v-if="asset.description" class="detail-item full-width">
-          <span class="detail-label">비고</span>
+          <span class="detail-label">{{ t('asset.description') }}</span>
           <span class="detail-value">{{ asset.description }}</span>
         </div>
       </div>
 
       <!-- 변경이력 -->
       <div class="detail-card">
-        <h2 class="card-title">변경 이력</h2>
+        <h2 class="card-title">{{ t('asset.changeHistory') }}</h2>
         <table class="data-table">
           <thead>
             <tr>
-              <th>변경항목</th>
-              <th>변경 전</th>
-              <th>변경 후</th>
-              <th>변경일시</th>
+              <th>{{ t('asset.changedField') }}</th>
+              <th>{{ t('asset.beforeValue') }}</th>
+              <th>{{ t('asset.afterValue') }}</th>
+              <th>{{ t('asset.changedAt') }}</th>
             </tr>
           </thead>
           <tbody>
             <tr v-if="histories.length === 0">
-              <td colspan="4" class="text-center">변경 이력이 없습니다.</td>
+              <td colspan="4" class="text-center">{{ t('asset.noHistory') }}</td>
             </tr>
             <tr v-for="h in histories" :key="h.historyId">
               <td>{{ h.changedField }}</td>
@@ -85,7 +85,7 @@ const histories = ref([])
 const loading = ref(false)
 
 function statusLabel(status) {
-  const map = { ACTIVE: '활성', INACTIVE: '비활성', DISPOSED: '폐기' }
+  const map = { ACTIVE: t('asset.active'), INACTIVE: t('asset.inactive'), DISPOSED: t('asset.disposed') }
   return map[status] || status
 }
 
@@ -110,7 +110,7 @@ async function loadDetail() {
     const { data } = await assetSwApi.getDetail(assetSwId)
     asset.value = data.data || data
   } catch (e) {
-    console.error('자산 상세 로드 실패:', e)
+    console.error('loadDetail failed:', e)
   } finally {
     loading.value = false
   }
@@ -120,17 +120,17 @@ async function loadHistory() {
   try {
     const { data } = await assetSwApi.getHistory(assetSwId)
     histories.value = data.data || data || []
-  } catch (e) { console.error('이력 로드 실패:', e) }
+  } catch (e) { console.error('loadHistory failed:', e) }
 }
 
 async function changeStatus(status) {
-  if (!confirm(`상태를 '${statusLabel(status)}'(으)로 변경하시겠습니까?`)) return
+  if (!confirm(t('asset.confirmStatusChange', { status: statusLabel(status) }))) return
   try {
     await assetSwApi.changeStatus(assetSwId, status)
     loadDetail()
     loadHistory()
   } catch (e) {
-    alert(e.response?.data?.error?.message || '상태 변경 실패')
+    alert(e.response?.data?.error?.message || t('asset.statusChangeFail'))
   }
 }
 </script>

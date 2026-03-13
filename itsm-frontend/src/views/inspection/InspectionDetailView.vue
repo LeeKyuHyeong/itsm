@@ -15,15 +15,15 @@
 
     <div class="detail-grid">
       <div class="detail-section">
-        <h3><!-- 기본 정보 -->기본 정보</h3>
+        <h3>{{ t('inspection.basicInfo') }}</h3>
         <div class="info-table">
           <div class="info-row"><span class="label">{{ t('incident.incidentTitle') }}</span><span>{{ inspection.title }}</span></div>
-          <div class="info-row"><span class="label">{{ t('asset.assetType', '유형') }}</span><span>{{ inspection.inspectionTypeCd }}</span></div>
-          <div class="info-row"><span class="label">{{ t('status.SCHEDULED', '예정일') }}</span><span>{{ inspection.scheduledAt || '-' }}</span></div>
+          <div class="info-row"><span class="label">{{ t('inspection.type') }}</span><span>{{ inspection.inspectionTypeCd }}</span></div>
+          <div class="info-row"><span class="label">{{ t('inspection.scheduledDate') }}</span><span>{{ inspection.scheduledAt || '-' }}</span></div>
           <div class="info-row"><span class="label">{{ t('incident.company') }}</span><span>{{ inspection.companyNm || '-' }}</span></div>
           <div class="info-row"><span class="label">{{ t('incident.description') }}</span><span>{{ inspection.description || '-' }}</span></div>
           <div class="info-row" v-if="inspection.completedAt">
-            <span class="label"><!-- 완료일시 -->완료일시</span><span>{{ formatDate(inspection.completedAt) }}</span>
+            <span class="label">{{ t('inspection.completedAt') }}</span><span>{{ formatDate(inspection.completedAt) }}</span>
           </div>
         </div>
       </div>
@@ -34,10 +34,10 @@
           <button v-if="canEditItems" class="btn btn-sm" @click="showAddItem = true">{{ t('common.add') }}</button>
         </div>
         <div v-if="showAddItem" class="add-item-form">
-          <input v-model="newItem.itemNm" placeholder="항목명" />
+          <input v-model="newItem.itemNm" :placeholder="t('inspection.itemName')" />
           <select v-model="newItem.isRequired">
             <option value="Y">{{ t('common.required') }}</option>
-            <option value="N"><!-- 선택 -->선택</option>
+            <option value="N">{{ t('common.select') }}</option>
           </select>
           <button class="btn btn-primary btn-xs" @click="addItem">{{ t('common.add') }}</button>
           <button class="btn btn-secondary btn-xs" @click="showAddItem = false">{{ t('common.cancel') }}</button>
@@ -46,10 +46,10 @@
           <thead>
             <tr>
               <th width="40">#</th>
-              <th><!-- 항목명 -->항목명</th>
+              <th>{{ t('inspection.itemName') }}</th>
               <th width="60">{{ t('common.required') }}</th>
-              <th width="120"><!-- 결과 -->결과</th>
-              <th width="60"><!-- 정상 -->정상</th>
+              <th width="120">{{ t('inspection.result') }}</th>
+              <th width="60">{{ t('inspection.normal') }}</th>
               <th v-if="canEditItems" width="50"></th>
             </tr>
           </thead>
@@ -60,15 +60,15 @@
               <td>{{ item.isRequired === 'Y' ? 'O' : '-' }}</td>
               <td>
                 <template v-if="isInProgress">
-                  <input v-model="resultMap[item.itemId].resultValue" placeholder="결과" class="input-sm" />
+                  <input v-model="resultMap[item.itemId].resultValue" :placeholder="t('inspection.result')" class="input-sm" />
                 </template>
                 <template v-else>{{ getResultValue(item.itemId) }}</template>
               </td>
               <td>
                 <template v-if="isInProgress">
                   <select v-model="resultMap[item.itemId].isNormal" class="input-sm">
-                    <option value="Y"><!-- 정상 -->정상</option>
-                    <option value="N"><!-- 비정상 -->비정상</option>
+                    <option value="Y">{{ t('inspection.normal') }}</option>
+                    <option value="N">{{ t('inspection.abnormal') }}</option>
                   </select>
                 </template>
                 <template v-else>
@@ -89,7 +89,7 @@
       </div>
 
       <div class="detail-section">
-        <h3><!-- 변경 이력 -->변경 이력</h3>
+        <h3>{{ t('inspection.changeHistory') }}</h3>
         <div v-if="history.length" class="timeline">
           <div v-for="h in history" :key="h.historyId" class="timeline-item">
             <div class="timeline-header">
@@ -139,7 +139,7 @@ const TRANSITIONS = {
 const STATUS_LABELS = {
   SCHEDULED: t('status.SCHEDULED'),
   IN_PROGRESS: t('status.IN_PROGRESS'),
-  ON_HOLD: '보류',
+  ON_HOLD: t('status.ON_HOLD'),
   COMPLETED: t('status.COMPLETED'),
   CLOSED: t('status.CLOSED')
 }
@@ -201,7 +201,7 @@ const loadAll = async () => {
 }
 
 const doChangeStatus = async (status) => {
-  if (!confirm(`${statusLabel(status)}?`)) return
+  if (!confirm(t('inspection.confirmStatusChange', { status: statusLabel(status) }))) return
   try {
     await inspectionApi.changeStatus(inspectionId, { status })
     loadAll()

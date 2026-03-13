@@ -18,8 +18,8 @@
       />
       <div class="drop-zone-content">
         <span class="drop-zone-icon">+</span>
-        <p class="drop-zone-text">파일을 드래그하거나 클릭하여 선택</p>
-        <p class="drop-zone-hint">최대 {{ maxSize }}MB</p>
+        <p class="drop-zone-text">{{ t('common.fileDragOrClick') }}</p>
+        <p class="drop-zone-hint">{{ t('common.maxFileSize', { size: maxSize }) }}</p>
       </div>
     </div>
 
@@ -37,6 +37,9 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps({
   accept: {
@@ -80,7 +83,7 @@ function handleFiles(newFiles) {
 
   for (const file of newFiles) {
     if (file.size > maxBytes) {
-      error.value = `"${file.name}" 파일이 ${props.maxSize}MB를 초과합니다.`
+      error.value = t('common.fileSizeExceeded', { name: file.name, size: props.maxSize })
       return
     }
   }

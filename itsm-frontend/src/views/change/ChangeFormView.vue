@@ -12,16 +12,16 @@
 
       <div class="form-row">
         <div class="form-group">
-          <label class="required"><!-- 변경 유형 -->변경 유형</label>
+          <label class="required">{{ t('change.type') }}</label>
           <select v-model="form.changeTypeCd" required>
-            <option value="">{{ t('common.all', '선택') }}</option>
+            <option value="">{{ t('common.select') }}</option>
             <option v-for="tp in changeTypes" :key="tp.code" :value="tp.code">{{ tp.name }}</option>
           </select>
         </div>
         <div class="form-group">
           <label class="required">{{ t('incident.priority') }}</label>
           <select v-model="form.priorityCd" required>
-            <option value="">{{ t('common.all', '선택') }}</option>
+            <option value="">{{ t('common.select') }}</option>
             <option value="CRITICAL">{{ t('priority.CRITICAL') }}</option>
             <option value="HIGH">{{ t('priority.HIGH') }}</option>
             <option value="MEDIUM">{{ t('priority.MEDIUM') }}</option>
@@ -32,25 +32,25 @@
 
       <div class="form-row">
         <div class="form-group">
-          <label><!-- 변경 예정일시 -->변경 예정일시</label>
+          <label>{{ t('change.scheduledAt') }}</label>
           <input v-model="form.scheduledAt" type="datetime-local" />
         </div>
         <div class="form-group" v-if="!isEdit">
           <label class="required">{{ t('incident.company') }}</label>
           <select v-model="form.companyId" required>
-            <option value="">{{ t('common.all', '선택') }}</option>
+            <option value="">{{ t('common.select') }}</option>
             <option v-for="c in companies" :key="c.companyId" :value="c.companyId">{{ c.companyNm }}</option>
           </select>
         </div>
       </div>
 
       <div class="form-group">
-        <label class="required"><!-- 변경 내용 -->변경 내용</label>
+        <label class="required">{{ t('change.content') }}</label>
         <textarea v-model="form.content" rows="6" required></textarea>
       </div>
 
       <div class="form-group">
-        <label><!-- 롤백 계획 -->롤백 계획</label>
+        <label>{{ t('change.rollbackPlan') }}</label>
         <textarea v-model="form.rollbackPlan" rows="4"></textarea>
       </div>
 

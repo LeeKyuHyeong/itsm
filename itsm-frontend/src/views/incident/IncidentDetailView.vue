@@ -172,7 +172,7 @@
     <BaseModal :show="showReportModal" :title="t('incident.writeReport')" width="640px" @close="showReportModal = false">
       <div class="form-group">
         <label>{{ t('incident.reportContent') }}</label>
-        <textarea v-model="reportContent" rows="10" placeholder='{"summary":"장애 요약","cause":"원인","solution":"해결방안","prevention":"재발방지"}'></textarea>
+        <textarea v-model="reportContent" rows="10" :placeholder="t('incident.reportPlaceholder')"></textarea>
       </div>
       <template #footer>
         <button class="btn btn-secondary" @click="showReportModal = false">{{ t('common.cancel') }}</button>

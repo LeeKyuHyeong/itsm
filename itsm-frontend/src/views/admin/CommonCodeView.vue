@@ -8,7 +8,7 @@
       <!-- Code Group Section -->
       <div class="org-panel">
         <div class="panel-header">
-          <h2 class="panel-title">코드그룹 목록</h2>
+          <h2 class="panel-title">{{ t('admin.codeGroupList') }}</h2>
           <button class="btn btn-primary btn-sm" @click="openGroupDialog()">+ {{ t('common.add') }}</button>
         </div>
 
@@ -16,18 +16,18 @@
           <table class="data-table">
             <thead>
               <tr>
-                <th>그룹코드</th>
-                <th>그룹명</th>
-                <th>사용여부</th>
-                <th>관리</th>
+                <th>{{ t('admin.groupCode') }}</th>
+                <th>{{ t('admin.groupName') }}</th>
+                <th>{{ t('admin.useYn') }}</th>
+                <th>{{ t('admin.manage') }}</th>
               </tr>
             </thead>
             <tbody>
               <tr v-if="loadingGroups">
-                <td colspan="4" class="text-center">로딩 중...</td>
+                <td colspan="4" class="text-center">{{ t('common.loading') }}</td>
               </tr>
               <tr v-else-if="groups.length === 0">
-                <td colspan="4" class="text-center">등록된 코드그룹이 없습니다.</td>
+                <td colspan="4" class="text-center">{{ t('admin.noCodeGroups') }}</td>
               </tr>
               <tr
                 v-for="group in groups"
@@ -40,7 +40,7 @@
                 <td>{{ group.groupNm }}</td>
                 <td>
                   <span class="status-badge" :class="group.active !== false ? 'status-active' : 'status-inactive'">
-                    {{ group.active !== false ? '사용' : '미사용' }}
+                    {{ group.active !== false ? t('admin.inUse') : t('admin.notInUse') }}
                   </span>
                 </td>
                 <td>
@@ -56,7 +56,7 @@
       <div class="org-panel">
         <div class="panel-header">
           <h2 class="panel-title">
-            코드상세 목록
+            {{ t('admin.codeDetailList') }}
             <span v-if="selectedGroupName" class="panel-subtitle">- {{ selectedGroupName }}</span>
           </h2>
           <button
@@ -72,22 +72,22 @@
           <table class="data-table">
             <thead>
               <tr>
-                <th>코드값</th>
-                <th>코드명</th>
-                <th>정렬순서</th>
-                <th>사용여부</th>
-                <th>관리</th>
+                <th>{{ t('admin.codeValue') }}</th>
+                <th>{{ t('admin.codeName') }}</th>
+                <th>{{ t('admin.sortOrder') }}</th>
+                <th>{{ t('admin.useYn') }}</th>
+                <th>{{ t('admin.manage') }}</th>
               </tr>
             </thead>
             <tbody>
               <tr v-if="!selectedGroupId">
-                <td colspan="5" class="text-center text-secondary">코드그룹을 선택해주세요.</td>
+                <td colspan="5" class="text-center text-secondary">{{ t('admin.selectCodeGroup') }}</td>
               </tr>
               <tr v-else-if="loadingDetails">
-                <td colspan="5" class="text-center">로딩 중...</td>
+                <td colspan="5" class="text-center">{{ t('common.loading') }}</td>
               </tr>
               <tr v-else-if="details.length === 0">
-                <td colspan="5" class="text-center">등록된 코드가 없습니다.</td>
+                <td colspan="5" class="text-center">{{ t('admin.noCodes') }}</td>
               </tr>
               <tr v-for="detail in details" :key="detail.id">
                 <td>{{ detail.codeVal }}</td>
@@ -95,7 +95,7 @@
                 <td>{{ detail.sortOrder }}</td>
                 <td>
                   <span class="status-badge" :class="detail.active !== false ? 'status-active' : 'status-inactive'">
-                    {{ detail.active !== false ? '사용' : '미사용' }}
+                    {{ detail.active !== false ? t('admin.inUse') : t('admin.notInUse') }}
                   </span>
                 </td>
                 <td>
@@ -112,27 +112,27 @@
     <div v-if="showGroupModal" class="modal-overlay" @click.self="closeGroupModal">
       <div class="modal-card">
         <div class="modal-header">
-          <h2 class="modal-title">{{ editingGroup ? '코드그룹 수정' : '코드그룹 추가' }}</h2>
+          <h2 class="modal-title">{{ editingGroup ? t('admin.codeGroupEdit') : t('admin.codeGroupAdd') }}</h2>
           <button class="modal-close" @click="closeGroupModal">&times;</button>
         </div>
         <form class="modal-body" @submit.prevent="saveGroup">
           <div class="form-group">
-            <label class="form-label">그룹코드</label>
+            <label class="form-label">{{ t('admin.groupCode') }}</label>
             <input v-model="groupForm.groupCd" type="text" class="form-input" :disabled="!!editingGroup" required />
           </div>
           <div class="form-group">
-            <label class="form-label">그룹명</label>
+            <label class="form-label">{{ t('admin.groupName') }}</label>
             <input v-model="groupForm.groupNm" type="text" class="form-input" required />
           </div>
           <div class="form-group">
-            <label class="form-label">설명</label>
+            <label class="form-label">{{ t('admin.description') }}</label>
             <input v-model="groupForm.description" type="text" class="form-input" />
           </div>
           <div v-if="groupSaveError" class="error-message">{{ groupSaveError }}</div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default" @click="closeGroupModal">{{ t('common.cancel') }}</button>
             <button type="submit" class="btn btn-primary" :disabled="groupSaving">
-              {{ groupSaving ? '저장 중...' : t('common.save') }}
+              {{ groupSaving ? t('common.saving') : t('common.save') }}
             </button>
           </div>
         </form>
@@ -143,27 +143,27 @@
     <div v-if="showDetailModal" class="modal-overlay" @click.self="closeDetailModal">
       <div class="modal-card">
         <div class="modal-header">
-          <h2 class="modal-title">{{ editingDetail ? '코드 수정' : '코드 추가' }}</h2>
+          <h2 class="modal-title">{{ editingDetail ? t('admin.codeEdit') : t('admin.codeAdd') }}</h2>
           <button class="modal-close" @click="closeDetailModal">&times;</button>
         </div>
         <form class="modal-body" @submit.prevent="saveDetail">
           <div class="form-group">
-            <label class="form-label">코드값</label>
+            <label class="form-label">{{ t('admin.codeValue') }}</label>
             <input v-model="detailForm.codeVal" type="text" class="form-input" :disabled="!!editingDetail" required />
           </div>
           <div class="form-group">
-            <label class="form-label">코드명</label>
+            <label class="form-label">{{ t('admin.codeName') }}</label>
             <input v-model="detailForm.codeNm" type="text" class="form-input" required />
           </div>
           <div class="form-group">
-            <label class="form-label">정렬순서</label>
+            <label class="form-label">{{ t('admin.sortOrder') }}</label>
             <input v-model.number="detailForm.sortOrder" type="number" class="form-input" />
           </div>
           <div v-if="detailSaveError" class="error-message">{{ detailSaveError }}</div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default" @click="closeDetailModal">{{ t('common.cancel') }}</button>
             <button type="submit" class="btn btn-primary" :disabled="detailSaving">
-              {{ detailSaving ? '저장 중...' : t('common.save') }}
+              {{ detailSaving ? t('common.saving') : t('common.save') }}
             </button>
           </div>
         </form>

@@ -1,16 +1,16 @@
 <template>
-  <BaseModal :show="show" :title="title" width="400px" @close="$emit('cancel')">
+  <BaseModal :show="show" :title="title || t('common.confirm')" width="400px" @close="$emit('cancel')">
     <p class="confirm-message">{{ message }}</p>
     <template #footer>
       <button class="btn btn-default" @click="$emit('cancel')">
-        {{ cancelText }}
+        {{ cancelText || t('common.cancel') }}
       </button>
       <button
         class="btn"
         :class="confirmButtonClass"
         @click="$emit('confirm')"
       >
-        {{ confirmText }}
+        {{ confirmText || t('common.confirm') }}
       </button>
     </template>
   </BaseModal>
@@ -18,7 +18,10 @@
 
 <script setup>
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import BaseModal from './BaseModal.vue'
+
+const { t } = useI18n()
 
 const props = defineProps({
   show: {
@@ -27,7 +30,7 @@ const props = defineProps({
   },
   title: {
     type: String,
-    default: '확인'
+    default: ''
   },
   message: {
     type: String,
@@ -35,11 +38,11 @@ const props = defineProps({
   },
   confirmText: {
     type: String,
-    default: '확인'
+    default: ''
   },
   cancelText: {
     type: String,
-    default: '취소'
+    default: ''
   },
   type: {
     type: String,

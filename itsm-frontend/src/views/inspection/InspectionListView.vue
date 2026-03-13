@@ -7,15 +7,15 @@
 
     <div class="filter-bar">
       <select v-model="filters.statusCd" @change="search">
-        <option value="">{{ t('common.all') }} {{ t('incident.status') }}</option>
+        <option value="">{{ t('common.allStatus') }}</option>
         <option value="SCHEDULED">{{ t('status.SCHEDULED') }}</option>
         <option value="IN_PROGRESS">{{ t('status.IN_PROGRESS') }}</option>
-        <option value="ON_HOLD"><!-- 보류 -->보류</option>
+        <option value="ON_HOLD">{{ t('status.ON_HOLD') }}</option>
         <option value="COMPLETED">{{ t('status.COMPLETED') }}</option>
         <option value="CLOSED">{{ t('status.CLOSED') }}</option>
       </select>
       <select v-model="filters.inspectionTypeCd" @change="search">
-        <option value="">{{ t('common.all') }} {{ t('asset.assetType', '유형') }}</option>
+        <option value="">{{ t('common.allType') }}</option>
         <option v-for="tp in inspectionTypes" :key="tp.code" :value="tp.code">{{ tp.name }}</option>
       </select>
       <div class="search-box">
@@ -76,11 +76,11 @@ const filters = reactive({
 const columns = computed(() => [
   { key: 'inspectionId', label: 'ID', width: '60px', align: 'center' },
   { key: 'title', label: t('incident.incidentTitle') },
-  { key: 'inspectionTypeCd', label: t('asset.assetType', '유형'), width: '100px' },
+  { key: 'inspectionTypeCd', label: t('inspection.type'), width: '100px' },
   { key: 'statusCd', label: t('incident.status'), width: '100px', align: 'center' },
   { key: 'companyNm', label: t('incident.company'), width: '120px' },
-  { key: 'scheduledAt', label: t('status.SCHEDULED', '예정일'), width: '120px' },
-  { key: 'progress', label: '진행률', width: '100px', align: 'center' },
+  { key: 'scheduledAt', label: t('inspection.scheduledDate'), width: '120px' },
+  { key: 'progress', label: t('inspection.progress'), width: '100px', align: 'center' },
   { key: 'createdAt', label: t('board.createdAt'), width: '150px' }
 ])
 

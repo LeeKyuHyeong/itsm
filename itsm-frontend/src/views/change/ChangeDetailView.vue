@@ -23,14 +23,14 @@
 
     <!-- 기본 정보 -->
     <div class="detail-card">
-      <h3><!-- 기본 정보 -->기본 정보</h3>
+      <h3>{{ t('change.basicInfo') }}</h3>
       <div class="info-grid">
         <div class="info-item">
           <label>{{ t('incident.incidentTitle') }}</label>
           <span>{{ change.title }}</span>
         </div>
         <div class="info-item">
-          <label><!-- 변경 유형 -->변경 유형</label>
+          <label>{{ t('change.type') }}</label>
           <span>{{ commonCodeStore.getCodeName('CHANGE_TYPE', change.changeTypeCd) || change.changeTypeCd }}</span>
         </div>
         <div class="info-item">
@@ -42,19 +42,19 @@
           <span>{{ change.companyNm }}</span>
         </div>
         <div class="info-item">
-          <label><!-- 변경 예정일시 -->변경 예정일시</label>
+          <label>{{ t('change.scheduledAt') }}</label>
           <span>{{ formatDate(change.scheduledAt) }}</span>
         </div>
         <div class="info-item">
-          <label><!-- 승인 현황 -->승인 현황</label>
+          <label>{{ t('change.approvalStatus') }}</label>
           <span>{{ change.approvedCount || 0 }} / {{ change.approverCount || 0 }} {{ t('status.APPROVED') }}</span>
         </div>
         <div class="info-item full-width">
-          <label><!-- 변경 내용 -->변경 내용</label>
+          <label>{{ t('change.content') }}</label>
           <div class="content-box">{{ change.content }}</div>
         </div>
         <div class="info-item full-width" v-if="change.rollbackPlan">
-          <label><!-- 롤백 계획 -->롤백 계획</label>
+          <label>{{ t('change.rollbackPlan') }}</label>
           <div class="content-box">{{ change.rollbackPlan }}</div>
         </div>
       </div>
@@ -63,7 +63,7 @@
     <!-- 승인 현황 -->
     <div class="detail-card">
       <div class="card-header">
-        <h3><!-- 승인자 현황 -->승인자 현황</h3>
+        <h3>{{ t('change.approverStatus') }}</h3>
         <button v-if="canEdit" class="btn btn-sm" @click="showApproverModal = true">{{ t('common.add') }}</button>
       </div>
       <div v-if="approvers.length === 0" class="empty-state">{{ t('common.noData') }}</div>
@@ -90,7 +90,7 @@
       <div v-else class="comment-list">
         <div v-for="c in comments" :key="c.commentId" class="comment-item">
           <div class="comment-header">
-            <span class="comment-author"><!-- 사용자 -->사용자#{{ c.createdBy }}</span>
+            <span class="comment-author">{{ t('change.userPrefix') }}#{{ c.createdBy }}</span>
             <span class="comment-date">{{ formatDate(c.createdAt) }}</span>
             <button class="btn-link danger" @click="handleDeleteComment(c.commentId)">{{ t('common.delete') }}</button>
           </div>
@@ -105,7 +105,7 @@
 
     <!-- 변경 이력 -->
     <div class="detail-card">
-      <h3><!-- 변경 이력 -->변경 이력</h3>
+      <h3>{{ t('change.changeHistory') }}</h3>
       <div v-if="histories.length === 0" class="empty-state">{{ t('common.noData') }}</div>
       <div v-else class="timeline">
         <div v-for="h in histories" :key="h.historyId" class="timeline-item">
@@ -138,7 +138,7 @@
     <!-- 승인/반려 모달 -->
     <BaseModal :show="showApproveModal" :title="approveDecision === 'APPROVED' ? t('status.APPROVED') : t('status.REJECTED')" @close="showApproveModal = false">
       <div class="form-group">
-        <label><!-- 의견 -->의견</label>
+        <label>{{ t('change.opinion') }}</label>
         <textarea v-model="approveComment" rows="3"></textarea>
       </div>
       <template #footer>
@@ -262,7 +262,7 @@ const loadHistory = async () => {
 }
 
 const handleChangeStatus = async (status) => {
-  if (!confirm(`${status}?`)) return
+  if (!confirm(t('change.confirmStatusChange', { status: t(`status.${status}`) }))) return
   try {
     await changeApi.changeStatus(changeId.value, { status })
     await loadDetail()

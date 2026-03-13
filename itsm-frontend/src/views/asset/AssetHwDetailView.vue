@@ -6,38 +6,38 @@
         <h1 class="page-title">{{ t('asset.hwDetail') }}</h1>
       </div>
       <div class="page-header-right">
-        <button v-if="asset && asset.status === 'ACTIVE'" class="btn btn-default" @click="changeStatus('INACTIVE')">비활성화</button>
-        <button v-if="asset && asset.status === 'INACTIVE'" class="btn btn-default" @click="changeStatus('ACTIVE')">활성화</button>
-        <button v-if="asset && asset.status !== 'DISPOSED'" class="btn btn-danger" @click="changeStatus('DISPOSED')">폐기</button>
+        <button v-if="asset && asset.status === 'ACTIVE'" class="btn btn-default" @click="changeStatus('INACTIVE')">{{ t('asset.deactivate') }}</button>
+        <button v-if="asset && asset.status === 'INACTIVE'" class="btn btn-default" @click="changeStatus('ACTIVE')">{{ t('asset.activate') }}</button>
+        <button v-if="asset && asset.status !== 'DISPOSED'" class="btn btn-danger" @click="changeStatus('DISPOSED')">{{ t('asset.dispose') }}</button>
       </div>
     </div>
 
-    <div v-if="loading" class="loading-text">로딩 중...</div>
+    <div v-if="loading" class="loading-text">{{ t('common.loading') }}</div>
 
     <template v-if="asset">
       <!-- 기본 정보 -->
       <div class="detail-card">
-        <h2 class="card-title">기본 정보</h2>
+        <h2 class="card-title">{{ t('asset.basicInfo') }}</h2>
         <div class="detail-grid">
           <div class="detail-item"><span class="detail-label">{{ t('asset.assetNm') }}</span><span class="detail-value">{{ asset.assetNm }}</span></div>
           <div class="detail-item"><span class="detail-label">{{ t('asset.assetType') }}</span><span class="detail-value">{{ getCodeName('ASSET_HW_TYPE', asset.assetTypeCd) }}</span></div>
           <div class="detail-item"><span class="detail-label">{{ t('asset.manufacturer') }}</span><span class="detail-value">{{ asset.manufacturer || '-' }}</span></div>
           <div class="detail-item"><span class="detail-label">{{ t('asset.model') }}</span><span class="detail-value">{{ asset.modelNm || '-' }}</span></div>
           <div class="detail-item"><span class="detail-label">{{ t('asset.serialNo') }}</span><span class="detail-value">{{ asset.serialNo || '-' }}</span></div>
-          <div class="detail-item"><span class="detail-label">IP주소</span><span class="detail-value">{{ asset.ipAddress || '-' }}</span></div>
-          <div class="detail-item"><span class="detail-label">MAC주소</span><span class="detail-value">{{ asset.macAddress || '-' }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ t('asset.ipAddress') }}</span><span class="detail-value">{{ asset.ipAddress || '-' }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ t('asset.macAddress') }}</span><span class="detail-value">{{ asset.macAddress || '-' }}</span></div>
           <div class="detail-item"><span class="detail-label">{{ t('asset.location') }}</span><span class="detail-value">{{ asset.location || '-' }}</span></div>
-          <div class="detail-item"><span class="detail-label">도입일</span><span class="detail-value">{{ asset.introducedAt || '-' }}</span></div>
-          <div class="detail-item"><span class="detail-label">유지보수 만료일</span><span class="detail-value">{{ asset.warrantyEndAt || '-' }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ t('asset.introducedAt') }}</span><span class="detail-value">{{ asset.introducedAt || '-' }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ t('asset.warrantyEndAt') }}</span><span class="detail-value">{{ asset.warrantyEndAt || '-' }}</span></div>
           <div class="detail-item"><span class="detail-label">{{ t('asset.company') }}</span><span class="detail-value">{{ asset.companyNm || '-' }}</span></div>
-          <div class="detail-item"><span class="detail-label">담당자</span><span class="detail-value">{{ asset.managerNm || '-' }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ t('asset.manager') }}</span><span class="detail-value">{{ asset.managerNm || '-' }}</span></div>
           <div class="detail-item"><span class="detail-label">{{ t('asset.status') }}</span>
             <span :class="['status-badge', `status-${asset.status?.toLowerCase()}`]">{{ statusLabel(asset.status) }}</span>
           </div>
-          <div class="detail-item"><span class="detail-label">등록일</span><span class="detail-value">{{ formatDate(asset.createdAt) }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ t('asset.createdAt') }}</span><span class="detail-value">{{ formatDate(asset.createdAt) }}</span></div>
         </div>
         <div v-if="asset.description" class="detail-item full-width">
-          <span class="detail-label">비고</span>
+          <span class="detail-label">{{ t('asset.description') }}</span>
           <span class="detail-value">{{ asset.description }}</span>
         </div>
       </div>
@@ -45,21 +45,21 @@
       <!-- 연관 SW -->
       <div class="detail-card">
         <div class="card-header">
-          <h2 class="card-title">연관 SW 자산</h2>
-          <button class="btn btn-sm btn-primary" @click="showRelationModal = true">+ SW 연결</button>
+          <h2 class="card-title">{{ t('asset.relatedSw') }}</h2>
+          <button class="btn btn-sm btn-primary" @click="showRelationModal = true">+ {{ t('asset.linkSw') }}</button>
         </div>
         <table class="data-table">
           <thead>
             <tr>
-              <th>SW명</th>
-              <th>설치일</th>
-              <th>등록일</th>
-              <th>관리</th>
+              <th>{{ t('asset.swNm') }}</th>
+              <th>{{ t('asset.installedAt') }}</th>
+              <th>{{ t('asset.createdAt') }}</th>
+              <th>{{ t('common.manage') }}</th>
             </tr>
           </thead>
           <tbody>
             <tr v-if="relations.length === 0">
-              <td colspan="4" class="text-center">연관 SW가 없습니다.</td>
+              <td colspan="4" class="text-center">{{ t('asset.noRelatedSw') }}</td>
             </tr>
             <tr v-for="r in relations" :key="r.assetSwId">
               <td>
@@ -69,7 +69,7 @@
               </td>
               <td>{{ r.installedAt || '-' }}</td>
               <td>{{ formatDate(r.createdAt) }}</td>
-              <td><button class="btn btn-sm btn-danger" @click="removeRelation(r.assetSwId)">해제</button></td>
+              <td><button class="btn btn-sm btn-danger" @click="removeRelation(r.assetSwId)">{{ t('asset.unlink') }}</button></td>
             </tr>
           </tbody>
         </table>
@@ -77,19 +77,19 @@
 
       <!-- 변경이력 -->
       <div class="detail-card">
-        <h2 class="card-title">변경 이력</h2>
+        <h2 class="card-title">{{ t('asset.changeHistory') }}</h2>
         <table class="data-table">
           <thead>
             <tr>
-              <th>변경항목</th>
-              <th>변경 전</th>
-              <th>변경 후</th>
-              <th>변경일시</th>
+              <th>{{ t('asset.changedField') }}</th>
+              <th>{{ t('asset.beforeValue') }}</th>
+              <th>{{ t('asset.afterValue') }}</th>
+              <th>{{ t('asset.changedAt') }}</th>
             </tr>
           </thead>
           <tbody>
             <tr v-if="histories.length === 0">
-              <td colspan="4" class="text-center">변경 이력이 없습니다.</td>
+              <td colspan="4" class="text-center">{{ t('asset.noHistory') }}</td>
             </tr>
             <tr v-for="h in histories" :key="h.historyId">
               <td>{{ h.changedField }}</td>
@@ -106,27 +106,27 @@
     <div v-if="showRelationModal" class="modal-overlay" @click.self="showRelationModal = false">
       <div class="modal-card">
         <div class="modal-header">
-          <h2 class="modal-title">SW 자산 연결</h2>
+          <h2 class="modal-title">{{ t('asset.linkSwAsset') }}</h2>
           <button class="modal-close" @click="showRelationModal = false">&times;</button>
         </div>
         <form class="modal-body" @submit.prevent="addRelation">
           <div class="form-group">
-            <label class="form-label">SW 자산 <span class="required">*</span></label>
+            <label class="form-label">{{ t('asset.swAsset') }} <span class="required">*</span></label>
             <select v-model="relationForm.assetSwId" class="form-input" required>
-              <option value="">선택</option>
+              <option value="">{{ t('common.select') }}</option>
               <option v-for="sw in swAssets" :key="sw.assetSwId" :value="sw.assetSwId">
                 {{ sw.swNm }} ({{ sw.version || '-' }})
               </option>
             </select>
           </div>
           <div class="form-group">
-            <label class="form-label">설치일</label>
+            <label class="form-label">{{ t('asset.installedAt') }}</label>
             <input v-model="relationForm.installedAt" type="date" class="form-input" />
           </div>
           <div v-if="relationError" class="error-message">{{ relationError }}</div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default" @click="showRelationModal = false">{{ t('common.cancel') }}</button>
-            <button type="submit" class="btn btn-primary">연결</button>
+            <button type="submit" class="btn btn-primary">{{ t('asset.link') }}</button>
           </div>
         </form>
       </div>
@@ -156,7 +156,7 @@ const relationError = ref('')
 const relationForm = reactive({ assetSwId: '', installedAt: '' })
 
 function statusLabel(status) {
-  const map = { ACTIVE: '활성', INACTIVE: '비활성', DISPOSED: '폐기' }
+  const map = { ACTIVE: t('asset.active'), INACTIVE: t('asset.inactive'), DISPOSED: t('asset.disposed') }
   return map[status] || status
 }
 
@@ -183,7 +183,7 @@ async function loadDetail() {
     const { data } = await assetHwApi.getDetail(assetHwId)
     asset.value = data.data || data
   } catch (e) {
-    console.error('자산 상세 로드 실패:', e)
+    console.error('loadDetail failed:', e)
   } finally {
     loading.value = false
   }
@@ -193,14 +193,14 @@ async function loadRelations() {
   try {
     const { data } = await assetHwApi.getRelations(assetHwId)
     relations.value = data.data || data || []
-  } catch (e) { console.error('연관관계 로드 실패:', e) }
+  } catch (e) { console.error('loadRelations failed:', e) }
 }
 
 async function loadHistory() {
   try {
     const { data } = await assetHwApi.getHistory(assetHwId)
     histories.value = data.data || data || []
-  } catch (e) { console.error('이력 로드 실패:', e) }
+  } catch (e) { console.error('loadHistory failed:', e) }
 }
 
 async function loadSwAssets() {
@@ -208,17 +208,17 @@ async function loadSwAssets() {
     const { data } = await assetSwApi.getList({ size: 200, status: 'ACTIVE' })
     const result = data.data || data
     swAssets.value = result.content || result || []
-  } catch (e) { console.error('SW 자산 목록 로드 실패:', e) }
+  } catch (e) { console.error('loadSwAssets failed:', e) }
 }
 
 async function changeStatus(status) {
-  if (!confirm(`상태를 '${statusLabel(status)}'(으)로 변경하시겠습니까?`)) return
+  if (!confirm(t('asset.confirmStatusChange', { status: statusLabel(status) }))) return
   try {
     await assetHwApi.changeStatus(assetHwId, status)
     loadDetail()
     loadHistory()
   } catch (e) {
-    alert(e.response?.data?.error?.message || '상태 변경 실패')
+    alert(e.response?.data?.error?.message || t('asset.statusChangeFail'))
   }
 }
 
@@ -236,7 +236,7 @@ async function addRelation() {
     relationForm.installedAt = ''
     loadRelations()
   } catch (e) {
-    relationError.value = e.response?.data?.error?.message || '연결 실패'
+    relationError.value = e.response?.data?.error?.message || t('asset.linkFail')
   }
 }
 
@@ -246,7 +246,7 @@ async function removeRelation(assetSwId) {
     await assetHwApi.removeRelation(assetHwId, assetSwId)
     loadRelations()
   } catch (e) {
-    alert(e.response?.data?.error?.message || '해제 실패')
+    alert(e.response?.data?.error?.message || t('asset.unlinkFail'))
   }
 }
 </script>

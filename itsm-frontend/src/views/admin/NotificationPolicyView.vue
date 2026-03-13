@@ -9,20 +9,20 @@
       <table class="data-table">
         <thead>
           <tr>
-            <th>번호</th>
-            <th>알림유형</th>
-            <th>발송조건</th>
-            <th>대상역할</th>
-            <th>사용여부</th>
-            <th>관리</th>
+            <th>{{ t('admin.number') }}</th>
+            <th>{{ t('admin.notificationType') }}</th>
+            <th>{{ t('admin.sendCondition') }}</th>
+            <th>{{ t('admin.targetRole') }}</th>
+            <th>{{ t('admin.useYn') }}</th>
+            <th>{{ t('admin.manage') }}</th>
           </tr>
         </thead>
         <tbody>
           <tr v-if="loading">
-            <td colspan="6" class="text-center">로딩 중...</td>
+            <td colspan="6" class="text-center">{{ t('common.loading') }}</td>
           </tr>
           <tr v-else-if="policies.length === 0">
-            <td colspan="6" class="text-center">등록된 알림 정책이 없습니다.</td>
+            <td colspan="6" class="text-center">{{ t('admin.noPolicies') }}</td>
           </tr>
           <tr v-for="(policy, index) in policies" :key="policy.id">
             <td>{{ index + 1 }}</td>
@@ -31,7 +31,7 @@
             <td>{{ policy.targetRoleName || policy.targetRoleCd || '-' }}</td>
             <td>
               <span class="status-badge" :class="policy.active !== false ? 'status-active' : 'status-inactive'">
-                {{ policy.active !== false ? '사용' : '미사용' }}
+                {{ policy.active !== false ? t('admin.inUse') : t('admin.notInUse') }}
               </span>
             </td>
             <td>
@@ -42,14 +42,14 @@
                   class="btn btn-sm btn-danger"
                   @click="toggleStatus(policy, false)"
                 >
-                  비활성화
+                  {{ t('admin.deactivate') }}
                 </button>
                 <button
                   v-else
                   class="btn btn-sm btn-primary"
                   @click="toggleStatus(policy, true)"
                 >
-                  활성화
+                  {{ t('admin.activate') }}
                 </button>
               </div>
             </td>
@@ -62,27 +62,27 @@
     <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
       <div class="modal-card">
         <div class="modal-header">
-          <h2 class="modal-title">{{ editing ? '알림 정책 수정' : '알림 정책 추가' }}</h2>
+          <h2 class="modal-title">{{ editing ? t('admin.policyEdit') : t('admin.policyAdd') }}</h2>
           <button class="modal-close" @click="closeModal">&times;</button>
         </div>
         <form class="modal-body" @submit.prevent="save">
           <div class="form-group">
-            <label class="form-label">알림유형코드</label>
+            <label class="form-label">{{ t('admin.notificationTypeCode') }}</label>
             <input v-model="form.typeCd" type="text" class="form-input" required />
           </div>
           <div class="form-group">
-            <label class="form-label">발송조건</label>
+            <label class="form-label">{{ t('admin.sendCondition') }}</label>
             <input v-model="form.conditionExpr" type="text" class="form-input" required />
           </div>
           <div class="form-group">
-            <label class="form-label">대상역할코드</label>
+            <label class="form-label">{{ t('admin.targetRoleCode') }}</label>
             <input v-model="form.targetRoleCd" type="text" class="form-input" required />
           </div>
           <div v-if="saveError" class="error-message">{{ saveError }}</div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default" @click="closeModal">{{ t('common.cancel') }}</button>
             <button type="submit" class="btn btn-primary" :disabled="saving">
-              {{ saving ? '저장 중...' : t('common.save') }}
+              {{ saving ? t('common.saving') : t('common.save') }}
             </button>
           </div>
         </form>
@@ -177,7 +177,7 @@ async function toggleStatus(policy, active) {
     await notificationPolicyApi.changeStatus(policy.id, { active })
     loadPolicies()
   } catch (error) {
-    alert(error.response?.data?.message || '상태 변경 중 오류가 발생했습니다.')
+    alert(error.response?.data?.message || t('admin.statusChangeError'))
   }
 }
 </script>

@@ -8,7 +8,7 @@
       <!-- Company Section -->
       <div class="org-panel">
         <div class="panel-header">
-          <h2 class="panel-title">회사 목록</h2>
+          <h2 class="panel-title">{{ t('admin.companyList') }}</h2>
           <button class="btn btn-primary btn-sm" @click="openCompanyDialog()">+ {{ t('common.add') }}</button>
         </div>
 
@@ -16,19 +16,19 @@
           <table class="data-table">
             <thead>
               <tr>
-                <th>번호</th>
-                <th>회사명</th>
-                <th>대표자</th>
-                <th>연락처</th>
-                <th>관리</th>
+                <th>{{ t('admin.number') }}</th>
+                <th>{{ t('admin.companyName') }}</th>
+                <th>{{ t('admin.representative') }}</th>
+                <th>{{ t('admin.contact') }}</th>
+                <th>{{ t('admin.manage') }}</th>
               </tr>
             </thead>
             <tbody>
               <tr v-if="loadingCompanies">
-                <td colspan="5" class="text-center">로딩 중...</td>
+                <td colspan="5" class="text-center">{{ t('common.loading') }}</td>
               </tr>
               <tr v-else-if="companies.length === 0">
-                <td colspan="5" class="text-center">등록된 회사가 없습니다.</td>
+                <td colspan="5" class="text-center">{{ t('admin.noCompanies') }}</td>
               </tr>
               <tr
                 v-for="(company, index) in companies"
@@ -54,7 +54,7 @@
       <div class="org-panel">
         <div class="panel-header">
           <h2 class="panel-title">
-            부서 목록
+            {{ t('admin.departmentList') }}
             <span v-if="selectedCompanyName" class="panel-subtitle">- {{ selectedCompanyName }}</span>
           </h2>
           <button
@@ -70,22 +70,22 @@
           <table class="data-table">
             <thead>
               <tr>
-                <th>번호</th>
-                <th>부서명</th>
-                <th>부서코드</th>
-                <th>상위부서</th>
-                <th>관리</th>
+                <th>{{ t('admin.number') }}</th>
+                <th>{{ t('admin.departmentName') }}</th>
+                <th>{{ t('admin.departmentCode') }}</th>
+                <th>{{ t('admin.parentDepartment') }}</th>
+                <th>{{ t('admin.manage') }}</th>
               </tr>
             </thead>
             <tbody>
               <tr v-if="!selectedCompanyId">
-                <td colspan="5" class="text-center text-secondary">회사를 선택해주세요.</td>
+                <td colspan="5" class="text-center text-secondary">{{ t('admin.selectCompany') }}</td>
               </tr>
               <tr v-else-if="loadingDepts">
-                <td colspan="5" class="text-center">로딩 중...</td>
+                <td colspan="5" class="text-center">{{ t('common.loading') }}</td>
               </tr>
               <tr v-else-if="departments.length === 0">
-                <td colspan="5" class="text-center">등록된 부서가 없습니다.</td>
+                <td colspan="5" class="text-center">{{ t('admin.noDepartments') }}</td>
               </tr>
               <tr v-for="(dept, index) in departments" :key="dept.id">
                 <td>{{ index + 1 }}</td>
@@ -106,35 +106,35 @@
     <div v-if="showCompanyModal" class="modal-overlay" @click.self="closeCompanyModal">
       <div class="modal-card">
         <div class="modal-header">
-          <h2 class="modal-title">{{ editingCompany ? '회사 수정' : '회사 추가' }}</h2>
+          <h2 class="modal-title">{{ editingCompany ? t('admin.companyEdit') : t('admin.companyAdd') }}</h2>
           <button class="modal-close" @click="closeCompanyModal">&times;</button>
         </div>
         <form class="modal-body" @submit.prevent="saveCompany">
           <div class="form-group">
-            <label class="form-label">회사명</label>
+            <label class="form-label">{{ t('admin.companyName') }}</label>
             <input v-model="companyForm.name" type="text" class="form-input" required />
           </div>
           <div class="form-group">
-            <label class="form-label">대표자</label>
+            <label class="form-label">{{ t('admin.representative') }}</label>
             <input v-model="companyForm.representative" type="text" class="form-input" />
           </div>
           <div class="form-group">
-            <label class="form-label">사업자번호</label>
+            <label class="form-label">{{ t('admin.businessNumber') }}</label>
             <input v-model="companyForm.businessNumber" type="text" class="form-input" />
           </div>
           <div class="form-group">
-            <label class="form-label">연락처</label>
+            <label class="form-label">{{ t('admin.contact') }}</label>
             <input v-model="companyForm.phone" type="text" class="form-input" />
           </div>
           <div class="form-group">
-            <label class="form-label">주소</label>
+            <label class="form-label">{{ t('admin.address') }}</label>
             <input v-model="companyForm.address" type="text" class="form-input" />
           </div>
           <div v-if="companySaveError" class="error-message">{{ companySaveError }}</div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default" @click="closeCompanyModal">{{ t('common.cancel') }}</button>
             <button type="submit" class="btn btn-primary" :disabled="companySaving">
-              {{ companySaving ? '저장 중...' : t('common.save') }}
+              {{ companySaving ? t('common.saving') : t('common.save') }}
             </button>
           </div>
         </form>
@@ -145,22 +145,22 @@
     <div v-if="showDeptModal" class="modal-overlay" @click.self="closeDeptModal">
       <div class="modal-card">
         <div class="modal-header">
-          <h2 class="modal-title">{{ editingDept ? '부서 수정' : '부서 추가' }}</h2>
+          <h2 class="modal-title">{{ editingDept ? t('admin.departmentEdit') : t('admin.departmentAdd') }}</h2>
           <button class="modal-close" @click="closeDeptModal">&times;</button>
         </div>
         <form class="modal-body" @submit.prevent="saveDept">
           <div class="form-group">
-            <label class="form-label">부서명</label>
+            <label class="form-label">{{ t('admin.departmentName') }}</label>
             <input v-model="deptForm.name" type="text" class="form-input" required />
           </div>
           <div class="form-group">
-            <label class="form-label">부서코드</label>
+            <label class="form-label">{{ t('admin.departmentCode') }}</label>
             <input v-model="deptForm.code" type="text" class="form-input" />
           </div>
           <div class="form-group">
-            <label class="form-label">상위부서</label>
+            <label class="form-label">{{ t('admin.parentDepartment') }}</label>
             <select v-model="deptForm.parentId" class="form-input">
-              <option value="">없음 (최상위)</option>
+              <option value="">{{ t('admin.noneTopLevel') }}</option>
               <option
                 v-for="d in departments.filter(d => d.id !== editingDept?.id)"
                 :key="d.id"
@@ -174,7 +174,7 @@
           <div class="modal-footer">
             <button type="button" class="btn btn-default" @click="closeDeptModal">{{ t('common.cancel') }}</button>
             <button type="submit" class="btn btn-primary" :disabled="deptSaving">
-              {{ deptSaving ? '저장 중...' : t('common.save') }}
+              {{ deptSaving ? t('common.saving') : t('common.save') }}
             </button>
           </div>
         </form>

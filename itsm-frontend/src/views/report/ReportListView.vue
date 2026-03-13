@@ -6,18 +6,18 @@
 
     <div class="filter-bar">
       <select v-model="filters.refType" @change="search">
-        <option value="">{{ t('common.all') }} 참조유형</option>
-        <option value="INCIDENT">장애</option>
-        <option value="CHANGE">변경</option>
-        <option value="INSPECTION">점검</option>
+        <option value="">{{ t('report.allRefType') }}</option>
+        <option value="INCIDENT">{{ t('report.incident') }}</option>
+        <option value="CHANGE">{{ t('report.change') }}</option>
+        <option value="INSPECTION">{{ t('report.inspection') }}</option>
       </select>
       <div class="search-box">
-        <input v-model="filters.refId" placeholder="참조 ID" @keyup.enter="search" />
+        <input v-model="filters.refId" :placeholder="t('report.refIdPlaceholder')" @keyup.enter="search" />
         <button class="btn btn-sm" @click="search">{{ t('common.search') }}</button>
       </div>
     </div>
 
-    <BaseTable :columns="columns" :data="reports" :loading="loading" empty-message="등록된 보고서가 없습니다."
+    <BaseTable :columns="columns" :data="reports" :loading="loading" :empty-message="t('report.noData')"
                @row-click="goDetail">
       <template #createdAt="{ row }">
         {{ formatDate(row.createdAt) }}
@@ -53,10 +53,10 @@ const filters = reactive({
 
 const columns = computed(() => [
   { key: 'reportId', label: 'ID', width: '60px', align: 'center' },
-  { key: 'formNm', label: '보고서 양식', width: '200px' },
-  { key: 'refType', label: '참조유형', width: '100px' },
-  { key: 'refId', label: '참조ID', width: '80px', align: 'center' },
-  { key: 'createdAt', label: '등록일시', width: '150px' }
+  { key: 'formNm', label: t('report.formNm'), width: '200px' },
+  { key: 'refType', label: t('report.refType'), width: '100px' },
+  { key: 'refId', label: t('report.refId'), width: '80px', align: 'center' },
+  { key: 'createdAt', label: t('report.createdAt'), width: '150px' }
 ])
 
 const formatDate = (dateStr) => {
@@ -80,7 +80,7 @@ const fetchList = async () => {
     totalPages.value = data.totalPages || 0
     totalElements.value = data.totalElements || 0
   } catch (e) {
-    console.error('보고서 목록 조회 실패:', e)
+    console.error('fetchList failed:', e)
   } finally {
     loading.value = false
   }

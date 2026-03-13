@@ -9,20 +9,20 @@
       <table class="data-table">
         <thead>
           <tr>
-            <th>메뉴명</th>
-            <th>경로</th>
-            <th>아이콘</th>
-            <th>정렬순서</th>
-            <th>사용여부</th>
-            <th>관리</th>
+            <th>{{ t('admin.menuName') }}</th>
+            <th>{{ t('admin.path') }}</th>
+            <th>{{ t('admin.icon') }}</th>
+            <th>{{ t('admin.sortOrder') }}</th>
+            <th>{{ t('admin.useYn') }}</th>
+            <th>{{ t('admin.manage') }}</th>
           </tr>
         </thead>
         <tbody>
           <tr v-if="loading">
-            <td colspan="6" class="text-center">로딩 중...</td>
+            <td colspan="6" class="text-center">{{ t('common.loading') }}</td>
           </tr>
           <tr v-else-if="flatMenus.length === 0">
-            <td colspan="6" class="text-center">등록된 메뉴가 없습니다.</td>
+            <td colspan="6" class="text-center">{{ t('admin.noMenus') }}</td>
           </tr>
           <tr v-for="menu in flatMenus" :key="menu.id">
             <td>
@@ -35,7 +35,7 @@
             <td>{{ menu.sortOrder }}</td>
             <td>
               <span class="status-badge" :class="menu.active !== false ? 'status-active' : 'status-inactive'">
-                {{ menu.active !== false ? '사용' : '미사용' }}
+                {{ menu.active !== false ? t('admin.inUse') : t('admin.notInUse') }}
               </span>
             </td>
             <td>
@@ -50,30 +50,30 @@
     <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
       <div class="modal-card">
         <div class="modal-header">
-          <h2 class="modal-title">{{ editing ? '메뉴 수정' : '메뉴 추가' }}</h2>
+          <h2 class="modal-title">{{ editing ? t('admin.menuEdit') : t('admin.menuAdd') }}</h2>
           <button class="modal-close" @click="closeModal">&times;</button>
         </div>
         <form class="modal-body" @submit.prevent="save">
           <div class="form-group">
-            <label class="form-label">메뉴명</label>
+            <label class="form-label">{{ t('admin.menuName') }}</label>
             <input v-model="form.name" type="text" class="form-input" required />
           </div>
           <div class="form-group">
-            <label class="form-label">경로</label>
+            <label class="form-label">{{ t('admin.path') }}</label>
             <input v-model="form.path" type="text" class="form-input" />
           </div>
           <div class="form-group">
-            <label class="form-label">아이콘</label>
+            <label class="form-label">{{ t('admin.icon') }}</label>
             <input v-model="form.icon" type="text" class="form-input" />
           </div>
           <div class="form-group">
-            <label class="form-label">정렬순서</label>
+            <label class="form-label">{{ t('admin.sortOrder') }}</label>
             <input v-model.number="form.sortOrder" type="number" class="form-input" />
           </div>
           <div class="form-group">
-            <label class="form-label">상위메뉴</label>
+            <label class="form-label">{{ t('admin.parentMenu') }}</label>
             <select v-model="form.parentId" class="form-input">
-              <option value="">없음 (최상위)</option>
+              <option value="">{{ t('admin.noneTopLevel') }}</option>
               <option
                 v-for="m in topMenus"
                 :key="m.id"
@@ -87,7 +87,7 @@
           <div class="modal-footer">
             <button type="button" class="btn btn-default" @click="closeModal">{{ t('common.cancel') }}</button>
             <button type="submit" class="btn btn-primary" :disabled="saving">
-              {{ saving ? '저장 중...' : t('common.save') }}
+              {{ saving ? t('common.saving') : t('common.save') }}
             </button>
           </div>
         </form>

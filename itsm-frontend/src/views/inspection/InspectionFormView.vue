@@ -12,14 +12,14 @@
 
       <div class="form-row">
         <div class="form-group">
-          <label class="required"><!-- 점검 유형 -->점검 유형</label>
+          <label class="required">{{ t('inspection.type') }}</label>
           <select v-model="form.inspectionTypeCd" required>
-            <option value="">{{ t('common.all', '선택') }}</option>
+            <option value="">{{ t('common.select') }}</option>
             <option v-for="tp in inspectionTypes" :key="tp.code" :value="tp.code">{{ tp.name }}</option>
           </select>
         </div>
         <div class="form-group">
-          <label class="required">{{ t('status.SCHEDULED', '예정일') }}</label>
+          <label class="required">{{ t('inspection.scheduledDate') }}</label>
           <input v-model="form.scheduledAt" type="date" required />
         </div>
       </div>
@@ -28,14 +28,14 @@
         <div class="form-group" v-if="!isEdit">
           <label class="required">{{ t('incident.company') }}</label>
           <select v-model="form.companyId" required>
-            <option value="">{{ t('common.all', '선택') }}</option>
+            <option value="">{{ t('common.select') }}</option>
             <option v-for="c in companies" :key="c.companyId" :value="c.companyId">{{ c.companyNm }}</option>
           </select>
         </div>
         <div class="form-group">
           <label>{{ t('incident.assignee') }}</label>
           <select v-model="form.managerId">
-            <option value="">{{ t('common.all', '선택') }}</option>
+            <option value="">{{ t('common.select') }}</option>
             <option v-for="u in users" :key="u.userId" :value="u.userId">{{ u.userNm }}</option>
           </select>
         </div>

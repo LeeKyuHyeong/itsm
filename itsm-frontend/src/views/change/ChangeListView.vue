@@ -7,7 +7,7 @@
 
     <div class="filter-bar">
       <select v-model="filters.statusCd" @change="search">
-        <option value="">{{ t('common.all') }} {{ t('incident.status') }}</option>
+        <option value="">{{ t('common.allStatus') }}</option>
         <option value="DRAFT">{{ t('status.DRAFT') }}</option>
         <option value="APPROVAL_REQUESTED">{{ t('status.REQUESTED') }}</option>
         <option value="APPROVED">{{ t('status.APPROVED') }}</option>
@@ -18,14 +18,14 @@
         <option value="CANCELLED">{{ t('status.CANCELLED') }}</option>
       </select>
       <select v-model="filters.priorityCd" @change="search">
-        <option value="">{{ t('common.all') }} {{ t('incident.priority') }}</option>
+        <option value="">{{ t('common.allPriority') }}</option>
         <option value="CRITICAL">{{ t('priority.CRITICAL') }}</option>
         <option value="HIGH">{{ t('priority.HIGH') }}</option>
         <option value="MEDIUM">{{ t('priority.MEDIUM') }}</option>
         <option value="LOW">{{ t('priority.LOW') }}</option>
       </select>
       <select v-model="filters.changeTypeCd" @change="search">
-        <option value="">{{ t('common.all') }} {{ t('asset.assetType', '유형') }}</option>
+        <option value="">{{ t('common.allType') }}</option>
         <option v-for="tp in changeTypes" :key="tp.code" :value="tp.code">{{ tp.name }}</option>
       </select>
       <div class="search-box">
@@ -88,11 +88,11 @@ const filters = reactive({
 const columns = computed(() => [
   { key: 'changeId', label: 'ID', width: '60px', align: 'center' },
   { key: 'title', label: t('incident.incidentTitle') },
-  { key: 'changeTypeCd', label: t('asset.assetType', '유형'), width: '100px' },
+  { key: 'changeTypeCd', label: t('change.type'), width: '100px' },
   { key: 'priorityCd', label: t('incident.priority'), width: '100px', align: 'center' },
   { key: 'statusCd', label: t('incident.status'), width: '110px', align: 'center' },
   { key: 'companyNm', label: t('incident.company'), width: '120px' },
-  { key: 'scheduledAt', label: '예정일시', width: '150px' },
+  { key: 'scheduledAt', label: t('change.scheduledAt'), width: '150px' },
   { key: 'createdAt', label: t('board.createdAt'), width: '150px' }
 ])
 
