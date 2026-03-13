@@ -1,396 +1,163 @@
 # ITSM 개발 TODO
 
 > Vue.js (프론트엔드) + Spring Boot (백엔드) REST API 구조
-> 구현 우선순위: 1.장애관리(완성도) → 2.서비스요청(MVP) → 3.변경관리(MVP)
 
 ---
 
-## Phase 0: 프로젝트 초기 세팅
-
-### 백엔드 (Spring Boot 멀티모듈)
-- [x] Gradle 멀티모듈 프로젝트 생성 (`itsm-core`, `itsm-api`, `itsm-batch`)
-- [x] `settings.gradle` / `build.gradle` 구성
-- [x] Spring Boot 의존성 설정 (Spring Web, JPA, Security, Validation, QueryDSL)
-- [x] DB 연결 설정 (MySQL/MariaDB + `application.yml`) — local/prod/test 프로파일 분리
-- [x] JPA 공통 설정 (`JpaConfig.java`, Auditing)
-- [x] 공통 응답 포맷 구현 (`ApiResponse`, `ErrorResponse`)
-- [x] 공통 예외 처리 (`BusinessException`, `ErrorCode`, `GlobalExceptionHandler`)
-- [x] Swagger (SpringDoc) 설정
-
-### 프론트엔드 (Vue.js)
-- [x] Vite + Vue 3 프로젝트 생성
-- [x] 의존성 설치 (Vue Router, Pinia, Axios, Chart.js)
-- [x] 프로젝트 폴더 구조 생성
-- [x] Axios 인스턴스 및 인터셉터 설정 (JWT 자동 첨부, 에러 핸들링)
-- [x] 전역 CSS / 변수 파일 세팅
-- [x] 공통 레이아웃 컴포넌트 (`AppLayout`, `AppHeader`, `AppSidebar`, `AppBreadcrumb`)
-
-### DB 스키마
-- [x] 전체 40개 테이블 DDL (`sql/01_ddl.sql`)
-- [x] 초기 데이터 DML (`sql/02_dml.sql`) — 역할, 메뉴, 관리자, 공통코드, SLA, 시스템설정
-
----
-
-## Phase 1: 인증 / 계정 / 조직 (기반 시스템)
-
-### DB 스키마
-- [x] `tb_company` / `tb_company_history` 테이블 생성 (Phase 0에서 완료)
-- [x] `tb_department` / `tb_department_history` 테이블 생성 (Phase 0에서 완료)
-- [x] `tb_user` / `tb_user_history` 테이블 생성 (Phase 0에서 완료)
-- [x] `tb_role` / `tb_user_role` 테이블 생성 (Phase 0에서 완료)
-- [x] `tb_menu` / `tb_role_menu` 테이블 생성 (Phase 0에서 완료)
-- [x] `tb_access_log` 테이블 생성 (Phase 0에서 완료)
-- [x] 초기 데이터 Insert (역할, 메뉴, 슈퍼관리자 계정, 공통코드) (Phase 0에서 완료)
-
-### 백엔드 — 엔티티 / 리포지토리
-- [x] `User`, `UserHistory` 엔티티 (Temporal Data Modeling — valid_from/valid_to)
-- [x] `Role`, `UserRole` 엔티티
-- [x] `Company`, `CompanyHistory`, `Department`, `DepartmentHistory` 엔티티
-- [x] `Menu`, `RoleMenu` 엔티티 (자기참조 구조)
-- [x] 각 엔티티 JPA Repository
-
-### 백엔드 — 인증 (JWT + Spring Security)
-- [x] `SecurityConfig` (Spring Security 설정, 필터 체인)
-- [x] `JwtTokenProvider` (Access Token / Refresh Token 생성, 검증, 파싱)
-- [x] `JwtAuthFilter` (요청마다 JWT 검증 필터)
-- [x] `CustomUserDetailsService` (DB 기반 인증)
-- [x] `AuthController` — 로그인, 로그아웃, 토큰 갱신, 내 정보 조회, 비밀번호 변경
-- [x] 비밀번호 정책 검증 (8자 이상, 영문대소문자+숫자+특수문자)
-- [x] 로그인 실패 5회 제한 → 계정 잠금 (LOCKED) → 30분 자동 해제
-- [x] Refresh Token HttpOnly Cookie 저장
-- [x] `tb_access_log` 로그인/로그아웃/실패 이력 적재
-
-### 백엔드 — 권한 (RBAC)
-- [x] `AuthInterceptor` (URL별 역할 검증 — 백엔드 이중 방어)
-- [x] `MenuAccessInterceptor` (메뉴 접근 로그 — `tb_menu_access_log`)
-- [x] 역할별 메뉴 조회 API (`GET /api/v1/admin/menus`)
-
-### 백엔드 — 사용자 / 조직 CRUD
-- [x] `UserController` + `UserService` — 목록, 등록, 상세, 수정, 상태변경, 이력조회
-- [x] `CompanyController` + `CompanyService` — 회사 CRUD + 이력
-- [x] 부서 CRUD (회사 하위)
-- [x] 역할 부여/회수 API
-- [x] 사용자 변경 시 `tb_user_history` 자동 적재 (Temporal 방식)
-- [x] 회사/부서 변경 시 이력 테이블 적재 (단순 이력 방식)
-- [x] login_id 마스킹 처리 (DELETED 시 `DELETED_{userId}_{loginId}`)
-
-### 프론트엔드 — 인증
-- [x] `LoginView.vue` (로그인 화면)
-- [x] `auth.js` Pinia store (JWT, 사용자 정보 관리)
-- [x] `guards.js` Vue Router 네비게이션 가드 (인증/권한 체크)
-- [x] Axios 인터셉터 — Access Token 만료 시 Refresh Token 자동 갱신
-- [x] 최초 로그인 시 비밀번호 강제 변경 화면
-- [x] 90일 초과 비밀번호 변경 안내 팝업
-
-### 프론트엔드 — 레이아웃 / 메뉴
-- [x] `AppSidebar.vue` — 역할 기반 동적 메뉴 렌더링 (API 조회)
-- [x] `AppHeader.vue` — 알림 아이콘, 사용자 정보
-- [x] `AppBreadcrumb.vue`
-
-### 프론트엔드 — 계정 / 조직 관리
-- [x] `AccountManageView.vue` — 사용자 목록, 등록, 수정, 상태 변경, 역할 관리
-- [x] `OrgManageView.vue` — 회사/부서 관리
-
----
-
-## Phase 2: 공통코드 / 설정 관리
-
-### DB 스키마
-- [x] `tb_common_code` / `tb_common_code_detail` 테이블 생성 (Phase 0에서 완료)
-- [x] `tb_system_config` 테이블 생성 (Phase 0에서 완료)
-- [x] `tb_sla_policy` 테이블 생성 (Phase 0에서 완료)
-- [x] `tb_notification_policy` 테이블 생성 (Phase 0에서 완료)
-- [x] `tb_notification` 테이블 생성 (Phase 0에서 완료)
-- [x] `tb_audit_log` / `tb_menu_access_log` 테이블 생성 (Phase 0에서 완료)
-- [x] 초기 공통코드 데이터 Insert (Phase 0에서 완료)
-
-### 백엔드 — 공통코드
-- [x] `CommonCode`, `CommonCodeDetail` 엔티티
-- [x] `CommonCodeController` — 그룹/상세 CRUD API
-- [x] 프론트에서 공통코드 캐싱용 조회 API
-
-### 백엔드 — 시스템 설정
-- [x] `SystemConfig` 엔티티
-- [x] `SystemConfigController` — 설정 조회/수정 API
-- [x] 공지사항, 시스템 점검 배너 설정
-
-### 백엔드 — SLA / 알림 정책
-- [x] `SlaPolicy` 엔티티
-- [x] `SlaController` — SLA 정책 CRUD API (고객사별/전체 기본값)
-- [x] `NotificationPolicy` 엔티티
-- [x] 알림 정책 CRUD API
-
-### 백엔드 — 알림
-- [x] `Notification` 엔티티
-- [x] `NotificationController` — 내 알림 목록, 읽음 처리, 전체 읽음
-- [x] 알림 발송 공통 서비스 (`NotificationService`)
-
-### 백엔드 — 감사 로그
-- [x] `AuditLogAspect` (AOP 기반 자동 적재)
-- [x] `AuditLog` 엔티티
-
-### 프론트엔드 — 설정 관리
-- [x] `CommonCodeView.vue` — 공통코드 관리 화면
-- [x] `SlaManageView.vue` — SLA 정책 관리
-- [x] `NotificationPolicyView.vue` — 알림 정책 관리
-- [x] `MenuManageView.vue` — 메뉴/권한 관리
-- [x] `commonCode.js` Pinia store — 공통코드 캐싱
-
-### 프론트엔드 — 알림
-- [x] `notification.js` Pinia store
-- [x] `NotificationDropdown.vue` — 헤더 알림 드롭다운
-
-### 프론트엔드 — 공통 컴포넌트
-- [x] `BaseTable.vue` — 공통 테이블 (정렬, 페이지네이션)
-- [x] `BasePagination.vue`
-- [x] `BaseModal.vue`
-- [x] `BaseConfirm.vue` — 확인/취소 다이얼로그
-- [x] `BaseFileUpload.vue`
-- [x] `BaseStatusBadge.vue` — 상태 뱃지 (색상 자동)
-- [x] `BaseSlaBar.vue` — SLA 경과율 프로그레스바
-- [x] `DynamicForm.vue` — 동적 폼 렌더러 (JSON 스키마 기반)
-
----
-
-## Phase 3: 자산관리 (CMDB)
-
-### DB 스키마
-- [x] `tb_asset_hw` / `tb_asset_hw_history` 테이블 생성 (Phase 0에서 완료)
-- [x] `tb_asset_sw` / `tb_asset_sw_history` 테이블 생성 (Phase 0에서 완료)
-- [x] `tb_asset_relation` 테이블 생성 (Phase 0에서 완료)
-
-### 백엔드
-- [x] `AssetHw`, `AssetSw`, `AssetRelation` 엔티티 + History 엔티티
-- [x] `AssetHwController` — HW 자산 CRUD + 이력 조회 API
-- [x] `AssetSwController` — SW 자산 CRUD + 이력 조회 API
-- [x] 자산 연관관계 등록/삭제 API
-- [x] 자산 수정 시 `tb_asset_hw_history` / `tb_asset_sw_history` 자동 적재
+## Phase 11: UI 테마 (라이트/다크 모드)
 
 ### 프론트엔드
-- [x] `AssetHwListView.vue` — HW 자산 목록 (검색, 필터, 페이지네이션)
-- [x] `AssetHwDetailView.vue` — HW 자산 상세 (연관 SW, 변경이력, 관련 장애/변경)
-- [x] `AssetSwListView.vue` — SW 자산 목록
-- [x] `AssetSwDetailView.vue` — SW 자산 상세
+- [ ] CSS 변수 기반 테마 시스템 구축 (`:root` / `[data-theme="dark"]`)
+- [ ] 다크 테마 색상 팔레트 정의
+  - [ ] 배경색 (surface, card, sidebar, header)
+  - [ ] 텍스트 색상 (primary, secondary, disabled)
+  - [ ] 보더, 쉐도우, 오버레이 색상
+  - [ ] 상태 뱃지 색상 (green, red, blue, gray 계열 다크 대응)
+  - [ ] 차트 색상 대응
+- [ ] 테마 토글 버튼 (AppHeader에 추가)
+- [ ] localStorage 기반 테마 설정 유지 (`itsm-theme`)
+- [ ] 사이드바 다크 테마 대응 (현재 이미 다크 계열이므로 라이트 모드 사이드바 추가)
+- [ ] 테이블, 모달, 폼 등 공통 컴포넌트 테마 대응
+- [ ] 로그인 화면 테마 대응
 
 ---
 
-## Phase 4: 장애관리 (완성도 있게 구현)
+## Phase 12: 자산관리 재구조화
 
-### DB 스키마
-- [x] `tb_incident` 테이블 생성 (Phase 0에서 완료)
-- [x] `tb_incident_asset` 테이블 생성 (Phase 0에서 완료)
-- [x] `tb_incident_assignee` 테이블 생성 (Phase 0에서 완료)
-- [x] `tb_incident_comment` 테이블 생성 (Phase 0에서 완료)
-- [x] `tb_incident_history` 테이블 생성 (Phase 0에서 완료)
-- [x] `tb_incident_report` 테이블 생성 (Phase 0에서 완료)
+### 자산 분류 체계
+
+#### 대분류 (3개)
+| 대분류 코드 | 대분류명 | 설명 |
+|---|---|---|
+| INFRA_HW | 운영장비 | 데이터센터/서버실 운영 인프라 장비 |
+| INFRA_SW | 운영SW | 인프라 운영에 사용되는 소프트웨어 |
+| OA | OA자산 | 사무용 IT 자산 (PC, 노트북, 주변기기 등) |
+
+#### 중분류 — 운영장비 (INFRA_HW)
+| 중분류 코드 | 중분류명 | 예시 |
+|---|---|---|
+| SERVER_RACK | 랙마운트 서버 | Dell PowerEdge R750, HPE DL380 |
+| SERVER_BLADE | 블레이드 서버 | HPE Synergy, Cisco UCS |
+| SERVER_TOWER | 타워 서버 | Dell T550, HPE ML350 |
+| STORAGE_SAN | SAN 스토리지 | EMC Unity, NetApp AFF |
+| STORAGE_NAS | NAS | Synology, QNAP Enterprise |
+| NETWORK_SWITCH | 네트워크 스위치 | Cisco Catalyst, Arista |
+| NETWORK_ROUTER | 라우터 | Cisco ISR, Juniper MX |
+| NETWORK_FW | 방화벽 | Palo Alto, FortiGate |
+| NETWORK_LB | 로드밸런서 | F5 BIG-IP, Citrix ADC |
+| NETWORK_AP | 무선AP | Cisco AP, Aruba |
+| SECURITY_IDS | IDS/IPS | Snort, Suricata |
+| SECURITY_WAF | WAF | AWS WAF, Imperva |
+| POWER_UPS | UPS | APC Smart-UPS |
+| POWER_PDU | PDU | Raritan, APC |
+| INFRA_KVM | KVM/콘솔 | Raritan KVM |
+
+#### 중분류 — 운영SW (INFRA_SW)
+| 중분류 코드 | 중분류명 | 예시 |
+|---|---|---|
+| SW_OS | 운영체제 | RHEL, Windows Server, Ubuntu |
+| SW_DB | 데이터베이스 | Oracle, MySQL, PostgreSQL, MSSQL |
+| SW_WAS | WAS/웹서버 | Tomcat, Nginx, Apache, WebLogic |
+| SW_MIDDLEWARE | 미들웨어 | RabbitMQ, Kafka, Redis |
+| SW_MONITORING | 모니터링 | Zabbix, Grafana, Prometheus |
+| SW_BACKUP | 백업솔루션 | Veeam, Acronis, NetBackup |
+| SW_SECURITY | 보안솔루션 | V3, 알약, CrowdStrike |
+| SW_VIRTUALIZATION | 가상화 | VMware vSphere, Hyper-V, KVM |
+| SW_CONTAINER | 컨테이너/오케 | Docker, Kubernetes, OpenShift |
+| SW_CICD | CI/CD | Jenkins, GitLab CI, ArgoCD |
+| SW_LICENSE | 상용라이선스 | MS Office 볼륨, Adobe CC |
+
+#### 중분류 — OA자산 (OA)
+| 중분류 코드 | 중분류명 | 예시 |
+|---|---|---|
+| OA_DESKTOP | 데스크톱 | Dell OptiPlex, HP EliteDesk |
+| OA_LAPTOP | 노트북 | Dell Latitude, Lenovo ThinkPad |
+| OA_MONITOR | 모니터 | Dell U2722D, LG 27UK850 |
+| OA_PRINTER | 프린터/복합기 | HP LaserJet, Canon IR |
+| OA_PHONE | 전화/VoIP | Cisco IP Phone |
+| OA_TABLET | 태블릿 | iPad, Galaxy Tab |
+| OA_PERIPHERAL | 주변기기 | 키보드, 마우스, 도킹스테이션 |
+| OA_PROJECTOR | 프로젝터 | Epson, BenQ |
+
+### DB 스키마 변경
+- [ ] `tb_asset_hw` 테이블에 `asset_category` (대분류), `asset_sub_category` (중분류) 컬럼 추가
+- [ ] `tb_asset_sw` 테이블에 `asset_category`, `asset_sub_category` 컬럼 추가
+- [ ] 공통코드에 자산 대분류/중분류 코드 등록 (ASSET_CATEGORY, ASSET_SUB_CATEGORY 그룹)
+- [ ] 마이그레이션 SQL 작성 (기존 데이터 분류 매핑)
 
 ### 백엔드
-- [x] `Incident`, `IncidentAsset`, `IncidentAssignee` 엔티티
-- [x] `IncidentComment`, `IncidentHistory`, `IncidentReport` 엔티티
-- [x] `IncidentController` + `IncidentService`
-  - [x] 장애 CRUD API
-  - [x] 상태 변경 API (상태머신: 접수→처리중→완료→종료, 반려)
-  - [x] 담당자 지정/해제 API
-  - [x] 댓글 CRUD API
-  - [x] 변경 이력 조회 API
-  - [x] 장애보고서 작성/수정 API
-- [x] 상태머신 검증 (유효하지 않은 상태 전이 차단)
-- [ ] 수정 권한 검증 (상태별 + 역할별 권한 매트릭스)
-- [x] SLA 기한 자동 계산 (`sla_deadline_at = 접수일시 + deadline_hours`)
-- [x] 수정 시 `tb_incident_history` 자동 적재
-- [x] 연관 자산 매핑 (HW/SW)
-- [x] `SlaCalculator` — 경과율 실시간 계산, 반려 시 기한 연장
+- [ ] `AssetHw`, `AssetSw` 엔티티에 분류 필드 추가
+- [ ] 자산 목록 API에 대분류/중분류 필터 추가
+- [ ] 자산 통계 API (분류별 자산 현황)
 
 ### 프론트엔드
-- [x] `IncidentListView.vue` — 장애 목록 (상태필터, 우선순위필터, 검색, SLA 경과율 표시)
-- [x] `IncidentFormView.vue` — 장애 등록/수정 (자산 연결, 우선순위 선택)
-- [x] `IncidentDetailView.vue` — 장애 상세
-  - [x] 상태머신 버튼 (현재 상태에 따라 활성/비활성)
-  - [x] 담당자 배정 영역
-  - [x] 처리내용 작성 영역 (주담당자만)
-  - [x] 댓글 영역
-  - [x] 변경 이력 타임라인
-  - [x] SLA 카운트다운 / 프로그레스바
-  - [x] 장애보고서 작성 (동적 폼 — `DynamicForm.vue` 활용)
-
-### 대시보드
-- [x] `DashboardView.vue`
-  - [x] 상태별 장애 건수 (도넛/파이 차트)
-  - [x] 우선순위별 미처리 건수
-  - [x] SLA 초과/임박 건수
-  - [x] 최근 장애 목록
-  - [x] 월별 장애 추이 (라인 차트)
+- [ ] 자산 목록 뷰 3탭 구성 (운영장비 / 운영SW / OA)
+- [ ] 중분류 필터 드롭다운 (대분류 선택 시 중분류 연동)
+- [ ] 자산 등록/수정 폼에 대분류/중분류 선택 추가
+- [ ] 대시보드에 자산 분류별 현황 위젯 추가
 
 ---
 
-## Phase 5: 서비스요청 (MVP)
+## Phase 13: 데모/시뮬레이션 배치
 
-### DB 스키마
-- [x] `tb_service_request` 테이블 생성 (Phase 0에서 완료)
-- [x] `tb_service_request_asset` 테이블 생성 (Phase 0에서 완료)
-- [x] `tb_service_request_assignee` 테이블 생성 (Phase 0에서 완료)
-- [x] `tb_service_request_process` 테이블 생성 (Phase 0에서 완료)
-- [x] `tb_service_request_history` 테이블 생성 (Phase 0에서 완료)
+> 목적: 실제 운영 중인 것처럼 보이도록 자동으로 데이터를 생성하여 통계 및 현황 데이터를 풍부하게 만든다.
 
-### 백엔드
-- [x] 엔티티: `ServiceRequest`, `ServiceRequestAsset`, `ServiceRequestAssignee`, `ServiceRequestProcess`, `ServiceRequestHistory`
-- [x] `ServiceRequestController` + `ServiceRequestService`
-  - [x] SR CRUD API
-  - [x] 상태 변경 API (접수→담당자배정→처리중→완료대기→종료, 요청취소, 반려)
-  - [x] 담당자 지정/제거 API
-  - [x] 처리내용 작성/수정/완료 API (담당자별)
-  - [ ] 댓글 CRUD API
-  - [x] 만족도 제출 API
-  - [x] 변경 이력 조회 API
-- [x] 상태 자동 전환 (담당자 전원 COMPLETED → 완료대기)
-- [ ] 담당자 전원 제거 시 접수로 자동 되돌림
-- [x] SLA 기한 자동 계산 (요청일 기준, 반려 시 연장)
-- [ ] 담당자 퇴사/비활성화 엣지케이스 처리
-- [ ] 중복 등록 방지 (debounce)
+### 자산 자동 등록 배치
+- [ ] `AssetAutoRegisterJob` — 분류체계 기반 자산 자동 생성
+  - 운영장비 100+대, 운영SW 50+건, OA자산 200+대 초기 세팅
+  - 자산별 리얼한 제조사/모델/시리얼번호 생성
+  - 자산 간 연관관계 자동 매핑 (서버↔OS, 서버↔DB 등)
+  - 위치 정보 (데이터센터 A/B, 사무실 N층 등)
+  - 실행 주기: 초기 1회 + 월 1~2건 신규 자산 추가
 
-### 프론트엔드
-- [x] `ServiceRequestListView.vue` — SR 목록
-- [x] `ServiceRequestFormView.vue` — SR 등록/수정
-- [x] `ServiceRequestDetailView.vue` — SR 상세
-  - [x] 상태머신 UI
-  - [x] 담당자별 처리현황 (N/N 완료 카운트)
-  - [x] 반려 횟수 표시
-  - [x] 만족도 조사 영역
+### 장애 시뮬레이션 배치
+- [ ] `IncidentSimulationJob` — 장애 자동 생성 및 처리
+  - 일 2~5건 장애 자동 접수 (시간대별 가중치: 업무시간 높음)
+  - 장애 유형: 서버 다운, 네트워크 장애, DB 성능저하, 스토리지 용량, 보안 이벤트 등
+  - 자동 담당자 배정 (접수 후 10~60분)
+  - 자동 처리 완료 (배정 후 1~8시간, 우선순위에 따라 차등)
+  - SLA 초과 건 5~10% 비율로 발생
+  - 댓글/이력 자동 생성 (처리 과정 기록)
+  - 장애보고서 자동 작성 (완료 건)
+  - 실행 주기: 매 30분
 
----
+### 서비스요청 시뮬레이션 배치
+- [ ] `ServiceRequestSimulationJob` — SR 자동 생성 및 처리
+  - 일 3~8건 SR 자동 접수
+  - 요청 유형: 계정 생성/변경, 권한 요청, SW 설치, HW 교체, VPN 설정 등
+  - 자동 배정 → 처리 → 완료 흐름
+  - 만족도 자동 입력 (3.5~5.0 분포)
+  - 실행 주기: 매 1시간
 
-## Phase 6: 변경관리 (MVP)
+### 변경관리 시뮬레이션 배치
+- [ ] `ChangeSimulationJob` — 변경 자동 생성 및 승인
+  - 주 2~4건 변경 요청 생성
+  - 변경 유형: 패치 적용, 설정 변경, 업그레이드, 인프라 확장 등
+  - 승인 → 실행 → 완료 자동 흐름 (1~3일 소요)
+  - 반려 10~15% 비율
+  - 실행 주기: 일 1회
 
-### DB 스키마
-- [x] `tb_change` 테이블 생성 (Phase 0에서 완료)
-- [x] `tb_change_asset` 테이블 생성 (Phase 0에서 완료)
-- [x] `tb_change_approver` 테이블 생성 (Phase 0에서 완료)
-- [x] `tb_change_history` 테이블 생성 (Phase 0에서 완료)
-- [x] `tb_change_comment` 테이블 생성 (Phase 0에서 완료)
+### 정기점검 시뮬레이션 배치
+- [ ] `InspectionSimulationJob` — 점검 자동 수행
+  - 월간/주간 정기점검 일정 자동 생성
+  - 체크리스트 결과 자동 입력 (정상 90%, 이상 10%)
+  - 이상 발견 시 장애 자동 연계 등록
+  - 실행 주기: 일 1회
 
-### 백엔드
-- [x] 엔티티: `Change`, `ChangeAsset`, `ChangeApprover`, `ChangeHistory`, `ChangeComment`
-- [x] `ChangeController` + `ChangeService`
-  - [x] 변경 CRUD API
-  - [x] 상태 변경 API (초안→승인요청→승인완료→실행중→완료→종료, 반려)
-  - [x] 승인자 지정 API
-  - [x] 승인/반려 처리 API (순차 승인)
-  - [x] 댓글 CRUD API
-  - [x] 변경 이력 조회 API
-- [x] 순차 승인 로직 (approve_order 기반)
-- [x] 승인자 전원 승인 시 자동 상태 전환
+### 트래픽/모니터링 시뮬레이션 배치
+- [ ] `TrafficSimulationJob` — 시스템 활동 로그 생성
+  - 사용자 로그인/로그아웃 이력 자동 생성 (업무시간 집중)
+  - 메뉴 접근 로그 생성 (페이지별 조회수)
+  - 알림 자동 발생 및 읽음 처리
+  - 실행 주기: 매 15분
 
-### 프론트엔드
-- [x] `ChangeListView.vue` — 변경 목록
-- [x] `ChangeFormView.vue` — 변경 등록/수정 (롤백 계획 포함)
-- [x] `ChangeDetailView.vue` — 변경 상세
-  - [x] 승인 현황 (승인자별 상태)
-  - [x] 상태머신 UI
-  - [x] 댓글 영역
-
----
-
-## Phase 7: 정기점검 / 보고관리
-
-### DB 스키마
-- [x] `tb_inspection` / `tb_inspection_asset` 테이블 생성 (Phase 0에서 완료)
-- [x] `tb_inspection_item` / `tb_inspection_result` 테이블 생성 (Phase 0에서 완료)
-- [x] `tb_inspection_history` 테이블 생성 (Phase 0에서 완료)
-- [x] `tb_report_form` / `tb_report` 테이블 생성 (Phase 0에서 완료)
-
-### 백엔드 — 정기점검
-- [x] 엔티티: `Inspection`, `InspectionAsset`, `InspectionItem`, `InspectionResult`, `InspectionHistory`
-- [x] `InspectionController` + `InspectionService`
-  - [x] 점검 CRUD API
-  - [x] 상태 변경 API (예정→진행중→완료→종료, 보류)
-  - [x] 체크리스트 항목 등록/수정 API
-  - [x] 점검 결과 입력/수정 API
-
-### 백엔드 — 보고관리
-- [x] `ReportForm`, `Report` 엔티티
-- [x] `ReportController` — 양식 CRUD, 보고서 작성/조회/수정 API
-- [x] 보고서 양식 관리 (JSON 스키마 기반 동적 폼)
-- [x] 참조유형별(INCIDENT/SR/CHANGE/INSPECTION) 연결
-
-### 프론트엔드 — 정기점검
-- [x] `InspectionListView.vue` — 점검 목록/일정
-- [x] `InspectionFormView.vue` — 점검 등록
-- [x] `InspectionDetailView.vue` — 점검 상세 (체크리스트 결과 입력)
-
-### 프론트엔드 — 보고관리
-- [x] `ReportListView.vue` — 보고서 목록
-- [x] `ReportDetailView.vue` — 보고서 상세/출력/PDF 다운로드
-- [x] 보고서 양식 관리 화면 (설정관리 내)
-
----
-
-## Phase 8: 게시판
-
-### DB 스키마
-- [x] `tb_board_config` 테이블 생성 (Phase 0에서 완료)
-- [x] `tb_board_post` 테이블 생성 (Phase 0에서 완료)
-- [x] `tb_board_comment` 테이블 생성 (Phase 0에서 완료)
-- [x] `tb_board_file` 테이블 생성 (Phase 0에서 완료)
-
-### 백엔드
-- [x] `BoardConfig`, `BoardPost`, `BoardComment`, `BoardFile` 엔티티
-- [x] `BoardController` — 게시판 목록, 게시글 CRUD, 댓글 CRUD API
-- [x] 게시판 빌더 API (`/api/v1/admin/boards` — 생성/수정/설정)
-- [ ] 역할별 읽기/쓰기 권한 검증 (role_permission JSON 기반)
-- [ ] 파일 업로드 — 허용 확장자 화이트리스트, UUID 파일명, 용량 제한
-- [ ] 게시판 생성 시 사이드바 메뉴 자동 반영
-
-### 프론트엔드
-- [x] `BoardListView.vue` — 게시글 목록 (게시판별)
-- [x] `BoardPostFormView.vue` — 게시글 작성/수정 (첨부파일)
-- [x] `BoardPostDetailView.vue` — 게시글 상세/댓글
-- [x] `BoardManageView.vue` — 게시판 빌더 (관리자)
-- [ ] 사이드바 게시판 메뉴 동적 렌더링
-
----
-
-## Phase 9: Spring Batch (자동화)
-
-### 배치 모듈 (`itsm-batch`)
-- [x] `BatchConfig` 설정
-- [x] SLA 경고 알림 (매시간 — 경과율 80% 초과 건)
-- [x] SLA 초과 에스컬레이션 (매시간 — 기한 초과 미종료 건)
-- [x] 미배정 장애 알림 (매시간)
-- [x] 완료대기 장기 미처리 SR 알림 (일 1회 — 2일 초과)
-- [x] 반복 장애 감지 (일 1회 — 동일 자산 30일 내 3회 이상)
-- [x] 자산 만료 임박 알림 (일 1회 — 30일/7일 전)
-- [x] 점검 임박 알림 (일 1회 — 7일/3일 전)
-- [x] 미실시 점검 감지 (일 1회)
-- [ ] 연간 SLA 보고서 자동 집계 (연 1회)
-
----
-
-## Phase 10: 대시보드 고도화 / 통계
-
-- [x] 대시보드에 서비스요청, 변경관리 통계 추가
-- [x] 운영 모니터링 지표 (미처리/지연/미배정 건수)
-- [ ] SLA 지표 현황 (장애처리율, 기한준수율, 만족도 평균 등)
-- [ ] 시스템 가용률 계산 및 표시
-- [ ] 담당자별 처리 건수 통계
-- [x] 월별/분기별 추이 차트
-
----
-
-## 기술 스택 요약
-
-| 영역 | 기술 |
-|---|---|
-| 백엔드 프레임워크 | Spring Boot |
-| 빌드 도구 | Gradle (멀티모듈) |
-| ORM | Spring Data JPA + QueryDSL |
-| 인증 | JWT (Access + Refresh Token) + Spring Security |
-| 배치 | Spring Batch |
-| 프론트엔드 | Vue 3 + Vite |
-| 상태관리 | Pinia |
-| HTTP 클라이언트 | Axios |
-| 라우팅 | Vue Router |
-| 차트 | Chart.js (Vue Chart) |
-| API 문서 | Swagger (SpringDoc) |
+### 통계 집계 배치
+- [ ] `StatisticsAggregationJob` — 대시보드용 통계 데이터 집계
+  - 일별/주별/월별 장애 건수, 평균 처리시간, SLA 준수율
+  - 서비스요청 처리 현황 및 만족도 추이
+  - 자산 가동률 및 장애 빈도 (자산별)
+  - 담당자별 업무 처리 통계
+  - 실행 주기: 일 1회 (새벽 2시)
 
 ---
 
