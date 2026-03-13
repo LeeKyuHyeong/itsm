@@ -8,8 +8,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface ChangeRepository extends JpaRepository<Change, Long> {
+
+    List<Change> findByStatusCd(String statusCd);
 
     @Query("SELECT c FROM Change c WHERE " +
             "(:keyword IS NULL OR c.title LIKE %:keyword% OR c.content LIKE %:keyword%) " +

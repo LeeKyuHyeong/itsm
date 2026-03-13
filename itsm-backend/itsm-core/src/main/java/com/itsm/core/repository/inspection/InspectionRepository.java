@@ -12,6 +12,8 @@ import java.util.List;
 
 public interface InspectionRepository extends JpaRepository<Inspection, Long> {
 
+    List<Inspection> findByStatusCd(String statusCd);
+
     List<Inspection> findByStatusCdAndScheduledAtBetween(String statusCd, LocalDate from, LocalDate to);
 
     List<Inspection> findByStatusCdAndScheduledAtBefore(String statusCd, LocalDate date);
