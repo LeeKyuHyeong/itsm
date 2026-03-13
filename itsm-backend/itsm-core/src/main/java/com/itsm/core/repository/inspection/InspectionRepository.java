@@ -7,7 +7,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
+import java.util.List;
+
 public interface InspectionRepository extends JpaRepository<Inspection, Long> {
+
+    List<Inspection> findByStatusCdAndScheduledAtBetween(String statusCd, LocalDate from, LocalDate to);
+
+    List<Inspection> findByStatusCdAndScheduledAtBefore(String statusCd, LocalDate date);
 
     @Query("SELECT i FROM Inspection i WHERE " +
             "(:keyword IS NULL OR i.title LIKE %:keyword% OR i.description LIKE %:keyword%) " +
@@ -19,4 +26,7 @@ public interface InspectionRepository extends JpaRepository<Inspection, Long> {
                             @Param("statusCd") String statusCd,
                             @Param("inspectionTypeCd") String inspectionTypeCd,
                             Pageable pageable);
+
+    @Query("SELECT COUNT(i) FROM Inspection i WHERE i.statusCd = :statusCd")
+    long countByStatusCd(@Param("statusCd") String statusCd);
 }

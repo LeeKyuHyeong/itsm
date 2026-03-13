@@ -68,7 +68,7 @@ public class ServiceRequest extends BaseEntity {
     private Company company;
 
     @Column(name = "satisfaction_score")
-    private Integer satisfactionScore;
+    private int satisfactionScore;
 
     @Column(name = "satisfaction_comment", length = 500)
     private String satisfactionComment;

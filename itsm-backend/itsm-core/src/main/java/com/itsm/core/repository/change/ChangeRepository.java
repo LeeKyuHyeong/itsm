@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
+
 public interface ChangeRepository extends JpaRepository<Change, Long> {
 
     @Query("SELECT c FROM Change c WHERE " +
@@ -21,4 +23,10 @@ public interface ChangeRepository extends JpaRepository<Change, Long> {
                         @Param("priorityCd") String priorityCd,
                         @Param("changeTypeCd") String changeTypeCd,
                         Pageable pageable);
+
+    @Query("SELECT COUNT(c) FROM Change c WHERE c.statusCd = :statusCd")
+    long countByStatusCd(@Param("statusCd") String statusCd);
+
+    @Query("SELECT COUNT(c) FROM Change c WHERE c.createdAt >= :from AND c.createdAt < :to")
+    long countByCreatedAtBetween(@Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
 }

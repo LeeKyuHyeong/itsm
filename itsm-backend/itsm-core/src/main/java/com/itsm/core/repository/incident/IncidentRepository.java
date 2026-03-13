@@ -7,9 +7,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface IncidentRepository extends JpaRepository<Incident, Long> {
+
+    List<Incident> findByStatusCdIn(List<String> statusCds);
+
+    @Query("SELECT i FROM Incident i WHERE i.statusCd IN :statusCds AND i.mainManager IS NULL")
+    List<Incident> findByStatusCdInAndMainManagerIsNull(@Param("statusCds") List<String> statusCds);
 
     @Query("SELECT i FROM Incident i WHERE " +
             "(:keyword IS NULL OR i.title LIKE %:keyword% OR i.content LIKE %:keyword%) " +
@@ -33,4 +39,10 @@ public interface IncidentRepository extends JpaRepository<Incident, Long> {
 
     @Query("SELECT COUNT(i) FROM Incident i WHERE i.statusCd = :statusCd AND i.priorityCd = :priorityCd")
     long countByStatusCdAndPriorityCd(@Param("statusCd") String statusCd, @Param("priorityCd") String priorityCd);
+
+    @Query("SELECT COUNT(i) FROM Incident i WHERE i.statusCd IN ('RECEIVED', 'IN_PROGRESS') AND i.mainManager IS NULL")
+    long countUnassigned();
+
+    @Query("SELECT COUNT(i) FROM Incident i WHERE i.createdAt >= :from AND i.createdAt < :to")
+    long countByCreatedAtBetween(@Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
 }

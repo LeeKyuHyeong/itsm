@@ -7,7 +7,16 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 public interface ServiceRequestRepository extends JpaRepository<ServiceRequest, Long> {
+
+    List<ServiceRequest> findByStatusCd(String statusCd);
+
+    @Query("SELECT sr FROM ServiceRequest sr WHERE sr.statusCd = :statusCd AND sr.updatedAt < :before")
+    List<ServiceRequest> findByStatusCdAndUpdatedAtBefore(@Param("statusCd") String statusCd,
+                                                          @Param("before") LocalDateTime before);
 
     @Query("SELECT sr FROM ServiceRequest sr WHERE " +
             "(:keyword IS NULL OR sr.title LIKE %:keyword% OR sr.content LIKE %:keyword%) " +
@@ -21,4 +30,10 @@ public interface ServiceRequestRepository extends JpaRepository<ServiceRequest, 
                                 @Param("priorityCd") String priorityCd,
                                 @Param("requestTypeCd") String requestTypeCd,
                                 Pageable pageable);
+
+    @Query("SELECT COUNT(sr) FROM ServiceRequest sr WHERE sr.statusCd = :statusCd")
+    long countByStatusCd(@Param("statusCd") String statusCd);
+
+    @Query("SELECT COUNT(sr) FROM ServiceRequest sr WHERE sr.createdAt >= :from AND sr.createdAt < :to")
+    long countByCreatedAtBetween(@Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
 }

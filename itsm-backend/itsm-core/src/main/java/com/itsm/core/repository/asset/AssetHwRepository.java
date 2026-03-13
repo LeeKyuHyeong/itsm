@@ -7,10 +7,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 public interface AssetHwRepository extends JpaRepository<AssetHw, Long> {
+
+    List<AssetHw> findByWarrantyEndAtBetween(LocalDate from, LocalDate to);
 
     Page<AssetHw> findByStatus(String status, Pageable pageable);
 
