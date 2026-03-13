@@ -21,13 +21,13 @@
             @click="navigateTo(menu.path)"
           >
             <span class="menu-icon" v-html="getMenuIcon(menu.icon)"></span>
-            <span v-if="!collapsed" class="menu-text">{{ menu.name }}</span>
+            <span v-if="!collapsed" class="menu-text">{{ menuLabel(menu) }}</span>
           </a>
 
           <template v-else>
             <a class="menu-link has-children" @click="toggleMenu(menu.id)">
               <span class="menu-icon" v-html="getMenuIcon(menu.icon)"></span>
-              <span v-if="!collapsed" class="menu-text">{{ menu.name }}</span>
+              <span v-if="!collapsed" class="menu-text">{{ menuLabel(menu) }}</span>
               <svg
                 v-if="!collapsed"
                 class="arrow-icon"
@@ -57,12 +57,12 @@
                   :class="{ active: isRouteActive(child.path) }"
                   @click="navigateTo(child.path)"
                 >
-                  <span class="submenu-text">{{ child.name }}</span>
+                  <span class="submenu-text">{{ menuLabel(child) }}</span>
                 </a>
 
                 <template v-else>
                   <a class="submenu-link has-children" @click="toggleMenu(child.id)">
-                    <span class="submenu-text">{{ child.name }}</span>
+                    <span class="submenu-text">{{ menuLabel(child) }}</span>
                     <svg
                       class="arrow-icon"
                       :class="{ rotated: openMenuIds.has(child.id) }"
@@ -89,7 +89,7 @@
                         :class="{ active: isRouteActive(grandchild.path) }"
                         @click="navigateTo(grandchild.path)"
                       >
-                        <span class="submenu-text">{{ grandchild.name }}</span>
+                        <span class="submenu-text">{{ menuLabel(grandchild) }}</span>
                       </a>
                     </li>
                   </ul>
@@ -106,8 +106,18 @@
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useMenuStore } from '@/stores/menu.js'
 import { menuApi } from '@/api/admin/menu.js'
+
+const { t, te } = useI18n()
+
+function menuLabel(item) {
+  if (item.i18nKey && te(item.i18nKey)) {
+    return t(item.i18nKey)
+  }
+  return item.name
+}
 
 const props = defineProps({
   collapsed: {

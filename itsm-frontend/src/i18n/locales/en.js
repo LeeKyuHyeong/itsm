@@ -494,14 +494,32 @@ export default {
   menu: {
     dashboard: 'Dashboard',
     incident: 'Incidents',
+    incidentList: 'Incident List',
+    incidentCreate: 'Create Incident',
     serviceRequest: 'Service Requests',
+    srList: 'Request List',
+    srCreate: 'Create Request',
     change: 'Changes',
+    changeList: 'Change List',
+    changeCreate: 'Create Change',
     asset: 'Assets',
+    hwAssetList: 'HW Assets',
+    swAssetList: 'SW Assets',
     inspection: 'Inspections',
+    inspectionList: 'Inspection List',
+    inspectionCreate: 'Create Inspection',
     report: 'Reports',
+    reportList: 'Report List',
     board: 'Board',
     settings: 'Settings',
-    account: 'Accounts'
+    menuManage: 'Menu Management',
+    commonCode: 'Common Codes',
+    boardManage: 'Board Management',
+    slaManage: 'SLA Management',
+    notificationPolicy: 'Notification Policy',
+    account: 'Accounts',
+    accountManage: 'User Management',
+    orgManage: 'Organization Management'
   },
 
   notification: {

@@ -507,14 +507,32 @@ export default {
   menu: {
     dashboard: '대시보드',
     incident: '장애관리',
+    incidentList: '장애 목록',
+    incidentCreate: '장애 등록',
     serviceRequest: '서비스요청',
+    srList: '요청 목록',
+    srCreate: '요청 등록',
     change: '변경관리',
+    changeList: '변경 목록',
+    changeCreate: '변경 등록',
     asset: '자산관리',
+    hwAssetList: 'HW 자산 목록',
+    swAssetList: 'SW 자산 목록',
     inspection: '정기점검관리',
+    inspectionList: '점검 목록',
+    inspectionCreate: '점검 등록',
     report: '보고관리',
+    reportList: '보고서 목록',
     board: '게시판',
     settings: '설정관리',
-    account: '계정관리'
+    menuManage: '메뉴 관리',
+    commonCode: '공통코드 관리',
+    boardManage: '게시판 관리',
+    slaManage: 'SLA 관리',
+    notificationPolicy: '알림 정책 관리',
+    account: '계정관리',
+    accountManage: '사용자 관리',
+    orgManage: '조직 관리'
   },
 
   // 알림
