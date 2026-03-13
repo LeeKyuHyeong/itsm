@@ -33,7 +33,7 @@
       <div class="form-row">
         <div class="form-group">
           <label class="required">{{ t('incident.occurredAt') }}</label>
-          <input v-model="form.occurredAt" type="datetime-local" required />
+          <BaseDatePicker v-model="form.occurredAt" :enable-time="true" required />
         </div>
         <div class="form-group" v-if="!isEdit">
           <label class="required">{{ t('incident.company') }}</label>
@@ -66,6 +66,7 @@ import { useI18n } from 'vue-i18n'
 import { serviceRequestApi } from '@/api/servicerequest.js'
 import { useCommonCodeStore } from '@/stores/commonCode.js'
 import api from '@/api/index.js'
+import BaseDatePicker from '@/components/common/BaseDatePicker.vue'
 
 const { t } = useI18n()
 const route = useRoute()

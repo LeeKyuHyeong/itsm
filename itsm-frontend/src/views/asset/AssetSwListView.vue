@@ -131,13 +131,13 @@
             </div>
             <div class="form-group">
               <label class="form-label">{{ t('asset.installedAt') }}</label>
-              <input v-model="form.installedAt" type="date" class="form-input" />
+              <BaseDatePicker v-model="form.installedAt" />
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
               <label class="form-label">{{ t('asset.expiredAt') }}</label>
-              <input v-model="form.expiredAt" type="date" class="form-input" />
+              <BaseDatePicker v-model="form.expiredAt" />
             </div>
             <div class="form-group">
               <label class="form-label">{{ t('asset.company') }} <span class="required">*</span></label>
@@ -182,6 +182,7 @@ import { assetSwApi } from '@/api/asset.js'
 import { companyApi } from '@/api/company.js'
 import { userApi } from '@/api/user.js'
 import { useCommonCodeStore } from '@/stores/commonCode.js'
+import BaseDatePicker from '@/components/common/BaseDatePicker.vue'
 
 const { t } = useI18n()
 const commonCodeStore = useCommonCodeStore()

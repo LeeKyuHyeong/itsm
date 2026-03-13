@@ -20,7 +20,7 @@
         </div>
         <div class="form-group">
           <label class="required">{{ t('inspection.scheduledDate') }}</label>
-          <input v-model="form.scheduledAt" type="date" required />
+          <BaseDatePicker v-model="form.scheduledAt" required />
         </div>
       </div>
 
@@ -63,6 +63,7 @@ import { useI18n } from 'vue-i18n'
 import { inspectionApi } from '@/api/inspection.js'
 import { useCommonCodeStore } from '@/stores/commonCode.js'
 import api from '@/api/index.js'
+import BaseDatePicker from '@/components/common/BaseDatePicker.vue'
 
 const { t } = useI18n()
 const route = useRoute()

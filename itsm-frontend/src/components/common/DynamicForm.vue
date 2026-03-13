@@ -31,14 +31,12 @@
       />
 
       <!-- date -->
-      <input
+      <BaseDatePicker
         v-else-if="field.type === 'date'"
-        type="date"
-        class="form-input"
-        :value="modelValue[field.key]"
+        :modelValue="modelValue[field.key]"
         :required="field.required"
-        :readonly="readonly"
-        @input="updateField(field.key, $event.target.value)"
+        :disabled="readonly"
+        @update:modelValue="updateField(field.key, $event)"
       />
 
       <!-- textarea -->
@@ -88,6 +86,7 @@
 
 <script setup>
 import { useI18n } from 'vue-i18n'
+import BaseDatePicker from '@/components/common/BaseDatePicker.vue'
 
 const { t } = useI18n()
 

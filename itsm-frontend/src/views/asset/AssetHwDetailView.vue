@@ -121,7 +121,7 @@
           </div>
           <div class="form-group">
             <label class="form-label">{{ t('asset.installedAt') }}</label>
-            <input v-model="relationForm.installedAt" type="date" class="form-input" />
+            <BaseDatePicker v-model="relationForm.installedAt" />
           </div>
           <div v-if="relationError" class="error-message">{{ relationError }}</div>
           <div class="modal-footer">
@@ -140,6 +140,7 @@ import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import { assetHwApi, assetSwApi } from '@/api/asset.js'
 import { useCommonCodeStore } from '@/stores/commonCode.js'
+import BaseDatePicker from '@/components/common/BaseDatePicker.vue'
 
 const { t } = useI18n()
 const route = useRoute()
