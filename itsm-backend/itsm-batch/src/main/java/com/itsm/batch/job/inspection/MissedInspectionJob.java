@@ -5,7 +5,6 @@ import com.itsm.core.domain.inspection.Inspection;
 import com.itsm.core.repository.inspection.InspectionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -21,7 +20,6 @@ public class MissedInspectionJob {
     private final InspectionRepository inspectionRepository;
     private final NotificationService notificationService;
 
-    @Scheduled(cron = "0 30 8 * * *")
     public void execute() {
         log.info("[MissedInspectionJob] 시작");
         LocalDate today = LocalDate.now();

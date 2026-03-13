@@ -5,7 +5,6 @@ import com.itsm.core.domain.incident.Incident;
 import com.itsm.core.repository.incident.IncidentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -20,7 +19,6 @@ public class UnassignedIncidentJob {
     private final IncidentRepository incidentRepository;
     private final NotificationService notificationService;
 
-    @Scheduled(cron = "0 20 * * * *")
     public void execute() {
         log.info("[UnassignedIncidentJob] 시작");
 

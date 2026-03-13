@@ -5,7 +5,6 @@ import com.itsm.core.domain.servicerequest.ServiceRequest;
 import com.itsm.core.repository.servicerequest.ServiceRequestRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -21,7 +20,6 @@ public class LongPendingSrJob {
     private final ServiceRequestRepository serviceRequestRepository;
     private final NotificationService notificationService;
 
-    @Scheduled(cron = "0 0 9 * * *")
     public void execute() {
         log.info("[LongPendingSrJob] 시작");
         LocalDateTime twoDaysAgo = LocalDateTime.now().minusDays(2);

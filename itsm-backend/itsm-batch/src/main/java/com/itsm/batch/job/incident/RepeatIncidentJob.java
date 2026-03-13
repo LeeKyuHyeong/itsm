@@ -4,7 +4,6 @@ import com.itsm.batch.service.NotificationService;
 import com.itsm.core.repository.incident.IncidentAssetRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -20,7 +19,6 @@ public class RepeatIncidentJob {
     private final IncidentAssetRepository incidentAssetRepository;
     private final NotificationService notificationService;
 
-    @Scheduled(cron = "0 0 8 * * *")
     public void execute() {
         log.info("[RepeatIncidentJob] 시작");
         LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusDays(30);

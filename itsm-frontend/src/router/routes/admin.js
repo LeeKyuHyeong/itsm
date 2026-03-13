@@ -44,5 +44,11 @@ export default [
     name: 'NotificationPolicyManage',
     component: () => import('@/views/admin/NotificationPolicyView.vue'),
     meta: { requiresAuth: true, roles: adminRoles }
+  },
+  {
+    path: '/admin/batch-jobs',
+    name: 'BatchJobManage',
+    component: () => import('@/views/admin/BatchJobManageView.vue'),
+    meta: { requiresAuth: true, roles: adminRoles }
   }
 ]

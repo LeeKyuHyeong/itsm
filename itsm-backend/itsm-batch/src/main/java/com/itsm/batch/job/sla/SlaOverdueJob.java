@@ -5,7 +5,6 @@ import com.itsm.core.domain.incident.Incident;
 import com.itsm.core.repository.incident.IncidentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -19,7 +18,6 @@ public class SlaOverdueJob {
     private final IncidentRepository incidentRepository;
     private final NotificationService notificationService;
 
-    @Scheduled(cron = "0 10 * * * *")
     public void execute() {
         log.info("[SlaOverdueJob] 시작");
         LocalDateTime now = LocalDateTime.now();
