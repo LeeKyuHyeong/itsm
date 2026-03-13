@@ -1,9 +1,9 @@
 <template>
   <div class="report-detail">
     <div class="page-header">
-      <h2>보고서 상세 #{{ report.reportId }}</h2>
+      <h2>{{ t('report.detail') }} #{{ report.reportId }}</h2>
       <div class="header-actions">
-        <button class="btn btn-secondary" @click="$router.back()">목록</button>
+        <button class="btn btn-secondary" @click="$router.back()">{{ t('common.list') }}</button>
       </div>
     </div>
 
@@ -29,9 +29,11 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import { reportApi } from '@/api/report.js'
 
+const { t } = useI18n()
 const route = useRoute()
 const report = ref({})
 
@@ -58,7 +60,7 @@ onMounted(async () => {
     report.value = res.data.data || res.data
   } catch (e) {
     console.error('보고서 조회 실패:', e)
-    alert('보고서를 불러올 수 없습니다.')
+    alert(t('message.loadFail'))
   }
 })
 </script>

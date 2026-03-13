@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard">
-    <h2>대시보드</h2>
+    <h2>{{ t('dashboard.title') }}</h2>
 
     <!-- 요약 카드 (4개) -->
     <div class="summary-grid" v-if="stats">
@@ -8,28 +8,28 @@
         <div class="summary-icon">&#x1F6A8;</div>
         <div class="summary-info">
           <span class="summary-count">{{ stats.totalIncidentCount || 0 }}</span>
-          <span class="summary-label">장애</span>
+          <span class="summary-label">{{ t('dashboard.incident') }}</span>
         </div>
       </div>
       <div class="summary-card summary-sr" @click="$router.push('/service-requests')">
         <div class="summary-icon">&#x1F4CB;</div>
         <div class="summary-info">
           <span class="summary-count">{{ stats.totalSrCount || 0 }}</span>
-          <span class="summary-label">서비스요청</span>
+          <span class="summary-label">{{ t('dashboard.serviceRequest') }}</span>
         </div>
       </div>
       <div class="summary-card summary-change" @click="$router.push('/changes')">
         <div class="summary-icon">&#x1F504;</div>
         <div class="summary-info">
           <span class="summary-count">{{ stats.totalChangeCount || 0 }}</span>
-          <span class="summary-label">변경관리</span>
+          <span class="summary-label">{{ t('dashboard.changeManagement') }}</span>
         </div>
       </div>
       <div class="summary-card summary-inspection" @click="$router.push('/inspections')">
         <div class="summary-icon">&#x1F50D;</div>
         <div class="summary-info">
           <span class="summary-count">{{ stats.totalInspectionCount || 0 }}</span>
-          <span class="summary-label">정기점검</span>
+          <span class="summary-label">{{ t('dashboard.inspection') }}</span>
         </div>
       </div>
     </div>
@@ -37,45 +37,45 @@
     <div class="stats-grid" v-if="stats">
       <!-- 상태별 장애 건수 -->
       <div class="stat-card">
-        <h3>상태별 장애 현황</h3>
+        <h3>{{ t('dashboard.incidentStatus') }}</h3>
         <div class="status-stats">
           <div v-for="(count, status) in stats.statusCounts" :key="status" class="status-item">
             <BaseStatusBadge :status="status" />
-            <span class="count">{{ count }}건</span>
+            <span class="count">{{ count }}{{ t('common.count', { n: '' }) }}</span>
           </div>
         </div>
       </div>
 
       <!-- SLA 현황 -->
       <div class="stat-card sla-card">
-        <h3>SLA 현황</h3>
+        <h3>{{ t('dashboard.slaStatus') }}</h3>
         <div class="sla-stats">
           <div class="sla-item danger">
             <span class="sla-number">{{ stats.slaOverdueCount }}</span>
-            <span class="sla-label">초과</span>
+            <span class="sla-label">{{ t('dashboard.slaOverdue') }}</span>
           </div>
           <div class="sla-item warning">
             <span class="sla-number">{{ stats.slaWarningCount }}</span>
-            <span class="sla-label">임박 (80%+)</span>
+            <span class="sla-label">{{ t('dashboard.slaWarning') }}</span>
           </div>
         </div>
       </div>
 
       <!-- 운영 모니터링 -->
       <div class="stat-card monitoring-card">
-        <h3>운영 모니터링</h3>
+        <h3>{{ t('dashboard.monitoring') }}</h3>
         <div class="monitoring-stats">
           <div class="monitoring-item" :class="{ alert: stats.unassignedIncidentCount > 0 }">
             <span class="monitoring-number">{{ stats.unassignedIncidentCount }}</span>
-            <span class="monitoring-label">미배정 장애</span>
+            <span class="monitoring-label">{{ t('dashboard.unassignedIncident') }}</span>
           </div>
           <div class="monitoring-item" :class="{ alert: stats.delayedIncidentCount > 0 }">
             <span class="monitoring-number">{{ stats.delayedIncidentCount }}</span>
-            <span class="monitoring-label">지연 장애</span>
+            <span class="monitoring-label">{{ t('dashboard.delayedIncident') }}</span>
           </div>
           <div class="monitoring-item" :class="{ alert: stats.pendingSrCount > 0 }">
             <span class="monitoring-number">{{ stats.pendingSrCount }}</span>
-            <span class="monitoring-label">완료대기 SR</span>
+            <span class="monitoring-label">{{ t('dashboard.pendingSr') }}</span>
           </div>
         </div>
       </div>
@@ -84,31 +84,31 @@
     <!-- SR / 변경 / 점검 상태 -->
     <div class="detail-grid" v-if="stats">
       <div class="stat-card">
-        <h3>서비스요청 상태</h3>
+        <h3>{{ t('dashboard.srStatus') }}</h3>
         <div class="status-stats">
           <div v-for="(count, status) in stats.srStatusCounts" :key="status" class="status-item">
             <BaseStatusBadge :status="status" />
-            <span class="count">{{ count }}건</span>
+            <span class="count">{{ count }}{{ t('common.count', { n: '' }) }}</span>
           </div>
         </div>
       </div>
 
       <div class="stat-card">
-        <h3>변경관리 상태</h3>
+        <h3>{{ t('dashboard.changeStatus') }}</h3>
         <div class="status-stats">
           <div v-for="(count, status) in stats.changeStatusCounts" :key="status" class="status-item">
             <BaseStatusBadge :status="status" />
-            <span class="count">{{ count }}건</span>
+            <span class="count">{{ count }}{{ t('common.count', { n: '' }) }}</span>
           </div>
         </div>
       </div>
 
       <div class="stat-card">
-        <h3>정기점검 상태</h3>
+        <h3>{{ t('dashboard.inspectionStatus') }}</h3>
         <div class="status-stats">
           <div v-for="(count, status) in stats.inspectionStatusCounts" :key="status" class="status-item">
             <BaseStatusBadge :status="status" />
-            <span class="count">{{ count }}건</span>
+            <span class="count">{{ count }}{{ t('common.count', { n: '' }) }}</span>
           </div>
         </div>
       </div>
@@ -116,14 +116,14 @@
 
     <!-- 월별 추이 -->
     <div class="trend-card" v-if="stats && stats.monthlyTrend">
-      <h3>월별 추이 (최근 6개월)</h3>
+      <h3>{{ t('dashboard.monthlyTrend') }}</h3>
       <table class="trend-table">
         <thead>
           <tr>
-            <th>월</th>
-            <th>장애</th>
-            <th>서비스요청</th>
-            <th>변경관리</th>
+            <th>{{ t('dashboard.month') }}</th>
+            <th>{{ t('dashboard.incident') }}</th>
+            <th>{{ t('dashboard.serviceRequest') }}</th>
+            <th>{{ t('dashboard.changeManagement') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -154,22 +154,22 @@
 
     <!-- 우선순위별 미처리 -->
     <div class="priority-card" v-if="stats">
-      <h3>우선순위별 미처리 장애</h3>
+      <h3>{{ t('dashboard.priorityOpen') }}</h3>
       <div class="priority-stats">
         <div v-for="(count, priority) in stats.priorityCounts" :key="priority" class="priority-item">
-          <span :class="['priority-badge', `priority-${priority}`]">{{ priorityLabel(priority) }}</span>
-          <span class="count">{{ count }}건</span>
+          <span :class="['priority-badge', `priority-${priority}`]">{{ t(`priority.${priority}`) }}</span>
+          <span class="count">{{ count }}{{ t('common.count', { n: '' }) }}</span>
         </div>
       </div>
     </div>
 
     <!-- 최근 장애 목록 -->
     <div class="recent-card" v-if="stats">
-      <h3>최근 장애</h3>
+      <h3>{{ t('dashboard.recentIncidents') }}</h3>
       <BaseTable :columns="columns" :data="stats.recentIncidents || []" :loading="loading"
-                 empty-message="등록된 장애가 없습니다." @row-click="goDetail">
+                 :empty-message="t('dashboard.noIncidents')" @row-click="goDetail">
         <template #priorityCd="{ row }">
-          <span :class="['priority-badge', `priority-${row.priorityCd}`]">{{ priorityLabel(row.priorityCd) }}</span>
+          <span :class="['priority-badge', `priority-${row.priorityCd}`]">{{ t(`priority.${row.priorityCd}`) }}</span>
         </template>
         <template #statusCd="{ row }">
           <BaseStatusBadge :status="row.statusCd" />
@@ -185,22 +185,24 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import api from '@/api/index.js'
 import BaseTable from '@/components/common/BaseTable.vue'
 import BaseStatusBadge from '@/components/common/BaseStatusBadge.vue'
 
+const { t } = useI18n()
 const router = useRouter()
 const stats = ref(null)
 const loading = ref(false)
 
-const columns = [
+const columns = computed(() => [
   { key: 'incidentId', label: 'ID', width: '60px', align: 'center' },
-  { key: 'title', label: '제목' },
-  { key: 'priorityCd', label: '우선순위', width: '100px', align: 'center' },
-  { key: 'statusCd', label: '상태', width: '100px', align: 'center' },
-  { key: 'companyNm', label: '고객사', width: '120px' },
-  { key: 'occurredAt', label: '발생일시', width: '150px' }
-]
+  { key: 'title', label: t('incident.incidentTitle') },
+  { key: 'priorityCd', label: t('incident.priority'), width: '100px', align: 'center' },
+  { key: 'statusCd', label: t('incident.status'), width: '100px', align: 'center' },
+  { key: 'companyNm', label: t('incident.company'), width: '120px' },
+  { key: 'occurredAt', label: t('incident.occurredAt'), width: '150px' }
+])
 
 const maxTrendCount = computed(() => {
   if (!stats.value || !stats.value.monthlyTrend) return 1
@@ -214,11 +216,6 @@ const maxTrendCount = computed(() => {
 const barWidth = (count) => {
   const pct = Math.min((count / maxTrendCount.value) * 100, 100)
   return pct + '%'
-}
-
-const priorityLabel = (code) => {
-  const map = { CRITICAL: '긴급', HIGH: '높음', MEDIUM: '보통', LOW: '낮음' }
-  return map[code] || code
 }
 
 const formatDate = (dateStr) => {

@@ -1,7 +1,7 @@
 <template>
   <div class="org-manage">
     <div class="page-header">
-      <h1 class="page-title">조직 관리</h1>
+      <h1 class="page-title">{{ t('admin.orgManage') }}</h1>
     </div>
 
     <div class="org-layout">
@@ -9,7 +9,7 @@
       <div class="org-panel">
         <div class="panel-header">
           <h2 class="panel-title">회사 목록</h2>
-          <button class="btn btn-primary btn-sm" @click="openCompanyDialog()">+ 회사 추가</button>
+          <button class="btn btn-primary btn-sm" @click="openCompanyDialog()">+ {{ t('common.add') }}</button>
         </div>
 
         <div class="table-container">
@@ -42,7 +42,7 @@
                 <td>{{ company.representative || '-' }}</td>
                 <td>{{ company.phone || '-' }}</td>
                 <td>
-                  <button class="btn btn-sm btn-default" @click.stop="openCompanyDialog(company)">수정</button>
+                  <button class="btn btn-sm btn-default" @click.stop="openCompanyDialog(company)">{{ t('common.edit') }}</button>
                 </td>
               </tr>
             </tbody>
@@ -62,7 +62,7 @@
             :disabled="!selectedCompanyId"
             @click="openDeptDialog()"
           >
-            + 부서 추가
+            + {{ t('common.add') }}
           </button>
         </div>
 
@@ -93,7 +93,7 @@
                 <td>{{ dept.code || '-' }}</td>
                 <td>{{ dept.parentName || '-' }}</td>
                 <td>
-                  <button class="btn btn-sm btn-default" @click="openDeptDialog(dept)">수정</button>
+                  <button class="btn btn-sm btn-default" @click="openDeptDialog(dept)">{{ t('common.edit') }}</button>
                 </td>
               </tr>
             </tbody>
@@ -132,9 +132,9 @@
           </div>
           <div v-if="companySaveError" class="error-message">{{ companySaveError }}</div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-default" @click="closeCompanyModal">취소</button>
+            <button type="button" class="btn btn-default" @click="closeCompanyModal">{{ t('common.cancel') }}</button>
             <button type="submit" class="btn btn-primary" :disabled="companySaving">
-              {{ companySaving ? '저장 중...' : '저장' }}
+              {{ companySaving ? '저장 중...' : t('common.save') }}
             </button>
           </div>
         </form>
@@ -172,9 +172,9 @@
           </div>
           <div v-if="deptSaveError" class="error-message">{{ deptSaveError }}</div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-default" @click="closeDeptModal">취소</button>
+            <button type="button" class="btn btn-default" @click="closeDeptModal">{{ t('common.cancel') }}</button>
             <button type="submit" class="btn btn-primary" :disabled="deptSaving">
-              {{ deptSaving ? '저장 중...' : '저장' }}
+              {{ deptSaving ? '저장 중...' : t('common.save') }}
             </button>
           </div>
         </form>
@@ -185,7 +185,10 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { companyApi } from '@/api/company.js'
+
+const { t } = useI18n()
 
 const companies = ref([])
 const departments = ref([])
@@ -300,7 +303,7 @@ async function saveCompany() {
     closeCompanyModal()
     loadCompanies()
   } catch (error) {
-    companySaveError.value = error.response?.data?.message || '저장 중 오류가 발생했습니다.'
+    companySaveError.value = error.response?.data?.message || t('message.saveFail')
   } finally {
     companySaving.value = false
   }
@@ -346,7 +349,7 @@ async function saveDept() {
     closeDeptModal()
     loadDepartments()
   } catch (error) {
-    deptSaveError.value = error.response?.data?.message || '저장 중 오류가 발생했습니다.'
+    deptSaveError.value = error.response?.data?.message || t('message.saveFail')
   } finally {
     deptSaving.value = false
   }

@@ -12,7 +12,17 @@
     </div>
 
     <div class="header-right">
-      <button class="notification-btn" title="알림">
+      <div class="locale-switcher">
+        <button
+          v-for="loc in locales"
+          :key="loc.code"
+          class="locale-btn"
+          :class="{ active: currentLocale === loc.code }"
+          @click="switchLocale(loc.code)"
+        >{{ loc.label }}</button>
+      </div>
+
+      <button class="notification-btn" :title="t('notification.title')">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
           <path d="M13.73 21a2 2 0 0 1-3.46 0" />
@@ -20,7 +30,7 @@
       </button>
 
       <div class="user-info">
-        <span class="user-name">{{ user?.name || '사용자' }}</span>
+        <span class="user-name">{{ user?.name || t('common.noData') }}</span>
         <span v-if="primaryRole" class="role-badge">{{ primaryRole }}</span>
       </div>
 
@@ -30,7 +40,7 @@
           <polyline points="16 17 21 12 16 7" />
           <line x1="21" y1="12" x2="9" y2="12" />
         </svg>
-        <span>로그아웃</span>
+        <span>{{ t('auth.logout') }}</span>
       </button>
     </div>
   </header>
@@ -39,13 +49,22 @@
 <script setup>
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth.js'
 import { ROLE_LABEL } from '@/constants/roles.js'
+import { setLocale } from '@/i18n/index.js'
+
+const { t, locale: currentLocale } = useI18n()
 
 defineEmits(['toggleSidebar'])
 
 const router = useRouter()
 const authStore = useAuthStore()
+
+const locales = [
+  { code: 'ko', label: 'KO' },
+  { code: 'en', label: 'EN' }
+]
 
 const user = computed(() => authStore.user)
 
@@ -54,6 +73,10 @@ const primaryRole = computed(() => {
   if (!roles || roles.length === 0) return ''
   return ROLE_LABEL[roles[0]] || roles[0]
 })
+
+function switchLocale(code) {
+  setLocale(code)
+}
 
 async function handleLogout() {
   await authStore.logout()
@@ -167,5 +190,36 @@ async function handleLogout() {
   background-color: #fef2f2;
   border-color: var(--color-danger);
   color: var(--color-danger);
+}
+
+.locale-switcher {
+  display: flex;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.locale-btn {
+  padding: 4px 10px;
+  border: none;
+  background: none;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.locale-btn + .locale-btn {
+  border-left: 1px solid var(--color-border);
+}
+
+.locale-btn.active {
+  background-color: var(--color-primary);
+  color: #fff;
+}
+
+.locale-btn:hover:not(.active) {
+  background-color: var(--color-bg);
 }
 </style>

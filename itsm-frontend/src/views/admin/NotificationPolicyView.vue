@@ -1,8 +1,8 @@
 <template>
   <div class="noti-policy-manage">
     <div class="page-header">
-      <h1 class="page-title">알림 정책 관리</h1>
-      <button class="btn btn-primary" @click="openDialog()">+ 알림 정책 추가</button>
+      <h1 class="page-title">{{ t('admin.notificationPolicy') }}</h1>
+      <button class="btn btn-primary" @click="openDialog()">+ {{ t('common.add') }}</button>
     </div>
 
     <div class="table-container">
@@ -36,7 +36,7 @@
             </td>
             <td>
               <div class="action-buttons">
-                <button class="btn btn-sm btn-default" @click="openDialog(policy)">수정</button>
+                <button class="btn btn-sm btn-default" @click="openDialog(policy)">{{ t('common.edit') }}</button>
                 <button
                   v-if="policy.active !== false"
                   class="btn btn-sm btn-danger"
@@ -80,9 +80,9 @@
           </div>
           <div v-if="saveError" class="error-message">{{ saveError }}</div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-default" @click="closeModal">취소</button>
+            <button type="button" class="btn btn-default" @click="closeModal">{{ t('common.cancel') }}</button>
             <button type="submit" class="btn btn-primary" :disabled="saving">
-              {{ saving ? '저장 중...' : '저장' }}
+              {{ saving ? '저장 중...' : t('common.save') }}
             </button>
           </div>
         </form>
@@ -93,7 +93,10 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { notificationPolicyApi } from '@/api/admin/notificationPolicy.js'
+
+const { t } = useI18n()
 
 const policies = ref([])
 const loading = ref(false)
@@ -163,7 +166,7 @@ async function save() {
     closeModal()
     loadPolicies()
   } catch (error) {
-    saveError.value = error.response?.data?.message || '저장 중 오류가 발생했습니다.'
+    saveError.value = error.response?.data?.message || t('message.saveFail')
   } finally {
     saving.value = false
   }

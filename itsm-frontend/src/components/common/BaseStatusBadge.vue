@@ -1,9 +1,12 @@
 <template>
-  <span class="status-badge" :class="badgeClass">{{ status }}</span>
+  <span class="status-badge" :class="badgeClass">{{ statusLabel }}</span>
 </template>
 
 <script setup>
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t, te } = useI18n()
 
 const props = defineProps({
   status: {
@@ -18,30 +21,38 @@ const props = defineProps({
 
 const STATUS_COLOR_MAP = {
   ACTIVE: 'green',
-  '활성': 'green',
-  '승인완료': 'green',
   COMPLETED: 'green',
-  '완료': 'green',
+  RESOLVED: 'green',
+  APPROVED: 'green',
 
   INACTIVE: 'gray',
-  '비활성': 'gray',
-  '보류': 'gray',
   CLOSED: 'gray',
-  '종료': 'gray',
+  CANCELLED: 'gray',
 
   LOCKED: 'red',
-  '잠김': 'red',
   REJECTED: 'red',
-  '반려': 'red',
+  OVERDUE: 'red',
+  ROLLBACK: 'red',
 
   PENDING: 'blue',
-  '대기': 'blue',
-  '접수': 'blue',
+  PENDING_COMPLETE: 'blue',
+  ON_HOLD: 'blue',
   RECEIVED: 'blue',
+  ASSIGNED: 'blue',
   IN_PROGRESS: 'blue',
-  '처리중': 'blue',
-  '진행중': 'blue'
+  REQUESTED: 'blue',
+  APPROVAL_REQUESTED: 'blue',
+  DRAFT: 'blue',
+  REVIEW: 'blue',
+  SCHEDULED: 'blue',
+  IMPLEMENTING: 'blue',
+  PLANNED: 'blue'
 }
+
+const statusLabel = computed(() => {
+  const key = `status.${props.status}`
+  return te(key) ? t(key) : props.status
+})
 
 const badgeClass = computed(() => {
   const color = props.type || STATUS_COLOR_MAP[props.status] || 'gray'

@@ -2,18 +2,18 @@
   <div class="board-post-detail">
     <div class="page-header">
       <h2>
-        <span v-if="post.isNotice === 'Y'" class="notice-badge">[공지]</span>
+        <span v-if="post.isNotice === 'Y'" class="notice-badge">[{{ t('board.notice') }}]</span>
         {{ post.title }}
       </h2>
       <div class="header-actions">
-        <button class="btn btn-secondary" @click="$router.push(`/boards/${boardId}`)">목록</button>
-        <button class="btn btn-secondary" @click="editPost">수정</button>
-        <button class="btn btn-danger" @click="deletePost">삭제</button>
+        <button class="btn btn-secondary" @click="$router.push(`/boards/${boardId}`)">{{ t('common.list') }}</button>
+        <button class="btn btn-secondary" @click="editPost">{{ t('common.edit') }}</button>
+        <button class="btn btn-danger" @click="deletePost">{{ t('common.delete') }}</button>
       </div>
     </div>
 
     <div class="post-meta">
-      <span>조회 {{ post.viewCnt }}</span>
+      <span>{{ t('board.views') }} {{ post.viewCnt }}</span>
       <span>{{ formatDate(post.createdAt) }}</span>
     </div>
 
@@ -22,30 +22,30 @@
     </div>
 
     <div class="comments-section" v-if="allowComment">
-      <h3>댓글 ({{ comments.length }})</h3>
+      <h3>{{ t('board.comment') }} ({{ comments.length }})</h3>
 
       <div class="comment-form">
-        <textarea v-model="newComment" rows="2" placeholder="댓글을 입력하세요"></textarea>
-        <button class="btn btn-primary btn-sm" @click="addComment" :disabled="!newComment.trim()">등록</button>
+        <textarea v-model="newComment" rows="2" :placeholder="t('board.commentPlaceholder')"></textarea>
+        <button class="btn btn-primary btn-sm" @click="addComment" :disabled="!newComment.trim()">{{ t('common.create') }}</button>
       </div>
 
       <div v-for="c in comments" :key="c.commentId" class="comment-item">
         <div class="comment-header">
-          <span class="comment-author">사용자 #{{ c.createdBy }}</span>
+          <span class="comment-author">{{ t('board.author') }} #{{ c.createdBy }}</span>
           <span class="comment-date">{{ formatDate(c.createdAt) }}</span>
         </div>
         <div v-if="editingCommentId === c.commentId" class="comment-edit">
           <textarea v-model="editCommentContent" rows="2"></textarea>
           <div class="comment-edit-actions">
-            <button class="btn btn-primary btn-xs" @click="saveEditComment(c.commentId)">저장</button>
-            <button class="btn btn-secondary btn-xs" @click="editingCommentId = null">취소</button>
+            <button class="btn btn-primary btn-xs" @click="saveEditComment(c.commentId)">{{ t('common.save') }}</button>
+            <button class="btn btn-secondary btn-xs" @click="editingCommentId = null">{{ t('common.cancel') }}</button>
           </div>
         </div>
         <div v-else class="comment-body">
           <p>{{ c.content }}</p>
           <div class="comment-actions">
-            <button class="btn-link" @click="startEditComment(c)">수정</button>
-            <button class="btn-link text-danger" @click="deleteComment(c.commentId)">삭제</button>
+            <button class="btn-link" @click="startEditComment(c)">{{ t('common.edit') }}</button>
+            <button class="btn-link text-danger" @click="deleteComment(c.commentId)">{{ t('common.delete') }}</button>
           </div>
         </div>
       </div>
@@ -56,8 +56,10 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { boardApi } from '@/api/board.js'
 
+const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const boardId = route.params.boardId
@@ -84,7 +86,7 @@ const loadPost = async () => {
     post.value = res.data.data || res.data
   } catch (e) {
     console.error('게시글 조회 실패:', e)
-    alert('게시글을 불러올 수 없습니다.')
+    alert(t('message.loadFail'))
   }
 }
 
@@ -104,7 +106,7 @@ const addComment = async () => {
     newComment.value = ''
     loadComments()
   } catch (e) {
-    alert('댓글 등록에 실패했습니다.')
+    alert(t('message.saveFail'))
   }
 }
 
@@ -119,17 +121,17 @@ const saveEditComment = async (commentId) => {
     editingCommentId.value = null
     loadComments()
   } catch (e) {
-    alert('댓글 수정에 실패했습니다.')
+    alert(t('message.saveFail'))
   }
 }
 
 const deleteComment = async (commentId) => {
-  if (!confirm('댓글을 삭제하시겠습니까?')) return
+  if (!confirm(t('board.commentDeleteConfirm'))) return
   try {
     await boardApi.deleteComment(boardId, postId, commentId)
     loadComments()
   } catch (e) {
-    alert('댓글 삭제에 실패했습니다.')
+    alert(t('message.deleteFail'))
   }
 }
 
@@ -138,12 +140,12 @@ const editPost = () => {
 }
 
 const deletePost = async () => {
-  if (!confirm('게시글을 삭제하시겠습니까?')) return
+  if (!confirm(t('board.deleteConfirm'))) return
   try {
     await boardApi.deletePost(boardId, postId)
     router.push(`/boards/${boardId}`)
   } catch (e) {
-    alert('게시글 삭제에 실패했습니다.')
+    alert(t('message.deleteFail'))
   }
 }
 

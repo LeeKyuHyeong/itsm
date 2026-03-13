@@ -1,39 +1,39 @@
 <template>
   <div class="asset-hw-list">
     <div class="page-header">
-      <h1 class="page-title">HW 자산 관리</h1>
-      <button class="btn btn-primary" @click="openCreateModal">+ HW 자산 등록</button>
+      <h1 class="page-title">{{ t('asset.hwList') }}</h1>
+      <button class="btn btn-primary" @click="openCreateModal">+ {{ t('common.create') }}</button>
     </div>
 
     <!-- 검색/필터 -->
     <div class="filter-bar">
       <div class="filter-group">
-        <label class="filter-label">상태</label>
+        <label class="filter-label">{{ t('asset.status') }}</label>
         <select v-model="filters.status" class="filter-select" @change="loadAssets">
-          <option value="">전체</option>
+          <option value="">{{ t('common.all') }}</option>
           <option value="ACTIVE">활성</option>
           <option value="INACTIVE">비활성</option>
           <option value="DISPOSED">폐기</option>
         </select>
       </div>
       <div class="filter-group">
-        <label class="filter-label">자산유형</label>
+        <label class="filter-label">{{ t('asset.assetType') }}</label>
         <select v-model="filters.assetTypeCd" class="filter-select" @change="loadAssets">
-          <option value="">전체</option>
+          <option value="">{{ t('common.all') }}</option>
           <option v-for="t in assetTypes" :key="t.code" :value="t.code">{{ t.name }}</option>
         </select>
       </div>
       <div class="filter-group">
-        <label class="filter-label">고객사</label>
+        <label class="filter-label">{{ t('asset.company') }}</label>
         <select v-model="filters.companyId" class="filter-select" @change="loadAssets">
-          <option value="">전체</option>
+          <option value="">{{ t('common.all') }}</option>
           <option v-for="c in companies" :key="c.companyId" :value="c.companyId">{{ c.companyNm }}</option>
         </select>
       </div>
       <div class="filter-group search-group">
         <input v-model="filters.keyword" type="text" class="filter-input"
                placeholder="자산명, 시리얼번호, IP주소 검색" @keyup.enter="loadAssets" />
-        <button class="btn btn-default" @click="loadAssets">검색</button>
+        <button class="btn btn-default" @click="loadAssets">{{ t('common.search') }}</button>
       </div>
     </div>
 
@@ -43,14 +43,14 @@
         <thead>
           <tr>
             <th>번호</th>
-            <th>자산명</th>
-            <th>유형</th>
-            <th>제조사/모델</th>
-            <th>시리얼번호</th>
+            <th>{{ t('asset.assetNm') }}</th>
+            <th>{{ t('asset.assetType') }}</th>
+            <th>{{ t('asset.manufacturer') }}/{{ t('asset.model') }}</th>
+            <th>{{ t('asset.serialNo') }}</th>
             <th>IP주소</th>
-            <th>고객사</th>
+            <th>{{ t('asset.company') }}</th>
             <th>담당자</th>
-            <th>상태</th>
+            <th>{{ t('asset.status') }}</th>
             <th>관리</th>
           </tr>
         </thead>
@@ -77,7 +77,7 @@
             <td><span :class="['status-badge', `status-${asset.status?.toLowerCase()}`]">{{ statusLabel(asset.status) }}</span></td>
             <td>
               <div class="action-buttons">
-                <button class="btn btn-sm btn-default" @click="openEditModal(asset)">수정</button>
+                <button class="btn btn-sm btn-default" @click="openEditModal(asset)">{{ t('common.edit') }}</button>
               </div>
             </td>
           </tr>
@@ -103,11 +103,11 @@
         <form class="modal-body" @submit.prevent="saveAsset">
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">자산명 <span class="required">*</span></label>
+              <label class="form-label">{{ t('asset.assetNm') }} <span class="required">*</span></label>
               <input v-model="form.assetNm" type="text" class="form-input" required />
             </div>
             <div class="form-group">
-              <label class="form-label">자산유형 <span class="required">*</span></label>
+              <label class="form-label">{{ t('asset.assetType') }} <span class="required">*</span></label>
               <select v-model="form.assetTypeCd" class="form-input" required>
                 <option value="">선택</option>
                 <option v-for="t in assetTypes" :key="t.code" :value="t.code">{{ t.name }}</option>
@@ -116,17 +116,17 @@
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">제조사</label>
+              <label class="form-label">{{ t('asset.manufacturer') }}</label>
               <input v-model="form.manufacturer" type="text" class="form-input" />
             </div>
             <div class="form-group">
-              <label class="form-label">모델명</label>
+              <label class="form-label">{{ t('asset.model') }}</label>
               <input v-model="form.modelNm" type="text" class="form-input" />
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">시리얼번호</label>
+              <label class="form-label">{{ t('asset.serialNo') }}</label>
               <input v-model="form.serialNo" type="text" class="form-input" />
             </div>
             <div class="form-group">
@@ -140,7 +140,7 @@
               <input v-model="form.macAddress" type="text" class="form-input" />
             </div>
             <div class="form-group">
-              <label class="form-label">설치위치</label>
+              <label class="form-label">{{ t('asset.location') }}</label>
               <input v-model="form.location" type="text" class="form-input" />
             </div>
           </div>
@@ -156,7 +156,7 @@
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">고객사 <span class="required">*</span></label>
+              <label class="form-label">{{ t('asset.company') }} <span class="required">*</span></label>
               <select v-model="form.companyId" class="form-input" required :disabled="isEditing">
                 <option value="">선택</option>
                 <option v-for="c in companies" :key="c.companyId" :value="c.companyId">{{ c.companyNm }}</option>
@@ -177,9 +177,9 @@
 
           <div v-if="saveError" class="error-message">{{ saveError }}</div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-default" @click="closeModal">취소</button>
+            <button type="button" class="btn btn-default" @click="closeModal">{{ t('common.cancel') }}</button>
             <button type="submit" class="btn btn-primary" :disabled="saving">
-              {{ saving ? '저장 중...' : '저장' }}
+              {{ saving ? '저장 중...' : t('common.save') }}
             </button>
           </div>
         </form>
@@ -190,11 +190,13 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { assetHwApi } from '@/api/asset.js'
 import { companyApi } from '@/api/company.js'
 import { userApi } from '@/api/user.js'
 import { useCommonCodeStore } from '@/stores/commonCode.js'
 
+const { t } = useI18n()
 const commonCodeStore = useCommonCodeStore()
 
 const assets = ref([])
@@ -335,7 +337,7 @@ async function saveAsset() {
     closeModal()
     loadAssets()
   } catch (e) {
-    saveError.value = e.response?.data?.error?.message || e.response?.data?.message || '저장 중 오류가 발생했습니다.'
+    saveError.value = e.response?.data?.error?.message || e.response?.data?.message || t('message.saveFail')
   } finally {
     saving.value = false
   }

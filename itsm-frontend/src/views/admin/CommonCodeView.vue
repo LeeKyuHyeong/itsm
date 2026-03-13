@@ -1,7 +1,7 @@
 <template>
   <div class="code-manage">
     <div class="page-header">
-      <h1 class="page-title">공통코드 관리</h1>
+      <h1 class="page-title">{{ t('admin.commonCode') }}</h1>
     </div>
 
     <div class="org-layout">
@@ -9,7 +9,7 @@
       <div class="org-panel">
         <div class="panel-header">
           <h2 class="panel-title">코드그룹 목록</h2>
-          <button class="btn btn-primary btn-sm" @click="openGroupDialog()">+ 그룹 추가</button>
+          <button class="btn btn-primary btn-sm" @click="openGroupDialog()">+ {{ t('common.add') }}</button>
         </div>
 
         <div class="table-container">
@@ -44,7 +44,7 @@
                   </span>
                 </td>
                 <td>
-                  <button class="btn btn-sm btn-default" @click.stop="openGroupDialog(group)">수정</button>
+                  <button class="btn btn-sm btn-default" @click.stop="openGroupDialog(group)">{{ t('common.edit') }}</button>
                 </td>
               </tr>
             </tbody>
@@ -64,7 +64,7 @@
             :disabled="!selectedGroupId"
             @click="openDetailDialog()"
           >
-            + 코드 추가
+            + {{ t('common.add') }}
           </button>
         </div>
 
@@ -99,7 +99,7 @@
                   </span>
                 </td>
                 <td>
-                  <button class="btn btn-sm btn-default" @click="openDetailDialog(detail)">수정</button>
+                  <button class="btn btn-sm btn-default" @click="openDetailDialog(detail)">{{ t('common.edit') }}</button>
                 </td>
               </tr>
             </tbody>
@@ -130,9 +130,9 @@
           </div>
           <div v-if="groupSaveError" class="error-message">{{ groupSaveError }}</div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-default" @click="closeGroupModal">취소</button>
+            <button type="button" class="btn btn-default" @click="closeGroupModal">{{ t('common.cancel') }}</button>
             <button type="submit" class="btn btn-primary" :disabled="groupSaving">
-              {{ groupSaving ? '저장 중...' : '저장' }}
+              {{ groupSaving ? '저장 중...' : t('common.save') }}
             </button>
           </div>
         </form>
@@ -161,9 +161,9 @@
           </div>
           <div v-if="detailSaveError" class="error-message">{{ detailSaveError }}</div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-default" @click="closeDetailModal">취소</button>
+            <button type="button" class="btn btn-default" @click="closeDetailModal">{{ t('common.cancel') }}</button>
             <button type="submit" class="btn btn-primary" :disabled="detailSaving">
-              {{ detailSaving ? '저장 중...' : '저장' }}
+              {{ detailSaving ? '저장 중...' : t('common.save') }}
             </button>
           </div>
         </form>
@@ -174,7 +174,10 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { commonCodeApi } from '@/api/admin/commonCode.js'
+
+const { t } = useI18n()
 
 const groups = ref([])
 const details = ref([])
@@ -283,7 +286,7 @@ async function saveGroup() {
     closeGroupModal()
     loadGroups()
   } catch (error) {
-    groupSaveError.value = error.response?.data?.message || '저장 중 오류가 발생했습니다.'
+    groupSaveError.value = error.response?.data?.message || t('message.saveFail')
   } finally {
     groupSaving.value = false
   }
@@ -326,7 +329,7 @@ async function saveDetail() {
     closeDetailModal()
     loadDetails()
   } catch (error) {
-    detailSaveError.value = error.response?.data?.message || '저장 중 오류가 발생했습니다.'
+    detailSaveError.value = error.response?.data?.message || t('message.saveFail')
   } finally {
     detailSaving.value = false
   }

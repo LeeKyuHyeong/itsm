@@ -1,17 +1,17 @@
 <template>
   <div class="incident-detail" v-if="incident">
     <div class="page-header">
-      <h2>장애 상세 - #{{ incident.incidentId }}</h2>
+      <h2>{{ t('incident.detail') }} - #{{ incident.incidentId }}</h2>
       <div class="header-actions">
-        <button class="btn btn-secondary" @click="$router.push('/incidents')">목록</button>
-        <button v-if="canEdit" class="btn btn-secondary" @click="$router.push(`/incidents/${incident.incidentId}/edit`)">수정</button>
+        <button class="btn btn-secondary" @click="$router.push('/incidents')">{{ t('common.list') }}</button>
+        <button v-if="canEdit" class="btn btn-secondary" @click="$router.push(`/incidents/${incident.incidentId}/edit`)">{{ t('common.edit') }}</button>
       </div>
     </div>
 
     <!-- 상태머신 버튼 -->
     <div class="status-actions">
       <span class="current-status">
-        현재 상태: <BaseStatusBadge :status="incident.statusCd" />
+        {{ t('incident.currentStatus') }}: <BaseStatusBadge :status="incident.statusCd" />
       </span>
       <div class="status-buttons">
         <button v-for="s in availableTransitions" :key="s.status"
@@ -24,7 +24,7 @@
     <!-- SLA 카운트다운 -->
     <div class="sla-section" v-if="incident.slaDeadlineAt">
       <div class="sla-info">
-        <span class="sla-label">SLA 기한: {{ formatDate(incident.slaDeadlineAt) }}</span>
+        <span class="sla-label">{{ t('incident.slaDeadline') }}: {{ formatDate(incident.slaDeadlineAt) }}</span>
         <span :class="['sla-countdown', slaUrgency]">{{ slaCountdown }}</span>
       </div>
       <BaseSlaBar :percentage="incident.slaPercentage || 0" :show-label="true" />
@@ -32,40 +32,40 @@
 
     <!-- 기본 정보 -->
     <div class="detail-card">
-      <h3>기본 정보</h3>
+      <h3>{{ t('incident.basicInfo') }}</h3>
       <div class="info-grid">
         <div class="info-item">
-          <label>제목</label>
+          <label>{{ t('incident.incidentTitle') }}</label>
           <span>{{ incident.title }}</span>
         </div>
         <div class="info-item">
-          <label>장애 유형</label>
+          <label>{{ t('incident.type') }}</label>
           <span>{{ commonCodeStore.getCodeName('INCIDENT_TYPE', incident.incidentTypeCd) || incident.incidentTypeCd }}</span>
         </div>
         <div class="info-item">
-          <label>우선순위</label>
+          <label>{{ t('incident.priority') }}</label>
           <span :class="['priority-badge', `priority-${incident.priorityCd}`]">{{ priorityLabel(incident.priorityCd) }}</span>
         </div>
         <div class="info-item">
-          <label>고객사</label>
+          <label>{{ t('incident.company') }}</label>
           <span>{{ incident.companyNm }}</span>
         </div>
         <div class="info-item">
-          <label>발생일시</label>
+          <label>{{ t('incident.occurredAt') }}</label>
           <span>{{ formatDate(incident.occurredAt) }}</span>
         </div>
         <div class="info-item">
-          <label>주담당자</label>
+          <label>{{ t('incident.mainManager') }}</label>
           <span>{{ incident.mainManagerNm || '-' }}
-            <button v-if="canEdit" class="btn-link" @click="showAssignManagerModal = true">[변경]</button>
+            <button v-if="canEdit" class="btn-link" @click="showAssignManagerModal = true">[{{ t('incident.change') }}]</button>
           </span>
         </div>
         <div class="info-item full-width">
-          <label>장애 내용</label>
+          <label>{{ t('incident.content') }}</label>
           <div class="content-box">{{ incident.content }}</div>
         </div>
         <div class="info-item full-width" v-if="incident.processContent">
-          <label>처리내용</label>
+          <label>{{ t('incident.processContent') }}</label>
           <div class="content-box">{{ incident.processContent }}</div>
         </div>
       </div>
@@ -74,52 +74,52 @@
     <!-- 담당자 배정 -->
     <div class="detail-card">
       <div class="card-header">
-        <h3>담당자 배정</h3>
-        <button class="btn btn-sm" @click="showAssigneeModal = true">담당자 추가</button>
+        <h3>{{ t('incident.assigneeManagement') }}</h3>
+        <button class="btn btn-sm" @click="showAssigneeModal = true">{{ t('incident.addAssignee') }}</button>
       </div>
-      <div v-if="assignees.length === 0" class="empty-state">배정된 담당자가 없습니다.</div>
+      <div v-if="assignees.length === 0" class="empty-state">{{ t('incident.noAssignee') }}</div>
       <div v-else class="assignee-list">
         <div v-for="a in assignees" :key="a.userId" class="assignee-item">
           <span>{{ a.userNm }}</span>
           <span class="assignee-date">{{ formatDate(a.grantedAt) }}</span>
-          <button class="btn-link danger" @click="handleRemoveAssignee(a.userId)">해제</button>
+          <button class="btn-link danger" @click="handleRemoveAssignee(a.userId)">{{ t('incident.removeAssignee') }}</button>
         </div>
       </div>
     </div>
 
     <!-- 댓글 -->
     <div class="detail-card">
-      <h3>댓글</h3>
-      <div v-if="comments.length === 0" class="empty-state">등록된 댓글이 없습니다.</div>
+      <h3>{{ t('incident.comment') }}</h3>
+      <div v-if="comments.length === 0" class="empty-state">{{ t('incident.noComment') }}</div>
       <div v-else class="comment-list">
         <div v-for="c in comments" :key="c.commentId" class="comment-item">
           <div class="comment-header">
-            <span class="comment-author">{{ c.createdByNm || `사용자#${c.createdBy}` }}</span>
+            <span class="comment-author">{{ c.createdByNm || `${t('incident.user')}#${c.createdBy}` }}</span>
             <span class="comment-date">{{ formatDate(c.createdAt) }}</span>
-            <button class="btn-link danger" @click="handleDeleteComment(c.commentId)">삭제</button>
+            <button class="btn-link danger" @click="handleDeleteComment(c.commentId)">{{ t('common.delete') }}</button>
           </div>
           <div class="comment-content">{{ c.content }}</div>
         </div>
       </div>
       <div class="comment-form">
-        <textarea v-model="newComment" rows="2" placeholder="댓글을 입력하세요"></textarea>
-        <button class="btn btn-primary btn-sm" @click="handleAddComment" :disabled="!newComment.trim()">등록</button>
+        <textarea v-model="newComment" rows="2" :placeholder="t('incident.commentPlaceholder')"></textarea>
+        <button class="btn btn-primary btn-sm" @click="handleAddComment" :disabled="!newComment.trim()">{{ t('common.create') }}</button>
       </div>
     </div>
 
     <!-- 변경 이력 타임라인 -->
     <div class="detail-card">
-      <h3>변경 이력</h3>
-      <div v-if="histories.length === 0" class="empty-state">변경 이력이 없습니다.</div>
+      <h3>{{ t('incident.changeHistory') }}</h3>
+      <div v-if="histories.length === 0" class="empty-state">{{ t('incident.noHistory') }}</div>
       <div v-else class="timeline">
         <div v-for="h in histories" :key="h.historyId" class="timeline-item">
           <div class="timeline-dot"></div>
           <div class="timeline-content">
             <div class="timeline-field">{{ h.changedField }}</div>
             <div class="timeline-change">
-              <span class="before">{{ h.beforeValue || '(없음)' }}</span>
+              <span class="before">{{ h.beforeValue || t('incident.none') }}</span>
               <span class="arrow">&rarr;</span>
-              <span class="after">{{ h.afterValue || '(없음)' }}</span>
+              <span class="after">{{ h.afterValue || t('incident.none') }}</span>
             </div>
             <div class="timeline-date">{{ formatDate(h.createdAt) }}</div>
           </div>
@@ -130,53 +130,53 @@
     <!-- 장애보고서 -->
     <div class="detail-card">
       <div class="card-header">
-        <h3>장애보고서</h3>
-        <button v-if="!report" class="btn btn-sm" @click="showReportModal = true">작성</button>
-        <button v-else class="btn btn-sm" @click="showReportModal = true">수정</button>
+        <h3>{{ t('incident.report') }}</h3>
+        <button v-if="!report" class="btn btn-sm" @click="showReportModal = true">{{ t('incident.writeReport') }}</button>
+        <button v-else class="btn btn-sm" @click="showReportModal = true">{{ t('common.edit') }}</button>
       </div>
-      <div v-if="!report" class="empty-state">작성된 장애보고서가 없습니다.</div>
+      <div v-if="!report" class="empty-state">{{ t('incident.noReport') }}</div>
       <div v-else class="report-content">
         <pre>{{ report.reportContent }}</pre>
         <div class="report-meta">
-          작성일: {{ formatDate(report.createdAt) }}
-          <span v-if="report.updatedAt"> | 수정일: {{ formatDate(report.updatedAt) }}</span>
+          {{ t('incident.createdAt') }}: {{ formatDate(report.createdAt) }}
+          <span v-if="report.updatedAt"> | {{ t('incident.updatedAt') }}: {{ formatDate(report.updatedAt) }}</span>
         </div>
       </div>
     </div>
 
     <!-- 담당자 추가 모달 -->
-    <BaseModal :show="showAssigneeModal" title="담당자 추가" @close="showAssigneeModal = false">
+    <BaseModal :show="showAssigneeModal" :title="t('incident.addAssignee')" @close="showAssigneeModal = false">
       <div class="form-group">
-        <label>사용자 ID</label>
-        <input v-model.number="assigneeUserId" type="number" placeholder="사용자 ID 입력" />
+        <label>{{ t('incident.userId') }}</label>
+        <input v-model.number="assigneeUserId" type="number" :placeholder="t('incident.userIdPlaceholder')" />
       </div>
       <template #footer>
-        <button class="btn btn-secondary" @click="showAssigneeModal = false">취소</button>
-        <button class="btn btn-primary" @click="handleAssignUser">추가</button>
+        <button class="btn btn-secondary" @click="showAssigneeModal = false">{{ t('common.cancel') }}</button>
+        <button class="btn btn-primary" @click="handleAssignUser">{{ t('common.add') }}</button>
       </template>
     </BaseModal>
 
     <!-- 주담당자 변경 모달 -->
-    <BaseModal :show="showAssignManagerModal" title="주담당자 변경" @close="showAssignManagerModal = false">
+    <BaseModal :show="showAssignManagerModal" :title="t('incident.changeMainManager')" @close="showAssignManagerModal = false">
       <div class="form-group">
-        <label>주담당자 ID</label>
-        <input v-model.number="mainManagerId" type="number" placeholder="사용자 ID 입력" />
+        <label>{{ t('incident.mainManagerId') }}</label>
+        <input v-model.number="mainManagerId" type="number" :placeholder="t('incident.userIdPlaceholder')" />
       </div>
       <template #footer>
-        <button class="btn btn-secondary" @click="showAssignManagerModal = false">취소</button>
-        <button class="btn btn-primary" @click="handleAssignMainManager">변경</button>
+        <button class="btn btn-secondary" @click="showAssignManagerModal = false">{{ t('common.cancel') }}</button>
+        <button class="btn btn-primary" @click="handleAssignMainManager">{{ t('incident.change') }}</button>
       </template>
     </BaseModal>
 
     <!-- 장애보고서 모달 -->
-    <BaseModal :show="showReportModal" title="장애보고서 작성" width="640px" @close="showReportModal = false">
+    <BaseModal :show="showReportModal" :title="t('incident.writeReport')" width="640px" @close="showReportModal = false">
       <div class="form-group">
-        <label>보고서 내용 (JSON)</label>
+        <label>{{ t('incident.reportContent') }}</label>
         <textarea v-model="reportContent" rows="10" placeholder='{"summary":"장애 요약","cause":"원인","solution":"해결방안","prevention":"재발방지"}'></textarea>
       </div>
       <template #footer>
-        <button class="btn btn-secondary" @click="showReportModal = false">취소</button>
-        <button class="btn btn-primary" @click="handleSaveReport">저장</button>
+        <button class="btn btn-secondary" @click="showReportModal = false">{{ t('common.cancel') }}</button>
+        <button class="btn btn-primary" @click="handleSaveReport">{{ t('common.save') }}</button>
       </template>
     </BaseModal>
   </div>
@@ -185,12 +185,14 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { incidentApi } from '@/api/incident.js'
 import { useCommonCodeStore } from '@/stores/commonCode.js'
 import BaseStatusBadge from '@/components/common/BaseStatusBadge.vue'
 import BaseSlaBar from '@/components/common/BaseSlaBar.vue'
 import BaseModal from '@/components/common/BaseModal.vue'
 
+const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const commonCodeStore = useCommonCodeStore()
@@ -211,18 +213,18 @@ const showReportModal = ref(false)
 
 const STATUS_TRANSITIONS = {
   RECEIVED: [
-    { status: 'IN_PROGRESS', label: '처리 시작', class: 'btn-primary' },
-    { status: 'REJECTED', label: '반려', class: 'btn-danger' }
+    { status: 'IN_PROGRESS', label: t('incident.statusAction.startProcess'), class: 'btn-primary' },
+    { status: 'REJECTED', label: t('status.REJECTED'), class: 'btn-danger' }
   ],
   IN_PROGRESS: [
-    { status: 'COMPLETED', label: '처리 완료', class: 'btn-success' },
-    { status: 'REJECTED', label: '반려', class: 'btn-danger' }
+    { status: 'COMPLETED', label: t('incident.statusAction.complete'), class: 'btn-success' },
+    { status: 'REJECTED', label: t('status.REJECTED'), class: 'btn-danger' }
   ],
   COMPLETED: [
-    { status: 'CLOSED', label: '종료', class: 'btn-primary' }
+    { status: 'CLOSED', label: t('status.CLOSED'), class: 'btn-primary' }
   ],
   REJECTED: [
-    { status: 'RECEIVED', label: '재접수', class: 'btn-primary' }
+    { status: 'RECEIVED', label: t('incident.statusAction.reReceive'), class: 'btn-primary' }
   ],
   CLOSED: []
 }
@@ -242,10 +244,10 @@ const slaCountdown = computed(() => {
   const deadline = new Date(incident.value.slaDeadlineAt)
   const now = new Date()
   const diff = deadline - now
-  if (diff <= 0) return 'SLA 초과'
+  if (diff <= 0) return t('incident.slaExceeded')
   const hours = Math.floor(diff / (1000 * 60 * 60))
   const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
-  return `${hours}시간 ${minutes}분 남음`
+  return t('incident.slaRemaining', { hours, minutes })
 })
 
 const slaUrgency = computed(() => {
@@ -257,8 +259,7 @@ const slaUrgency = computed(() => {
 })
 
 const priorityLabel = (code) => {
-  const map = { CRITICAL: '긴급', HIGH: '높음', MEDIUM: '보통', LOW: '낮음' }
-  return map[code] || code
+  return t(`priority.${code}`, code)
 }
 
 const formatDate = (dateStr) => {
@@ -275,7 +276,7 @@ const loadDetail = async () => {
     incident.value = res.data.data || res.data
   } catch (e) {
     console.error('장애 조회 실패:', e)
-    alert('장애 정보를 불러올 수 없습니다.')
+    alert(t('message.loadFail'))
   }
 }
 
@@ -316,13 +317,13 @@ const loadReport = async () => {
 }
 
 const handleChangeStatus = async (status) => {
-  if (!confirm(`상태를 "${status}"(으)로 변경하시겠습니까?`)) return
+  if (!confirm(t('incident.confirmStatusChange', { status }))) return
   try {
     await incidentApi.changeStatus(incidentId.value, { status })
     await loadDetail()
     await loadHistory()
   } catch (e) {
-    alert(e.response?.data?.error?.message || '상태 변경에 실패했습니다.')
+    alert(e.response?.data?.error?.message || t('incident.statusChangeFail'))
   }
 }
 
@@ -334,17 +335,17 @@ const handleAssignUser = async () => {
     assigneeUserId.value = null
     await loadAssignees()
   } catch (e) {
-    alert(e.response?.data?.error?.message || '담당자 추가에 실패했습니다.')
+    alert(e.response?.data?.error?.message || t('incident.assignFail'))
   }
 }
 
 const handleRemoveAssignee = async (userId) => {
-  if (!confirm('담당자를 해제하시겠습니까?')) return
+  if (!confirm(t('incident.confirmRemoveAssignee'))) return
   try {
     await incidentApi.removeAssignee(incidentId.value, userId)
     await loadAssignees()
   } catch (e) {
-    alert('담당자 해제에 실패했습니다.')
+    alert(t('incident.removeAssigneeFail'))
   }
 }
 
@@ -356,7 +357,7 @@ const handleAssignMainManager = async () => {
     mainManagerId.value = null
     await loadDetail()
   } catch (e) {
-    alert(e.response?.data?.error?.message || '주담당자 변경에 실패했습니다.')
+    alert(e.response?.data?.error?.message || t('incident.changeMainManagerFail'))
   }
 }
 
@@ -367,17 +368,17 @@ const handleAddComment = async () => {
     newComment.value = ''
     await loadComments()
   } catch (e) {
-    alert('댓글 등록에 실패했습니다.')
+    alert(t('incident.commentAddFail'))
   }
 }
 
 const handleDeleteComment = async (commentId) => {
-  if (!confirm('댓글을 삭제하시겠습니까?')) return
+  if (!confirm(t('incident.confirmDeleteComment'))) return
   try {
     await incidentApi.deleteComment(incidentId.value, commentId)
     await loadComments()
   } catch (e) {
-    alert('댓글 삭제에 실패했습니다.')
+    alert(t('incident.commentDeleteFail'))
   }
 }
 
@@ -392,7 +393,7 @@ const handleSaveReport = async () => {
     showReportModal.value = false
     await loadReport()
   } catch (e) {
-    alert(e.response?.data?.error?.message || '보고서 저장에 실패했습니다.')
+    alert(e.response?.data?.error?.message || t('incident.reportSaveFail'))
   }
 }
 

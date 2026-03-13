@@ -1,18 +1,18 @@
 <template>
   <div class="account-manage">
     <div class="page-header">
-      <h1 class="page-title">계정 관리</h1>
+      <h1 class="page-title">{{ t('admin.accountManage') }}</h1>
       <button class="btn btn-primary" @click="openCreateDialog">
-        + 사용자 추가
+        + {{ t('common.add') }}
       </button>
     </div>
 
     <!-- Search & Filters -->
     <div class="filter-bar">
       <div class="filter-group">
-        <label class="filter-label">상태</label>
+        <label class="filter-label">{{ t('asset.status') }}</label>
         <select v-model="filters.status" class="filter-select" @change="loadUsers">
-          <option value="">전체</option>
+          <option value="">{{ t('common.all') }}</option>
           <option value="ACTIVE">활성</option>
           <option value="INACTIVE">비활성</option>
           <option value="LOCKED">잠김</option>
@@ -28,7 +28,7 @@
           placeholder="이름 또는 아이디로 검색"
           @keyup.enter="loadUsers"
         />
-        <button class="btn btn-default" @click="loadUsers">검색</button>
+        <button class="btn btn-default" @click="loadUsers">{{ t('common.search') }}</button>
       </div>
     </div>
 
@@ -42,7 +42,7 @@
             <th>이름</th>
             <th>이메일</th>
             <th>부서</th>
-            <th>상태</th>
+            <th>{{ t('asset.status') }}</th>
             <th>역할</th>
             <th>관리</th>
           </tr>
@@ -79,7 +79,7 @@
             </td>
             <td>
               <div class="action-buttons">
-                <button class="btn btn-sm btn-default" @click="openEditDialog(user)">수정</button>
+                <button class="btn btn-sm btn-default" @click="openEditDialog(user)">{{ t('common.edit') }}</button>
                 <button class="btn btn-sm btn-default" @click="openRoleDialog(user)">역할</button>
                 <button
                   v-if="user.status === 'ACTIVE'"
@@ -179,9 +179,9 @@
           </div>
           <div v-if="saveError" class="error-message">{{ saveError }}</div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-default" @click="closeUserModal">취소</button>
+            <button type="button" class="btn btn-default" @click="closeUserModal">{{ t('common.cancel') }}</button>
             <button type="submit" class="btn btn-primary" :disabled="saving">
-              {{ saving ? '저장 중...' : '저장' }}
+              {{ saving ? '저장 중...' : t('common.save') }}
             </button>
           </div>
         </form>
@@ -201,7 +201,7 @@
             <div v-if="roleTarget?.roles?.length" class="role-list">
               <div v-for="role in roleTarget.roles" :key="role" class="role-item">
                 <span class="role-tag">{{ roleLabel(role) }}</span>
-                <button class="btn btn-sm btn-danger" @click="removeRoleFromUser(role)">제거</button>
+                <button class="btn btn-sm btn-danger" @click="removeRoleFromUser(role)">{{ t('common.delete') }}</button>
               </div>
             </div>
             <p v-else class="text-secondary">할당된 역할이 없습니다.</p>
@@ -225,7 +225,7 @@
                 :disabled="!newRole"
                 @click="addRoleToUser"
               >
-                추가
+                {{ t('common.add') }}
               </button>
             </div>
           </div>
@@ -239,9 +239,12 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { userApi } from '@/api/user.js'
 import { companyApi } from '@/api/company.js'
 import { ROLE_LABEL } from '@/constants/roles.js'
+
+const { t } = useI18n()
 
 const users = ref([])
 const loading = ref(false)
@@ -432,7 +435,7 @@ async function saveUser() {
     closeUserModal()
     loadUsers()
   } catch (error) {
-    saveError.value = error.response?.data?.message || '저장 중 오류가 발생했습니다.'
+    saveError.value = error.response?.data?.message || t('message.saveFail')
   } finally {
     saving.value = false
   }
@@ -479,7 +482,7 @@ async function addRoleToUser() {
 
 async function removeRoleFromUser(role) {
   if (!roleTarget.value) return
-  if (!confirm(`${roleLabel(role)} 역할을 제거하시겠습니까?`)) return
+  if (!confirm(t('message.deleteConfirm'))) return
   roleError.value = ''
   try {
     await userApi.removeRole(roleTarget.value.id, role)

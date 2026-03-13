@@ -1,8 +1,8 @@
 <template>
   <div class="sla-manage">
     <div class="page-header">
-      <h1 class="page-title">SLA 정책 관리</h1>
-      <button class="btn btn-primary" @click="openDialog()">+ SLA 추가</button>
+      <h1 class="page-title">{{ t('admin.slaManage') }}</h1>
+      <button class="btn btn-primary" @click="openDialog()">+ {{ t('common.add') }}</button>
     </div>
 
     <div class="table-container">
@@ -13,7 +13,7 @@
             <th>우선순위</th>
             <th>처리기한(시간)</th>
             <th>경고기준(%)</th>
-            <th>고객사</th>
+            <th>{{ t('asset.company') }}</th>
             <th>사용여부</th>
             <th>관리</th>
           </tr>
@@ -37,7 +37,7 @@
               </span>
             </td>
             <td>
-              <button class="btn btn-sm btn-default" @click="openDialog(sla)">수정</button>
+              <button class="btn btn-sm btn-default" @click="openDialog(sla)">{{ t('common.edit') }}</button>
             </td>
           </tr>
         </tbody>
@@ -53,7 +53,7 @@
         </div>
         <form class="modal-body" @submit.prevent="save">
           <div class="form-group">
-            <label class="form-label">고객사 (선택)</label>
+            <label class="form-label">{{ t('asset.company') }} (선택)</label>
             <select v-model="form.companyId" class="form-input">
               <option value="">공통 (전체 적용)</option>
               <option v-for="c in companies" :key="c.id" :value="c.id">{{ c.name }}</option>
@@ -73,9 +73,9 @@
           </div>
           <div v-if="saveError" class="error-message">{{ saveError }}</div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-default" @click="closeModal">취소</button>
+            <button type="button" class="btn btn-default" @click="closeModal">{{ t('common.cancel') }}</button>
             <button type="submit" class="btn btn-primary" :disabled="saving">
-              {{ saving ? '저장 중...' : '저장' }}
+              {{ saving ? '저장 중...' : t('common.save') }}
             </button>
           </div>
         </form>
@@ -86,8 +86,11 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { slaApi } from '@/api/admin/sla.js'
 import { companyApi } from '@/api/company.js'
+
+const { t } = useI18n()
 
 const slaList = ref([])
 const companies = ref([])
@@ -175,7 +178,7 @@ async function save() {
     closeModal()
     loadSlaList()
   } catch (error) {
-    saveError.value = error.response?.data?.message || '저장 중 오류가 발생했습니다.'
+    saveError.value = error.response?.data?.message || t('message.saveFail')
   } finally {
     saving.value = false
   }

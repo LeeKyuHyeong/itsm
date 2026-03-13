@@ -1,17 +1,17 @@
 <template>
   <div class="sr-detail" v-if="sr">
     <div class="page-header">
-      <h2>서비스요청 상세 - #{{ sr.requestId }}</h2>
+      <h2>{{ t('serviceRequest.detail') }} - #{{ sr.requestId }}</h2>
       <div class="header-actions">
-        <button class="btn btn-secondary" @click="$router.push('/service-requests')">목록</button>
-        <button v-if="canEdit" class="btn btn-secondary" @click="$router.push(`/service-requests/${sr.requestId}/edit`)">수정</button>
+        <button class="btn btn-secondary" @click="$router.push('/service-requests')">{{ t('common.list') }}</button>
+        <button v-if="canEdit" class="btn btn-secondary" @click="$router.push(`/service-requests/${sr.requestId}/edit`)">{{ t('common.edit') }}</button>
       </div>
     </div>
 
     <!-- 상태머신 버튼 -->
     <div class="status-actions">
       <span class="current-status">
-        현재 상태: <BaseStatusBadge :status="sr.statusCd" />
+        {{ t('incident.status') }}: <BaseStatusBadge :status="sr.statusCd" />
       </span>
       <div class="status-buttons">
         <button v-for="s in availableTransitions" :key="s.status"
@@ -24,7 +24,7 @@
     <!-- SLA 카운트다운 -->
     <div class="sla-section" v-if="sr.slaDeadlineAt">
       <div class="sla-info">
-        <span class="sla-label">SLA 기한: {{ formatDate(sr.slaDeadlineAt) }}</span>
+        <span class="sla-label">SLA: {{ formatDate(sr.slaDeadlineAt) }}</span>
         <span :class="['sla-countdown', slaUrgency]">{{ slaCountdown }}</span>
       </div>
       <BaseSlaBar :percentage="sr.slaPercentage || 0" :show-label="true" />
@@ -32,34 +32,34 @@
 
     <!-- 기본 정보 -->
     <div class="detail-card">
-      <h3>기본 정보</h3>
+      <h3><!-- 기본 정보 -->기본 정보</h3>
       <div class="info-grid">
         <div class="info-item">
-          <label>제목</label>
+          <label>{{ t('incident.incidentTitle') }}</label>
           <span>{{ sr.title }}</span>
         </div>
         <div class="info-item">
-          <label>요청 유형</label>
+          <label><!-- 요청 유형 -->요청 유형</label>
           <span>{{ commonCodeStore.getCodeName('REQUEST_TYPE', sr.requestTypeCd) || sr.requestTypeCd }}</span>
         </div>
         <div class="info-item">
-          <label>우선순위</label>
-          <span :class="['priority-badge', `priority-${sr.priorityCd}`]">{{ priorityLabel(sr.priorityCd) }}</span>
+          <label>{{ t('incident.priority') }}</label>
+          <span :class="['priority-badge', `priority-${sr.priorityCd}`]">{{ t(`priority.${sr.priorityCd}`) }}</span>
         </div>
         <div class="info-item">
-          <label>고객사</label>
+          <label>{{ t('incident.company') }}</label>
           <span>{{ sr.companyNm }}</span>
         </div>
         <div class="info-item">
-          <label>요청일시</label>
+          <label>{{ t('incident.occurredAt') }}</label>
           <span>{{ formatDate(sr.occurredAt) }}</span>
         </div>
         <div class="info-item">
-          <label>반려 횟수</label>
-          <span>{{ sr.rejectCnt }}회</span>
+          <label><!-- 반려 횟수 -->반려 횟수</label>
+          <span>{{ sr.rejectCnt }}<!-- 회 -->회</span>
         </div>
         <div class="info-item full-width">
-          <label>요청 내용</label>
+          <label><!-- 요청 내용 -->요청 내용</label>
           <div class="content-box">{{ sr.content }}</div>
         </div>
       </div>
@@ -68,19 +68,19 @@
     <!-- 담당자 배정 & 진행상태 -->
     <div class="detail-card">
       <div class="card-header">
-        <h3>담당자 배정</h3>
+        <h3>{{ t('incident.assignee') }}</h3>
         <div class="assignee-summary" v-if="assignees.length > 0">
-          <span>처리 현황: {{ sr.completedAssigneeCount || 0 }} / {{ sr.assigneeCount || 0 }}명 완료</span>
+          <span>{{ sr.completedAssigneeCount || 0 }} / {{ sr.assigneeCount || 0 }} {{ t('status.COMPLETED') }}</span>
         </div>
-        <button class="btn btn-sm" @click="showAssigneeModal = true">담당자 추가</button>
+        <button class="btn btn-sm" @click="showAssigneeModal = true">{{ t('common.add') }}</button>
       </div>
-      <div v-if="assignees.length === 0" class="empty-state">배정된 담당자가 없습니다.</div>
+      <div v-if="assignees.length === 0" class="empty-state">{{ t('common.noData') }}</div>
       <div v-else class="assignee-list">
         <div v-for="a in assignees" :key="a.userId" class="assignee-item">
           <span class="assignee-name">{{ a.userNm }}</span>
           <span :class="['process-status', `status-${a.processStatus}`]">{{ processStatusLabel(a.processStatus) }}</span>
           <span class="assignee-date">{{ formatDate(a.grantedAt) }}</span>
-          <button class="btn-link danger" @click="handleRemoveAssignee(a.userId)">해제</button>
+          <button class="btn-link danger" @click="handleRemoveAssignee(a.userId)"><!-- 해제 -->해제</button>
         </div>
       </div>
     </div>
@@ -88,34 +88,34 @@
     <!-- 처리내용 -->
     <div class="detail-card">
       <div class="card-header">
-        <h3>처리내용</h3>
+        <h3><!-- 처리내용 -->처리내용</h3>
       </div>
-      <div v-if="processes.length === 0" class="empty-state">등록된 처리내용이 없습니다.</div>
+      <div v-if="processes.length === 0" class="empty-state">{{ t('common.noData') }}</div>
       <div v-else class="process-list">
         <div v-for="p in processes" :key="p.processId" class="process-item">
           <div class="process-header">
-            <span class="process-user">사용자#{{ p.userId }}</span>
+            <span class="process-user"><!-- 사용자 -->사용자#{{ p.userId }}</span>
             <span :class="['process-badge', p.isCompleted === 'Y' ? 'completed' : 'pending']">
-              {{ p.isCompleted === 'Y' ? '완료' : '진행중' }}
+              {{ p.isCompleted === 'Y' ? t('status.COMPLETED') : t('status.IN_PROGRESS') }}
             </span>
             <span class="process-date">{{ formatDate(p.createdAt) }}</span>
-            <button v-if="p.isCompleted !== 'Y'" class="btn-link" @click="handleCompleteProcess(p.processId)">완료처리</button>
+            <button v-if="p.isCompleted !== 'Y'" class="btn-link" @click="handleCompleteProcess(p.processId)"><!-- 완료처리 -->완료처리</button>
           </div>
           <div class="process-content">{{ p.processContent }}</div>
         </div>
       </div>
       <div class="process-form">
         <div class="form-row-inline">
-          <input v-model.number="processUserId" type="number" placeholder="사용자 ID" class="input-sm" />
-          <textarea v-model="processContent" rows="2" placeholder="처리내용을 입력하세요"></textarea>
-          <button class="btn btn-primary btn-sm" @click="handleAddProcess" :disabled="!processContent.trim() || !processUserId">등록</button>
+          <input v-model.number="processUserId" type="number" placeholder="ID" class="input-sm" />
+          <textarea v-model="processContent" rows="2"></textarea>
+          <button class="btn btn-primary btn-sm" @click="handleAddProcess" :disabled="!processContent.trim() || !processUserId">{{ t('common.create') }}</button>
         </div>
       </div>
     </div>
 
     <!-- 만족도 -->
     <div class="detail-card" v-if="sr.statusCd === 'CLOSED'">
-      <h3>만족도</h3>
+      <h3><!-- 만족도 -->만족도</h3>
       <div v-if="sr.satisfactionScore != null" class="satisfaction-result">
         <div class="stars">
           <span v-for="i in 5" :key="i" :class="['star', i <= sr.satisfactionScore ? 'filled' : '']">&#9733;</span>
@@ -127,24 +127,24 @@
           <span v-for="i in 5" :key="i" :class="['star', i <= satisfactionScore ? 'filled' : '']"
                 @click="satisfactionScore = i" style="cursor:pointer">&#9733;</span>
         </div>
-        <textarea v-model="satisfactionComment" rows="2" placeholder="의견을 남겨주세요 (선택)"></textarea>
-        <button class="btn btn-primary btn-sm" @click="handleSubmitSatisfaction" :disabled="!satisfactionScore">만족도 제출</button>
+        <textarea v-model="satisfactionComment" rows="2"></textarea>
+        <button class="btn btn-primary btn-sm" @click="handleSubmitSatisfaction" :disabled="!satisfactionScore"><!-- 만족도 제출 -->만족도 제출</button>
       </div>
     </div>
 
     <!-- 변경 이력 타임라인 -->
     <div class="detail-card">
-      <h3>변경 이력</h3>
-      <div v-if="histories.length === 0" class="empty-state">변경 이력이 없습니다.</div>
+      <h3><!-- 변경 이력 -->변경 이력</h3>
+      <div v-if="histories.length === 0" class="empty-state">{{ t('common.noData') }}</div>
       <div v-else class="timeline">
         <div v-for="h in histories" :key="h.historyId" class="timeline-item">
           <div class="timeline-dot"></div>
           <div class="timeline-content">
             <div class="timeline-field">{{ h.changedField }}</div>
             <div class="timeline-change">
-              <span class="before">{{ h.beforeValue || '(없음)' }}</span>
+              <span class="before">{{ h.beforeValue || '-' }}</span>
               <span class="arrow">&rarr;</span>
-              <span class="after">{{ h.afterValue || '(없음)' }}</span>
+              <span class="after">{{ h.afterValue || '-' }}</span>
             </div>
             <div class="timeline-date">{{ formatDate(h.createdAt) }}</div>
           </div>
@@ -153,14 +153,14 @@
     </div>
 
     <!-- 담당자 추가 모달 -->
-    <BaseModal :show="showAssigneeModal" title="담당자 추가" @close="showAssigneeModal = false">
+    <BaseModal :show="showAssigneeModal" :title="t('common.add')" @close="showAssigneeModal = false">
       <div class="form-group">
-        <label>사용자 ID</label>
-        <input v-model.number="assigneeUserId" type="number" placeholder="사용자 ID 입력" />
+        <label>ID</label>
+        <input v-model.number="assigneeUserId" type="number" />
       </div>
       <template #footer>
-        <button class="btn btn-secondary" @click="showAssigneeModal = false">취소</button>
-        <button class="btn btn-primary" @click="handleAssignUser">추가</button>
+        <button class="btn btn-secondary" @click="showAssigneeModal = false">{{ t('common.cancel') }}</button>
+        <button class="btn btn-primary" @click="handleAssignUser">{{ t('common.add') }}</button>
       </template>
     </BaseModal>
   </div>
@@ -169,12 +169,14 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { serviceRequestApi } from '@/api/servicerequest.js'
 import { useCommonCodeStore } from '@/stores/commonCode.js'
 import BaseStatusBadge from '@/components/common/BaseStatusBadge.vue'
 import BaseSlaBar from '@/components/common/BaseSlaBar.vue'
 import BaseModal from '@/components/common/BaseModal.vue'
 
+const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const commonCodeStore = useCommonCodeStore()
@@ -194,22 +196,22 @@ const showAssigneeModal = ref(false)
 const STATUS_TRANSITIONS = {
   RECEIVED: [
     { status: 'ASSIGNED', label: '배정', class: 'btn-primary' },
-    { status: 'CANCELLED', label: '취소', class: 'btn-secondary' },
-    { status: 'REJECTED', label: '반려', class: 'btn-danger' }
+    { status: 'CANCELLED', label: t('status.CANCELLED'), class: 'btn-secondary' },
+    { status: 'REJECTED', label: t('status.REJECTED'), class: 'btn-danger' }
   ],
   ASSIGNED: [
-    { status: 'IN_PROGRESS', label: '처리 시작', class: 'btn-primary' },
-    { status: 'REJECTED', label: '반려', class: 'btn-danger' }
+    { status: 'IN_PROGRESS', label: t('status.IN_PROGRESS'), class: 'btn-primary' },
+    { status: 'REJECTED', label: t('status.REJECTED'), class: 'btn-danger' }
   ],
   IN_PROGRESS: [
     { status: 'PENDING_COMPLETE', label: '처리완료대기', class: 'btn-success' },
-    { status: 'REJECTED', label: '반려', class: 'btn-danger' }
+    { status: 'REJECTED', label: t('status.REJECTED'), class: 'btn-danger' }
   ],
   PENDING_COMPLETE: [
-    { status: 'CLOSED', label: '종료', class: 'btn-primary' }
+    { status: 'CLOSED', label: t('status.CLOSED'), class: 'btn-primary' }
   ],
   REJECTED: [
-    { status: 'RECEIVED', label: '재접수', class: 'btn-primary' }
+    { status: 'RECEIVED', label: t('status.RECEIVED'), class: 'btn-primary' }
   ],
   CLOSED: [],
   CANCELLED: []
@@ -230,10 +232,10 @@ const slaCountdown = computed(() => {
   const deadline = new Date(sr.value.slaDeadlineAt)
   const now = new Date()
   const diff = deadline - now
-  if (diff <= 0) return 'SLA 초과'
+  if (diff <= 0) return t('status.OVERDUE')
   const hours = Math.floor(diff / (1000 * 60 * 60))
   const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
-  return `${hours}시간 ${minutes}분 남음`
+  return `${hours}h ${minutes}m`
 })
 
 const slaUrgency = computed(() => {
@@ -244,13 +246,8 @@ const slaUrgency = computed(() => {
   return 'normal'
 })
 
-const priorityLabel = (code) => {
-  const map = { CRITICAL: '긴급', HIGH: '높음', MEDIUM: '보통', LOW: '낮음' }
-  return map[code] || code
-}
-
 const processStatusLabel = (status) => {
-  const map = { PENDING: '대기', IN_PROGRESS: '처리중', COMPLETED: '완료' }
+  const map = { PENDING: t('status.PENDING'), IN_PROGRESS: t('status.IN_PROGRESS'), COMPLETED: t('status.COMPLETED') }
   return map[status] || status
 }
 
@@ -267,8 +264,8 @@ const loadDetail = async () => {
     const res = await serviceRequestApi.getDetail(requestId.value)
     sr.value = res.data.data || res.data
   } catch (e) {
-    console.error('서비스요청 조회 실패:', e)
-    alert('서비스요청 정보를 불러올 수 없습니다.')
+    console.error(t('message.loadFail'), e)
+    alert(t('message.loadFail'))
   }
 }
 
@@ -300,13 +297,13 @@ const loadHistory = async () => {
 }
 
 const handleChangeStatus = async (status) => {
-  if (!confirm(`상태를 "${status}"(으)로 변경하시겠습니까?`)) return
+  if (!confirm(`${status}?`)) return
   try {
     await serviceRequestApi.changeStatus(requestId.value, { status })
     await loadDetail()
     await loadHistory()
   } catch (e) {
-    alert(e.response?.data?.error?.message || '상태 변경에 실패했습니다.')
+    alert(e.response?.data?.error?.message || t('message.saveFail'))
   }
 }
 
@@ -319,18 +316,18 @@ const handleAssignUser = async () => {
     await loadAssignees()
     await loadDetail()
   } catch (e) {
-    alert(e.response?.data?.error?.message || '담당자 추가에 실패했습니다.')
+    alert(e.response?.data?.error?.message || t('message.saveFail'))
   }
 }
 
 const handleRemoveAssignee = async (userId) => {
-  if (!confirm('담당자를 해제하시겠습니까?')) return
+  if (!confirm(t('message.deleteConfirm'))) return
   try {
     await serviceRequestApi.removeAssignee(requestId.value, userId)
     await loadAssignees()
     await loadDetail()
   } catch (e) {
-    alert('담당자 해제에 실패했습니다.')
+    alert(t('message.deleteFail'))
   }
 }
 
@@ -344,18 +341,18 @@ const handleAddProcess = async () => {
     processContent.value = ''
     await loadProcesses()
   } catch (e) {
-    alert('처리내용 등록에 실패했습니다.')
+    alert(t('message.saveFail'))
   }
 }
 
 const handleCompleteProcess = async (processId) => {
-  if (!confirm('이 처리내용을 완료 처리하시겠습니까?')) return
+  if (!confirm(t('message.deleteConfirm'))) return
   try {
     await serviceRequestApi.completeProcess(requestId.value, processId)
     await loadProcesses()
     await loadDetail()
   } catch (e) {
-    alert('완료 처리에 실패했습니다.')
+    alert(t('message.saveFail'))
   }
 }
 
@@ -368,7 +365,7 @@ const handleSubmitSatisfaction = async () => {
     })
     await loadDetail()
   } catch (e) {
-    alert(e.response?.data?.error?.message || '만족도 제출에 실패했습니다.')
+    alert(e.response?.data?.error?.message || t('message.saveFail'))
   }
 }
 

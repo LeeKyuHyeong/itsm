@@ -1,30 +1,30 @@
 <template>
   <div class="board-post-form">
     <div class="page-header">
-      <h2>{{ isEdit ? '게시글 수정' : '게시글 작성' }}</h2>
+      <h2>{{ isEdit ? t('board.postEdit') : t('board.postCreate') }}</h2>
     </div>
 
     <form @submit.prevent="handleSubmit" class="form-card">
       <div class="form-group">
-        <label class="required">제목</label>
-        <input v-model="form.title" type="text" required placeholder="제목을 입력하세요" />
+        <label class="required">{{ t('board.postTitle') }}</label>
+        <input v-model="form.title" type="text" required :placeholder="t('board.postTitle')" />
       </div>
 
       <div class="form-group">
-        <label class="required">내용</label>
-        <textarea v-model="form.content" rows="10" required placeholder="내용을 입력하세요"></textarea>
+        <label class="required">{{ t('board.content') }}</label>
+        <textarea v-model="form.content" rows="10" required :placeholder="t('board.content')"></textarea>
       </div>
 
       <div class="form-group">
         <label>
-          <input v-model="isNotice" type="checkbox" /> 공지사항으로 등록
+          <input v-model="isNotice" type="checkbox" /> {{ t('board.isNotice') }}
         </label>
       </div>
 
       <div class="form-actions">
-        <button type="button" class="btn btn-secondary" @click="$router.back()">취소</button>
+        <button type="button" class="btn btn-secondary" @click="$router.back()">{{ t('common.cancel') }}</button>
         <button type="submit" class="btn btn-primary" :disabled="submitting">
-          {{ submitting ? '처리중...' : (isEdit ? '수정' : '등록') }}
+          {{ submitting ? t('common.processing') : (isEdit ? t('common.edit') : t('common.create')) }}
         </button>
       </div>
     </form>
@@ -34,8 +34,10 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { boardApi } from '@/api/board.js'
 
+const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const boardId = route.params.boardId
@@ -60,7 +62,7 @@ const loadDetail = async () => {
     isNotice.value = data.isNotice === 'Y'
   } catch (e) {
     console.error('게시글 조회 실패:', e)
-    alert('게시글을 불러올 수 없습니다.')
+    alert(t('message.loadFail'))
   }
 }
 
@@ -82,7 +84,7 @@ const handleSubmit = async () => {
     }
   } catch (e) {
     console.error('게시글 저장 실패:', e)
-    alert('저장에 실패했습니다.')
+    alert(t('message.saveFail'))
   } finally {
     submitting.value = false
   }

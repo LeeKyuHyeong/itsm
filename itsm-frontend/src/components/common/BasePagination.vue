@@ -1,7 +1,7 @@
 <template>
   <div class="pagination">
     <div class="pagination-info">
-      총 {{ totalElements }}건
+      {{ t('common.total') }} {{ totalElements }}{{ t('common.count', { n: '' }) }}
     </div>
     <div class="pagination-controls">
       <button
@@ -9,7 +9,7 @@
         :disabled="currentPage <= 1"
         @click="$emit('page-change', currentPage - 1)"
       >
-        &laquo; 이전
+        &laquo; {{ t('common.prev') }}
       </button>
       <button
         v-for="page in visiblePages"
@@ -25,7 +25,7 @@
         :disabled="currentPage >= totalPages"
         @click="$emit('page-change', currentPage + 1)"
       >
-        다음 &raquo;
+        {{ t('common.next') }} &raquo;
       </button>
     </div>
   </div>
@@ -33,6 +33,9 @@
 
 <script setup>
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps({
   currentPage: {

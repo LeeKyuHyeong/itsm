@@ -14,11 +14,11 @@
       </thead>
       <tbody>
         <tr v-if="loading">
-          <td :colspan="columns.length" class="text-center">로딩 중...</td>
+          <td :colspan="columns.length" class="text-center">{{ t('common.loading') }}</td>
         </tr>
         <tr v-else-if="!data || data.length === 0">
           <td :colspan="columns.length" class="text-center text-secondary">
-            {{ emptyMessage }}
+            {{ emptyMessage || t('common.noData') }}
           </td>
         </tr>
         <template v-else>
@@ -45,6 +45,10 @@
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
 defineProps({
   columns: {
     type: Array,
@@ -60,7 +64,7 @@ defineProps({
   },
   emptyMessage: {
     type: String,
-    default: '데이터가 없습니다.'
+    default: ''
   }
 })
 

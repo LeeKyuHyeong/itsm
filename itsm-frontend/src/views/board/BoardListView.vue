@@ -1,14 +1,14 @@
 <template>
   <div class="board-list">
     <div class="page-header">
-      <h2>{{ boardConfig.boardNm || '게시판' }}</h2>
-      <button class="btn btn-primary" @click="$router.push(`/boards/${boardId}/posts/new`)">글쓰기</button>
+      <h2>{{ boardConfig.boardNm || t('board.title') }}</h2>
+      <button class="btn btn-primary" @click="$router.push(`/boards/${boardId}/posts/new`)">{{ t('board.writePost') }}</button>
     </div>
 
-    <BaseTable :columns="columns" :data="posts" :loading="loading" empty-message="등록된 게시글이 없습니다."
+    <BaseTable :columns="columns" :data="posts" :loading="loading" :empty-message="t('board.noPost')"
                @row-click="goDetail">
       <template #title="{ row }">
-        <span v-if="row.isNotice === 'Y'" class="notice-badge">[공지]</span>
+        <span v-if="row.isNotice === 'Y'" class="notice-badge">[{{ t('board.notice') }}]</span>
         {{ row.title }}
       </template>
       <template #createdAt="{ row }">
@@ -22,12 +22,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { boardApi } from '@/api/board.js'
 import BaseTable from '@/components/common/BaseTable.vue'
 import BasePagination from '@/components/common/BasePagination.vue'
 
+const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const boardId = route.params.boardId
@@ -39,12 +41,12 @@ const page = ref(0)
 const totalPages = ref(0)
 const totalElements = ref(0)
 
-const columns = [
+const columns = computed(() => [
   { key: 'postId', label: 'ID', width: '60px', align: 'center' },
-  { key: 'title', label: '제목' },
-  { key: 'viewCnt', label: '조회수', width: '80px', align: 'center' },
-  { key: 'createdAt', label: '등록일시', width: '150px' }
-]
+  { key: 'title', label: t('board.postTitle') },
+  { key: 'viewCnt', label: t('board.views'), width: '80px', align: 'center' },
+  { key: 'createdAt', label: t('board.createdAt'), width: '150px' }
+])
 
 const formatDate = (dateStr) => {
   if (!dateStr) return '-'

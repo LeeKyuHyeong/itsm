@@ -8,13 +8,13 @@
 
       <form class="login-form" @submit.prevent="handleLogin">
         <div class="form-group">
-          <label for="loginId" class="form-label">아이디</label>
+          <label for="loginId" class="form-label">{{ t('auth.username') }}</label>
           <input
             id="loginId"
             v-model="loginId"
             type="text"
             class="form-input"
-            placeholder="아이디를 입력하세요"
+            :placeholder="t('auth.usernamePlaceholder')"
             autocomplete="username"
             :disabled="loading"
             required
@@ -22,13 +22,13 @@
         </div>
 
         <div class="form-group">
-          <label for="password" class="form-label">비밀번호</label>
+          <label for="password" class="form-label">{{ t('auth.password') }}</label>
           <input
             id="password"
             v-model="password"
             type="password"
             class="form-input"
-            placeholder="비밀번호를 입력하세요"
+            :placeholder="t('auth.passwordPlaceholder')"
             autocomplete="current-password"
             :disabled="loading"
             required
@@ -41,7 +41,7 @@
 
         <button type="submit" class="login-btn" :disabled="loading">
           <span v-if="loading" class="spinner"></span>
-          <span v-else>로그인</span>
+          <span v-else>{{ t('auth.login') }}</span>
         </button>
       </form>
     </div>
@@ -51,8 +51,10 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth.js'
 
+const { t } = useI18n()
 const router = useRouter()
 const authStore = useAuthStore()
 
@@ -63,7 +65,7 @@ const errorMessage = ref('')
 
 async function handleLogin() {
   if (!loginId.value || !password.value) {
-    errorMessage.value = '아이디와 비밀번호를 입력해주세요.'
+    errorMessage.value = t('auth.inputRequired')
     return
   }
 
@@ -83,11 +85,11 @@ async function handleLogin() {
     const code = error.response?.data?.code
 
     if (status === 423 || code === 'ACCOUNT_LOCKED') {
-      errorMessage.value = '계정이 잠겼습니다. 관리자에게 문의하세요.'
+      errorMessage.value = t('auth.accountLocked')
     } else if (status === 401) {
-      errorMessage.value = '아이디 또는 비밀번호가 올바르지 않습니다.'
+      errorMessage.value = t('auth.invalidCredentials')
     } else {
-      errorMessage.value = '로그인 중 오류가 발생했습니다. 다시 시도해주세요.'
+      errorMessage.value = t('auth.loginError')
     }
   } finally {
     loading.value = false

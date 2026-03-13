@@ -2,8 +2,8 @@
   <div class="asset-hw-detail">
     <div class="page-header">
       <div class="page-header-left">
-        <button class="btn btn-default" @click="$router.push({ name: 'AssetHwList' })">&larr; 목록</button>
-        <h1 class="page-title">HW 자산 상세</h1>
+        <button class="btn btn-default" @click="$router.push({ name: 'AssetHwList' })">&larr; {{ t('common.list') }}</button>
+        <h1 class="page-title">{{ t('asset.hwDetail') }}</h1>
       </div>
       <div class="page-header-right">
         <button v-if="asset && asset.status === 'ACTIVE'" class="btn btn-default" @click="changeStatus('INACTIVE')">비활성화</button>
@@ -19,19 +19,19 @@
       <div class="detail-card">
         <h2 class="card-title">기본 정보</h2>
         <div class="detail-grid">
-          <div class="detail-item"><span class="detail-label">자산명</span><span class="detail-value">{{ asset.assetNm }}</span></div>
-          <div class="detail-item"><span class="detail-label">자산유형</span><span class="detail-value">{{ getCodeName('ASSET_HW_TYPE', asset.assetTypeCd) }}</span></div>
-          <div class="detail-item"><span class="detail-label">제조사</span><span class="detail-value">{{ asset.manufacturer || '-' }}</span></div>
-          <div class="detail-item"><span class="detail-label">모델명</span><span class="detail-value">{{ asset.modelNm || '-' }}</span></div>
-          <div class="detail-item"><span class="detail-label">시리얼번호</span><span class="detail-value">{{ asset.serialNo || '-' }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ t('asset.assetNm') }}</span><span class="detail-value">{{ asset.assetNm }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ t('asset.assetType') }}</span><span class="detail-value">{{ getCodeName('ASSET_HW_TYPE', asset.assetTypeCd) }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ t('asset.manufacturer') }}</span><span class="detail-value">{{ asset.manufacturer || '-' }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ t('asset.model') }}</span><span class="detail-value">{{ asset.modelNm || '-' }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ t('asset.serialNo') }}</span><span class="detail-value">{{ asset.serialNo || '-' }}</span></div>
           <div class="detail-item"><span class="detail-label">IP주소</span><span class="detail-value">{{ asset.ipAddress || '-' }}</span></div>
           <div class="detail-item"><span class="detail-label">MAC주소</span><span class="detail-value">{{ asset.macAddress || '-' }}</span></div>
-          <div class="detail-item"><span class="detail-label">설치위치</span><span class="detail-value">{{ asset.location || '-' }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ t('asset.location') }}</span><span class="detail-value">{{ asset.location || '-' }}</span></div>
           <div class="detail-item"><span class="detail-label">도입일</span><span class="detail-value">{{ asset.introducedAt || '-' }}</span></div>
           <div class="detail-item"><span class="detail-label">유지보수 만료일</span><span class="detail-value">{{ asset.warrantyEndAt || '-' }}</span></div>
-          <div class="detail-item"><span class="detail-label">고객사</span><span class="detail-value">{{ asset.companyNm || '-' }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ t('asset.company') }}</span><span class="detail-value">{{ asset.companyNm || '-' }}</span></div>
           <div class="detail-item"><span class="detail-label">담당자</span><span class="detail-value">{{ asset.managerNm || '-' }}</span></div>
-          <div class="detail-item"><span class="detail-label">상태</span>
+          <div class="detail-item"><span class="detail-label">{{ t('asset.status') }}</span>
             <span :class="['status-badge', `status-${asset.status?.toLowerCase()}`]">{{ statusLabel(asset.status) }}</span>
           </div>
           <div class="detail-item"><span class="detail-label">등록일</span><span class="detail-value">{{ formatDate(asset.createdAt) }}</span></div>
@@ -125,7 +125,7 @@
           </div>
           <div v-if="relationError" class="error-message">{{ relationError }}</div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-default" @click="showRelationModal = false">취소</button>
+            <button type="button" class="btn btn-default" @click="showRelationModal = false">{{ t('common.cancel') }}</button>
             <button type="submit" class="btn btn-primary">연결</button>
           </div>
         </form>
@@ -136,10 +136,12 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import { assetHwApi, assetSwApi } from '@/api/asset.js'
 import { useCommonCodeStore } from '@/stores/commonCode.js'
 
+const { t } = useI18n()
 const route = useRoute()
 const commonCodeStore = useCommonCodeStore()
 const assetHwId = Number(route.params.id)
@@ -239,7 +241,7 @@ async function addRelation() {
 }
 
 async function removeRelation(assetSwId) {
-  if (!confirm('연관관계를 해제하시겠습니까?')) return
+  if (!confirm(t('message.deleteConfirm'))) return
   try {
     await assetHwApi.removeRelation(assetHwId, assetSwId)
     loadRelations()

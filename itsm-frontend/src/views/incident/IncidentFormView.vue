@@ -1,63 +1,63 @@
 <template>
   <div class="incident-form">
     <div class="page-header">
-      <h2>{{ isEdit ? '장애 수정' : '장애 등록' }}</h2>
+      <h2>{{ isEdit ? t('incident.edit') : t('incident.create') }}</h2>
     </div>
 
     <form @submit.prevent="handleSubmit" class="form-card">
       <div class="form-group">
-        <label class="required">제목</label>
-        <input v-model="form.title" type="text" required placeholder="장애 제목을 입력하세요" />
+        <label class="required">{{ t('incident.incidentTitle') }}</label>
+        <input v-model="form.title" type="text" required :placeholder="t('incident.titlePlaceholder')" />
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <label class="required">장애 유형</label>
+          <label class="required">{{ t('incident.type') }}</label>
           <select v-model="form.incidentTypeCd" required>
-            <option value="">선택</option>
-            <option v-for="t in incidentTypes" :key="t.code" :value="t.code">{{ t.name }}</option>
+            <option value="">{{ t('incident.select') }}</option>
+            <option v-for="tp in incidentTypes" :key="tp.code" :value="tp.code">{{ tp.name }}</option>
           </select>
         </div>
         <div class="form-group">
-          <label class="required">우선순위</label>
+          <label class="required">{{ t('incident.priority') }}</label>
           <select v-model="form.priorityCd" required>
-            <option value="">선택</option>
-            <option value="CRITICAL">긴급</option>
-            <option value="HIGH">높음</option>
-            <option value="MEDIUM">보통</option>
-            <option value="LOW">낮음</option>
+            <option value="">{{ t('incident.select') }}</option>
+            <option value="CRITICAL">{{ t('priority.CRITICAL') }}</option>
+            <option value="HIGH">{{ t('priority.HIGH') }}</option>
+            <option value="MEDIUM">{{ t('priority.MEDIUM') }}</option>
+            <option value="LOW">{{ t('priority.LOW') }}</option>
           </select>
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <label class="required">발생일시</label>
+          <label class="required">{{ t('incident.occurredAt') }}</label>
           <input v-model="form.occurredAt" type="datetime-local" required />
         </div>
         <div class="form-group" v-if="!isEdit">
-          <label class="required">고객사</label>
+          <label class="required">{{ t('incident.company') }}</label>
           <select v-model="form.companyId" required>
-            <option value="">선택</option>
+            <option value="">{{ t('incident.select') }}</option>
             <option v-for="c in companies" :key="c.companyId" :value="c.companyId">{{ c.companyNm }}</option>
           </select>
         </div>
       </div>
 
       <div class="form-group">
-        <label class="required">장애 내용</label>
-        <textarea v-model="form.content" rows="6" required placeholder="장애 상세 내용을 입력하세요"></textarea>
+        <label class="required">{{ t('incident.content') }}</label>
+        <textarea v-model="form.content" rows="6" required :placeholder="t('incident.contentPlaceholder')"></textarea>
       </div>
 
       <div class="form-group" v-if="isEdit">
-        <label>처리내용 (주담당자 작성)</label>
-        <textarea v-model="form.processContent" rows="4" placeholder="처리 내용을 입력하세요"></textarea>
+        <label>{{ t('incident.processContent') }}</label>
+        <textarea v-model="form.processContent" rows="4" :placeholder="t('incident.processContentPlaceholder')"></textarea>
       </div>
 
       <div class="form-actions">
-        <button type="button" class="btn btn-secondary" @click="$router.back()">취소</button>
+        <button type="button" class="btn btn-secondary" @click="$router.back()">{{ t('common.cancel') }}</button>
         <button type="submit" class="btn btn-primary" :disabled="submitting">
-          {{ submitting ? '처리중...' : (isEdit ? '수정' : '등록') }}
+          {{ submitting ? t('common.processing') : (isEdit ? t('common.edit') : t('common.create')) }}
         </button>
       </div>
     </form>
@@ -67,10 +67,12 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { incidentApi } from '@/api/incident.js'
 import { useCommonCodeStore } from '@/stores/commonCode.js'
 import api from '@/api/index.js'
 
+const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const commonCodeStore = useCommonCodeStore()
@@ -104,7 +106,7 @@ const loadDetail = async () => {
     form.processContent = data.processContent || ''
   } catch (e) {
     console.error('장애 조회 실패:', e)
-    alert('장애 정보를 불러올 수 없습니다.')
+    alert(t('message.loadFail'))
   }
 }
 
@@ -130,7 +132,7 @@ const handleSubmit = async () => {
     }
   } catch (e) {
     console.error('장애 저장 실패:', e)
-    alert('저장에 실패했습니다.')
+    alert(t('message.saveFail'))
   } finally {
     submitting.value = false
   }

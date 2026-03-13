@@ -2,59 +2,59 @@
   <div class="change-password-page">
     <div class="change-password-card">
       <div class="card-header">
-        <h1 class="card-title">비밀번호 변경</h1>
-        <p class="card-subtitle">안전한 비밀번호로 변경해주세요.</p>
+        <h1 class="card-title">{{ t('auth.changePassword') }}</h1>
+        <p class="card-subtitle">{{ t('auth.changePasswordDesc') }}</p>
       </div>
 
       <form class="password-form" @submit.prevent="handleChangePassword">
         <div class="form-group">
-          <label for="currentPassword" class="form-label">현재 비밀번호</label>
+          <label for="currentPassword" class="form-label">{{ t('auth.currentPassword') }}</label>
           <input
             id="currentPassword"
             v-model="form.currentPassword"
             type="password"
             class="form-input"
-            placeholder="현재 비밀번호를 입력하세요"
+            :placeholder="t('auth.currentPasswordPlaceholder')"
             :disabled="loading"
             required
           />
         </div>
 
         <div class="form-group">
-          <label for="newPassword" class="form-label">새 비밀번호</label>
+          <label for="newPassword" class="form-label">{{ t('auth.newPassword') }}</label>
           <input
             id="newPassword"
             v-model="form.newPassword"
             type="password"
             class="form-input"
             :class="{ 'input-error': form.newPassword && !isNewPasswordValid }"
-            placeholder="새 비밀번호를 입력하세요"
+            :placeholder="t('auth.newPasswordPlaceholder')"
             :disabled="loading"
             required
           />
           <ul class="password-hints">
-            <li :class="{ valid: hasMinLength }">8자 이상</li>
-            <li :class="{ valid: hasUppercase }">대문자 포함</li>
-            <li :class="{ valid: hasLowercase }">소문자 포함</li>
-            <li :class="{ valid: hasDigit }">숫자 포함</li>
-            <li :class="{ valid: hasSpecialChar }">특수문자 포함</li>
+            <li :class="{ valid: hasMinLength }">{{ t('auth.minLength') }}</li>
+            <li :class="{ valid: hasUppercase }">{{ t('auth.hasUppercase') }}</li>
+            <li :class="{ valid: hasLowercase }">{{ t('auth.hasLowercase') }}</li>
+            <li :class="{ valid: hasDigit }">{{ t('auth.hasDigit') }}</li>
+            <li :class="{ valid: hasSpecialChar }">{{ t('auth.hasSpecial') }}</li>
           </ul>
         </div>
 
         <div class="form-group">
-          <label for="confirmPassword" class="form-label">새 비밀번호 확인</label>
+          <label for="confirmPassword" class="form-label">{{ t('auth.confirmPassword') }}</label>
           <input
             id="confirmPassword"
             v-model="form.confirmPassword"
             type="password"
             class="form-input"
             :class="{ 'input-error': form.confirmPassword && !isConfirmMatch }"
-            placeholder="새 비밀번호를 다시 입력하세요"
+            :placeholder="t('auth.confirmPasswordPlaceholder')"
             :disabled="loading"
             required
           />
           <p v-if="form.confirmPassword && !isConfirmMatch" class="hint-error">
-            비밀번호가 일치하지 않습니다.
+            {{ t('auth.passwordMismatch') }}
           </p>
         </div>
 
@@ -72,7 +72,7 @@
           :disabled="loading || !isFormValid"
         >
           <span v-if="loading" class="spinner"></span>
-          <span v-else>비밀번호 변경</span>
+          <span v-else>{{ t('auth.changePassword') }}</span>
         </button>
       </form>
     </div>
@@ -82,9 +82,11 @@
 <script setup>
 import { ref, computed, reactive } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { authApi } from '@/api/auth.js'
 import { useAuthStore } from '@/stores/auth.js'
 
+const { t } = useI18n()
 const router = useRouter()
 const authStore = useAuthStore()
 
@@ -128,7 +130,7 @@ async function handleChangePassword() {
       confirmPassword: form.confirmPassword
     })
 
-    successMessage.value = '비밀번호가 성공적으로 변경되었습니다.'
+    successMessage.value = t('auth.passwordChanged')
 
     // 사용자 정보 갱신
     await authStore.fetchMe()
@@ -141,7 +143,7 @@ async function handleChangePassword() {
     if (message) {
       errorMessage.value = message
     } else {
-      errorMessage.value = '비밀번호 변경 중 오류가 발생했습니다.'
+      errorMessage.value = t('auth.passwordChangeError')
     }
   } finally {
     loading.value = false

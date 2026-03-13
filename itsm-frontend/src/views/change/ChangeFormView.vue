@@ -1,63 +1,63 @@
 <template>
   <div class="change-form">
     <div class="page-header">
-      <h2>{{ isEdit ? '변경요청 수정' : '변경요청 등록' }}</h2>
+      <h2>{{ isEdit ? t('change.edit') : t('change.create') }}</h2>
     </div>
 
     <form @submit.prevent="handleSubmit" class="form-card">
       <div class="form-group">
-        <label class="required">제목</label>
-        <input v-model="form.title" type="text" required placeholder="변경 제목을 입력하세요" />
+        <label class="required">{{ t('incident.incidentTitle') }}</label>
+        <input v-model="form.title" type="text" required />
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <label class="required">변경 유형</label>
+          <label class="required"><!-- 변경 유형 -->변경 유형</label>
           <select v-model="form.changeTypeCd" required>
-            <option value="">선택</option>
-            <option v-for="t in changeTypes" :key="t.code" :value="t.code">{{ t.name }}</option>
+            <option value="">{{ t('common.all', '선택') }}</option>
+            <option v-for="tp in changeTypes" :key="tp.code" :value="tp.code">{{ tp.name }}</option>
           </select>
         </div>
         <div class="form-group">
-          <label class="required">우선순위</label>
+          <label class="required">{{ t('incident.priority') }}</label>
           <select v-model="form.priorityCd" required>
-            <option value="">선택</option>
-            <option value="CRITICAL">긴급</option>
-            <option value="HIGH">높음</option>
-            <option value="MEDIUM">보통</option>
-            <option value="LOW">낮음</option>
+            <option value="">{{ t('common.all', '선택') }}</option>
+            <option value="CRITICAL">{{ t('priority.CRITICAL') }}</option>
+            <option value="HIGH">{{ t('priority.HIGH') }}</option>
+            <option value="MEDIUM">{{ t('priority.MEDIUM') }}</option>
+            <option value="LOW">{{ t('priority.LOW') }}</option>
           </select>
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <label>변경 예정일시</label>
+          <label><!-- 변경 예정일시 -->변경 예정일시</label>
           <input v-model="form.scheduledAt" type="datetime-local" />
         </div>
         <div class="form-group" v-if="!isEdit">
-          <label class="required">고객사</label>
+          <label class="required">{{ t('incident.company') }}</label>
           <select v-model="form.companyId" required>
-            <option value="">선택</option>
+            <option value="">{{ t('common.all', '선택') }}</option>
             <option v-for="c in companies" :key="c.companyId" :value="c.companyId">{{ c.companyNm }}</option>
           </select>
         </div>
       </div>
 
       <div class="form-group">
-        <label class="required">변경 내용</label>
-        <textarea v-model="form.content" rows="6" required placeholder="변경 상세 내용을 입력하세요"></textarea>
+        <label class="required"><!-- 변경 내용 -->변경 내용</label>
+        <textarea v-model="form.content" rows="6" required></textarea>
       </div>
 
       <div class="form-group">
-        <label>롤백 계획</label>
-        <textarea v-model="form.rollbackPlan" rows="4" placeholder="변경 실패 시 롤백 계획을 입력하세요"></textarea>
+        <label><!-- 롤백 계획 -->롤백 계획</label>
+        <textarea v-model="form.rollbackPlan" rows="4"></textarea>
       </div>
 
       <div class="form-actions">
-        <button type="button" class="btn btn-secondary" @click="$router.back()">취소</button>
+        <button type="button" class="btn btn-secondary" @click="$router.back()">{{ t('common.cancel') }}</button>
         <button type="submit" class="btn btn-primary" :disabled="submitting">
-          {{ submitting ? '처리중...' : (isEdit ? '수정' : '등록') }}
+          {{ submitting ? t('common.processing') : (isEdit ? t('common.edit') : t('common.create')) }}
         </button>
       </div>
     </form>
@@ -67,10 +67,12 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { changeApi } from '@/api/change.js'
 import { useCommonCodeStore } from '@/stores/commonCode.js'
 import api from '@/api/index.js'
 
+const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const commonCodeStore = useCommonCodeStore()
@@ -103,8 +105,8 @@ const loadDetail = async () => {
     form.rollbackPlan = data.rollbackPlan || ''
     form.companyId = data.companyId
   } catch (e) {
-    console.error('변경요청 조회 실패:', e)
-    alert('변경요청 정보를 불러올 수 없습니다.')
+    console.error(t('message.loadFail'), e)
+    alert(t('message.loadFail'))
   }
 }
 
@@ -129,8 +131,8 @@ const handleSubmit = async () => {
       router.push(`/changes/${data.changeId}`)
     }
   } catch (e) {
-    console.error('변경요청 저장 실패:', e)
-    alert('저장에 실패했습니다.')
+    console.error(t('message.saveFail'), e)
+    alert(t('message.saveFail'))
   } finally {
     submitting.value = false
   }
@@ -141,7 +143,7 @@ onMounted(async () => {
     const codes = await commonCodeStore.fetchCodes('CHANGE_TYPE')
     changeTypes.value = codes || []
   } catch (e) {
-    console.error('공통코드 조회 실패:', e)
+    console.error(t('message.loadFail'), e)
   }
   if (!isEdit.value) {
     try {
@@ -149,7 +151,7 @@ onMounted(async () => {
       const data = res.data.data || res.data
       companies.value = data.content || data || []
     } catch (e) {
-      console.error('고객사 조회 실패:', e)
+      console.error(t('message.loadFail'), e)
     }
   }
   loadDetail()

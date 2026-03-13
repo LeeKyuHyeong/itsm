@@ -1,19 +1,19 @@
 <template>
   <div class="report-list">
     <div class="page-header">
-      <h2>보고서 목록</h2>
+      <h2>{{ t('report.list') }}</h2>
     </div>
 
     <div class="filter-bar">
       <select v-model="filters.refType" @change="search">
-        <option value="">전체 참조유형</option>
+        <option value="">{{ t('common.all') }} 참조유형</option>
         <option value="INCIDENT">장애</option>
         <option value="CHANGE">변경</option>
         <option value="INSPECTION">점검</option>
       </select>
       <div class="search-box">
         <input v-model="filters.refId" placeholder="참조 ID" @keyup.enter="search" />
-        <button class="btn btn-sm" @click="search">검색</button>
+        <button class="btn btn-sm" @click="search">{{ t('common.search') }}</button>
       </div>
     </div>
 
@@ -30,12 +30,14 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { reportApi } from '@/api/report.js'
 import BaseTable from '@/components/common/BaseTable.vue'
 import BasePagination from '@/components/common/BasePagination.vue'
 
+const { t } = useI18n()
 const router = useRouter()
 
 const loading = ref(false)
@@ -49,13 +51,13 @@ const filters = reactive({
   refId: ''
 })
 
-const columns = [
+const columns = computed(() => [
   { key: 'reportId', label: 'ID', width: '60px', align: 'center' },
   { key: 'formNm', label: '보고서 양식', width: '200px' },
   { key: 'refType', label: '참조유형', width: '100px' },
   { key: 'refId', label: '참조ID', width: '80px', align: 'center' },
   { key: 'createdAt', label: '등록일시', width: '150px' }
-]
+])
 
 const formatDate = (dateStr) => {
   if (!dateStr) return '-'

@@ -1,30 +1,30 @@
 <template>
   <div class="inspection-list">
     <div class="page-header">
-      <h2>점검관리 목록</h2>
-      <button class="btn btn-primary" @click="$router.push('/inspections/new')">점검 등록</button>
+      <h2>{{ t('inspection.list') }}</h2>
+      <button class="btn btn-primary" @click="$router.push('/inspections/new')">{{ t('inspection.create') }}</button>
     </div>
 
     <div class="filter-bar">
       <select v-model="filters.statusCd" @change="search">
-        <option value="">전체 상태</option>
-        <option value="SCHEDULED">예정</option>
-        <option value="IN_PROGRESS">진행중</option>
-        <option value="ON_HOLD">보류</option>
-        <option value="COMPLETED">완료</option>
-        <option value="CLOSED">종료</option>
+        <option value="">{{ t('common.all') }} {{ t('incident.status') }}</option>
+        <option value="SCHEDULED">{{ t('status.SCHEDULED') }}</option>
+        <option value="IN_PROGRESS">{{ t('status.IN_PROGRESS') }}</option>
+        <option value="ON_HOLD"><!-- 보류 -->보류</option>
+        <option value="COMPLETED">{{ t('status.COMPLETED') }}</option>
+        <option value="CLOSED">{{ t('status.CLOSED') }}</option>
       </select>
       <select v-model="filters.inspectionTypeCd" @change="search">
-        <option value="">전체 유형</option>
-        <option v-for="t in inspectionTypes" :key="t.code" :value="t.code">{{ t.name }}</option>
+        <option value="">{{ t('common.all') }} {{ t('asset.assetType', '유형') }}</option>
+        <option v-for="tp in inspectionTypes" :key="tp.code" :value="tp.code">{{ tp.name }}</option>
       </select>
       <div class="search-box">
-        <input v-model="filters.keyword" placeholder="제목/설명 검색" @keyup.enter="search" />
-        <button class="btn btn-sm" @click="search">검색</button>
+        <input v-model="filters.keyword" :placeholder="t('common.search')" @keyup.enter="search" />
+        <button class="btn btn-sm" @click="search">{{ t('common.search') }}</button>
       </div>
     </div>
 
-    <BaseTable :columns="columns" :data="inspections" :loading="loading" empty-message="등록된 점검이 없습니다."
+    <BaseTable :columns="columns" :data="inspections" :loading="loading" :empty-message="t('common.noData')"
                @row-click="goDetail">
       <template #statusCd="{ row }">
         <BaseStatusBadge :status="row.statusCd" />
@@ -47,14 +47,16 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { inspectionApi } from '@/api/inspection.js'
 import { useCommonCodeStore } from '@/stores/commonCode.js'
 import BaseTable from '@/components/common/BaseTable.vue'
 import BasePagination from '@/components/common/BasePagination.vue'
 import BaseStatusBadge from '@/components/common/BaseStatusBadge.vue'
 
+const { t } = useI18n()
 const router = useRouter()
 const commonCodeStore = useCommonCodeStore()
 
@@ -71,16 +73,16 @@ const filters = reactive({
   inspectionTypeCd: ''
 })
 
-const columns = [
+const columns = computed(() => [
   { key: 'inspectionId', label: 'ID', width: '60px', align: 'center' },
-  { key: 'title', label: '제목' },
-  { key: 'inspectionTypeCd', label: '유형', width: '100px' },
-  { key: 'statusCd', label: '상태', width: '100px', align: 'center' },
-  { key: 'companyNm', label: '고객사', width: '120px' },
-  { key: 'scheduledAt', label: '예정일', width: '120px' },
+  { key: 'title', label: t('incident.incidentTitle') },
+  { key: 'inspectionTypeCd', label: t('asset.assetType', '유형'), width: '100px' },
+  { key: 'statusCd', label: t('incident.status'), width: '100px', align: 'center' },
+  { key: 'companyNm', label: t('incident.company'), width: '120px' },
+  { key: 'scheduledAt', label: t('status.SCHEDULED', '예정일'), width: '120px' },
   { key: 'progress', label: '진행률', width: '100px', align: 'center' },
-  { key: 'createdAt', label: '등록일시', width: '150px' }
-]
+  { key: 'createdAt', label: t('board.createdAt'), width: '150px' }
+])
 
 const formatDate = (dateStr) => {
   if (!dateStr) return '-'
@@ -104,7 +106,7 @@ const fetchList = async () => {
     totalPages.value = data.totalPages || 0
     totalElements.value = data.totalElements || 0
   } catch (e) {
-    console.error('점검 목록 조회 실패:', e)
+    console.error(t('message.loadFail'), e)
   } finally {
     loading.value = false
   }
@@ -129,7 +131,7 @@ onMounted(async () => {
     const codes = await commonCodeStore.fetchCodes('INSPECTION_TYPE')
     inspectionTypes.value = codes || []
   } catch (e) {
-    console.error('공통코드 조회 실패:', e)
+    console.error(t('message.loadFail'), e)
   }
   fetchList()
 })

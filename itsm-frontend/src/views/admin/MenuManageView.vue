@@ -1,8 +1,8 @@
 <template>
   <div class="menu-manage">
     <div class="page-header">
-      <h1 class="page-title">메뉴 관리</h1>
-      <button class="btn btn-primary" @click="openDialog()">+ 메뉴 추가</button>
+      <h1 class="page-title">{{ t('admin.menuManage') }}</h1>
+      <button class="btn btn-primary" @click="openDialog()">+ {{ t('common.add') }}</button>
     </div>
 
     <div class="table-container">
@@ -39,7 +39,7 @@
               </span>
             </td>
             <td>
-              <button class="btn btn-sm btn-default" @click="openDialog(menu)">수정</button>
+              <button class="btn btn-sm btn-default" @click="openDialog(menu)">{{ t('common.edit') }}</button>
             </td>
           </tr>
         </tbody>
@@ -85,9 +85,9 @@
           </div>
           <div v-if="saveError" class="error-message">{{ saveError }}</div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-default" @click="closeModal">취소</button>
+            <button type="button" class="btn btn-default" @click="closeModal">{{ t('common.cancel') }}</button>
             <button type="submit" class="btn btn-primary" :disabled="saving">
-              {{ saving ? '저장 중...' : '저장' }}
+              {{ saving ? '저장 중...' : t('common.save') }}
             </button>
           </div>
         </form>
@@ -98,7 +98,10 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { menuApi } from '@/api/admin/menu.js'
+
+const { t } = useI18n()
 
 const menus = ref([])
 const loading = ref(false)
@@ -215,7 +218,7 @@ async function save() {
     closeModal()
     loadMenus()
   } catch (error) {
-    saveError.value = error.response?.data?.message || '저장 중 오류가 발생했습니다.'
+    saveError.value = error.response?.data?.message || t('message.saveFail')
   } finally {
     saving.value = false
   }

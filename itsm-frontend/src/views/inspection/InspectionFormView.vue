@@ -1,55 +1,55 @@
 <template>
   <div class="inspection-form">
     <div class="page-header">
-      <h2>{{ isEdit ? '점검 수정' : '점검 등록' }}</h2>
+      <h2>{{ isEdit ? t('inspection.edit') : t('inspection.create') }}</h2>
     </div>
 
     <form @submit.prevent="handleSubmit" class="form-card">
       <div class="form-group">
-        <label class="required">제목</label>
-        <input v-model="form.title" type="text" required placeholder="점검 제목을 입력하세요" />
+        <label class="required">{{ t('incident.incidentTitle') }}</label>
+        <input v-model="form.title" type="text" required />
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <label class="required">점검 유형</label>
+          <label class="required"><!-- 점검 유형 -->점검 유형</label>
           <select v-model="form.inspectionTypeCd" required>
-            <option value="">선택</option>
-            <option v-for="t in inspectionTypes" :key="t.code" :value="t.code">{{ t.name }}</option>
+            <option value="">{{ t('common.all', '선택') }}</option>
+            <option v-for="tp in inspectionTypes" :key="tp.code" :value="tp.code">{{ tp.name }}</option>
           </select>
         </div>
         <div class="form-group">
-          <label class="required">예정일</label>
+          <label class="required">{{ t('status.SCHEDULED', '예정일') }}</label>
           <input v-model="form.scheduledAt" type="date" required />
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-group" v-if="!isEdit">
-          <label class="required">고객사</label>
+          <label class="required">{{ t('incident.company') }}</label>
           <select v-model="form.companyId" required>
-            <option value="">선택</option>
+            <option value="">{{ t('common.all', '선택') }}</option>
             <option v-for="c in companies" :key="c.companyId" :value="c.companyId">{{ c.companyNm }}</option>
           </select>
         </div>
         <div class="form-group">
-          <label>담당자</label>
+          <label>{{ t('incident.assignee') }}</label>
           <select v-model="form.managerId">
-            <option value="">선택</option>
+            <option value="">{{ t('common.all', '선택') }}</option>
             <option v-for="u in users" :key="u.userId" :value="u.userId">{{ u.userNm }}</option>
           </select>
         </div>
       </div>
 
       <div class="form-group">
-        <label>설명</label>
-        <textarea v-model="form.description" rows="4" placeholder="점검 상세 설명을 입력하세요"></textarea>
+        <label>{{ t('incident.description') }}</label>
+        <textarea v-model="form.description" rows="4"></textarea>
       </div>
 
       <div class="form-actions">
-        <button type="button" class="btn btn-secondary" @click="$router.back()">취소</button>
+        <button type="button" class="btn btn-secondary" @click="$router.back()">{{ t('common.cancel') }}</button>
         <button type="submit" class="btn btn-primary" :disabled="submitting">
-          {{ submitting ? '처리중...' : (isEdit ? '수정' : '등록') }}
+          {{ submitting ? t('common.processing') : (isEdit ? t('common.edit') : t('common.create')) }}
         </button>
       </div>
     </form>
@@ -59,10 +59,12 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { inspectionApi } from '@/api/inspection.js'
 import { useCommonCodeStore } from '@/stores/commonCode.js'
 import api from '@/api/index.js'
 
+const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const commonCodeStore = useCommonCodeStore()
@@ -94,8 +96,8 @@ const loadDetail = async () => {
     form.description = data.description || ''
     form.companyId = data.companyId
   } catch (e) {
-    console.error('점검 조회 실패:', e)
-    alert('점검 정보를 불러올 수 없습니다.')
+    console.error(t('message.loadFail'), e)
+    alert(t('message.loadFail'))
   }
 }
 
@@ -126,8 +128,8 @@ const handleSubmit = async () => {
       router.push(`/inspections/${data.inspectionId}`)
     }
   } catch (e) {
-    console.error('점검 저장 실패:', e)
-    alert('저장에 실패했습니다.')
+    console.error(t('message.saveFail'), e)
+    alert(t('message.saveFail'))
   } finally {
     submitting.value = false
   }
@@ -138,7 +140,7 @@ onMounted(async () => {
     const codes = await commonCodeStore.fetchCodes('INSPECTION_TYPE')
     inspectionTypes.value = codes || []
   } catch (e) {
-    console.error('공통코드 조회 실패:', e)
+    console.error(t('message.loadFail'), e)
   }
   if (!isEdit.value) {
     try {
@@ -146,7 +148,7 @@ onMounted(async () => {
       const data = res.data.data || res.data
       companies.value = data.content || data || []
     } catch (e) {
-      console.error('고객사 조회 실패:', e)
+      console.error(t('message.loadFail'), e)
     }
   }
   try {
@@ -154,7 +156,7 @@ onMounted(async () => {
     const data = res.data.data || res.data
     users.value = data.content || data || []
   } catch (e) {
-    console.error('사용자 조회 실패:', e)
+    console.error(t('message.loadFail'), e)
   }
   loadDetail()
 })

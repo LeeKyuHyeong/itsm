@@ -1,17 +1,17 @@
 <template>
   <div class="change-detail" v-if="change">
     <div class="page-header">
-      <h2>변경요청 상세 - #{{ change.changeId }}</h2>
+      <h2>{{ t('change.detail') }} - #{{ change.changeId }}</h2>
       <div class="header-actions">
-        <button class="btn btn-secondary" @click="$router.push('/changes')">목록</button>
-        <button v-if="canEdit" class="btn btn-secondary" @click="$router.push(`/changes/${change.changeId}/edit`)">수정</button>
+        <button class="btn btn-secondary" @click="$router.push('/changes')">{{ t('common.list') }}</button>
+        <button v-if="canEdit" class="btn btn-secondary" @click="$router.push(`/changes/${change.changeId}/edit`)">{{ t('common.edit') }}</button>
       </div>
     </div>
 
     <!-- 상태머신 버튼 -->
     <div class="status-actions">
       <span class="current-status">
-        현재 상태: <BaseStatusBadge :status="change.statusCd" />
+        {{ t('incident.status') }}: <BaseStatusBadge :status="change.statusCd" />
       </span>
       <div class="status-buttons">
         <button v-for="s in availableTransitions" :key="s.status"
@@ -23,38 +23,38 @@
 
     <!-- 기본 정보 -->
     <div class="detail-card">
-      <h3>기본 정보</h3>
+      <h3><!-- 기본 정보 -->기본 정보</h3>
       <div class="info-grid">
         <div class="info-item">
-          <label>제목</label>
+          <label>{{ t('incident.incidentTitle') }}</label>
           <span>{{ change.title }}</span>
         </div>
         <div class="info-item">
-          <label>변경 유형</label>
+          <label><!-- 변경 유형 -->변경 유형</label>
           <span>{{ commonCodeStore.getCodeName('CHANGE_TYPE', change.changeTypeCd) || change.changeTypeCd }}</span>
         </div>
         <div class="info-item">
-          <label>우선순위</label>
-          <span :class="['priority-badge', `priority-${change.priorityCd}`]">{{ priorityLabel(change.priorityCd) }}</span>
+          <label>{{ t('incident.priority') }}</label>
+          <span :class="['priority-badge', `priority-${change.priorityCd}`]">{{ t(`priority.${change.priorityCd}`) }}</span>
         </div>
         <div class="info-item">
-          <label>고객사</label>
+          <label>{{ t('incident.company') }}</label>
           <span>{{ change.companyNm }}</span>
         </div>
         <div class="info-item">
-          <label>변경 예정일시</label>
+          <label><!-- 변경 예정일시 -->변경 예정일시</label>
           <span>{{ formatDate(change.scheduledAt) }}</span>
         </div>
         <div class="info-item">
-          <label>승인 현황</label>
-          <span>{{ change.approvedCount || 0 }} / {{ change.approverCount || 0 }}명 승인</span>
+          <label><!-- 승인 현황 -->승인 현황</label>
+          <span>{{ change.approvedCount || 0 }} / {{ change.approverCount || 0 }} {{ t('status.APPROVED') }}</span>
         </div>
         <div class="info-item full-width">
-          <label>변경 내용</label>
+          <label><!-- 변경 내용 -->변경 내용</label>
           <div class="content-box">{{ change.content }}</div>
         </div>
         <div class="info-item full-width" v-if="change.rollbackPlan">
-          <label>롤백 계획</label>
+          <label><!-- 롤백 계획 -->롤백 계획</label>
           <div class="content-box">{{ change.rollbackPlan }}</div>
         </div>
       </div>
@@ -63,10 +63,10 @@
     <!-- 승인 현황 -->
     <div class="detail-card">
       <div class="card-header">
-        <h3>승인자 현황</h3>
-        <button v-if="canEdit" class="btn btn-sm" @click="showApproverModal = true">승인자 추가</button>
+        <h3><!-- 승인자 현황 -->승인자 현황</h3>
+        <button v-if="canEdit" class="btn btn-sm" @click="showApproverModal = true">{{ t('common.add') }}</button>
       </div>
-      <div v-if="approvers.length === 0" class="empty-state">지정된 승인자가 없습니다.</div>
+      <div v-if="approvers.length === 0" class="empty-state">{{ t('common.noData') }}</div>
       <div v-else class="approver-list">
         <div v-for="a in approvers" :key="a.userId" class="approver-item">
           <span class="approver-order">#{{ a.approveOrder }}</span>
@@ -75,47 +75,47 @@
           <span v-if="a.approvedAt" class="approver-date">{{ formatDate(a.approvedAt) }}</span>
           <span v-if="a.comment" class="approver-comment">{{ a.comment }}</span>
           <template v-if="change.statusCd === 'APPROVAL_REQUESTED' && a.approveStatus === 'PENDING'">
-            <button class="btn-link" @click="handleApprove(a.userId, 'APPROVED')">승인</button>
-            <button class="btn-link danger" @click="handleApprove(a.userId, 'REJECTED')">반려</button>
+            <button class="btn-link" @click="handleApprove(a.userId, 'APPROVED')">{{ t('status.APPROVED') }}</button>
+            <button class="btn-link danger" @click="handleApprove(a.userId, 'REJECTED')">{{ t('status.REJECTED') }}</button>
           </template>
-          <button v-if="canEdit && a.approveStatus === 'PENDING'" class="btn-link danger" @click="handleRemoveApprover(a.userId)">삭제</button>
+          <button v-if="canEdit && a.approveStatus === 'PENDING'" class="btn-link danger" @click="handleRemoveApprover(a.userId)">{{ t('common.delete') }}</button>
         </div>
       </div>
     </div>
 
     <!-- 댓글 -->
     <div class="detail-card">
-      <h3>댓글</h3>
-      <div v-if="comments.length === 0" class="empty-state">등록된 댓글이 없습니다.</div>
+      <h3>{{ t('board.comment') }}</h3>
+      <div v-if="comments.length === 0" class="empty-state">{{ t('common.noData') }}</div>
       <div v-else class="comment-list">
         <div v-for="c in comments" :key="c.commentId" class="comment-item">
           <div class="comment-header">
-            <span class="comment-author">사용자#{{ c.createdBy }}</span>
+            <span class="comment-author"><!-- 사용자 -->사용자#{{ c.createdBy }}</span>
             <span class="comment-date">{{ formatDate(c.createdAt) }}</span>
-            <button class="btn-link danger" @click="handleDeleteComment(c.commentId)">삭제</button>
+            <button class="btn-link danger" @click="handleDeleteComment(c.commentId)">{{ t('common.delete') }}</button>
           </div>
           <div class="comment-content">{{ c.content }}</div>
         </div>
       </div>
       <div class="comment-form">
-        <textarea v-model="newComment" rows="2" placeholder="댓글을 입력하세요"></textarea>
-        <button class="btn btn-primary btn-sm" @click="handleAddComment" :disabled="!newComment.trim()">등록</button>
+        <textarea v-model="newComment" rows="2" :placeholder="t('board.commentPlaceholder')"></textarea>
+        <button class="btn btn-primary btn-sm" @click="handleAddComment" :disabled="!newComment.trim()">{{ t('common.create') }}</button>
       </div>
     </div>
 
     <!-- 변경 이력 -->
     <div class="detail-card">
-      <h3>변경 이력</h3>
-      <div v-if="histories.length === 0" class="empty-state">변경 이력이 없습니다.</div>
+      <h3><!-- 변경 이력 -->변경 이력</h3>
+      <div v-if="histories.length === 0" class="empty-state">{{ t('common.noData') }}</div>
       <div v-else class="timeline">
         <div v-for="h in histories" :key="h.historyId" class="timeline-item">
           <div class="timeline-dot"></div>
           <div class="timeline-content">
             <div class="timeline-field">{{ h.changedField }}</div>
             <div class="timeline-change">
-              <span class="before">{{ h.beforeValue || '(없음)' }}</span>
+              <span class="before">{{ h.beforeValue || '-' }}</span>
               <span class="arrow">&rarr;</span>
-              <span class="after">{{ h.afterValue || '(없음)' }}</span>
+              <span class="after">{{ h.afterValue || '-' }}</span>
             </div>
             <div class="timeline-date">{{ formatDate(h.createdAt) }}</div>
           </div>
@@ -124,28 +124,28 @@
     </div>
 
     <!-- 승인자 추가 모달 -->
-    <BaseModal :show="showApproverModal" title="승인자 추가" @close="showApproverModal = false">
+    <BaseModal :show="showApproverModal" :title="t('common.add')" @close="showApproverModal = false">
       <div class="form-group">
-        <label>사용자 ID</label>
-        <input v-model.number="approverUserId" type="number" placeholder="사용자 ID 입력" />
+        <label>ID</label>
+        <input v-model.number="approverUserId" type="number" />
       </div>
       <template #footer>
-        <button class="btn btn-secondary" @click="showApproverModal = false">취소</button>
-        <button class="btn btn-primary" @click="handleAddApprover">추가</button>
+        <button class="btn btn-secondary" @click="showApproverModal = false">{{ t('common.cancel') }}</button>
+        <button class="btn btn-primary" @click="handleAddApprover">{{ t('common.add') }}</button>
       </template>
     </BaseModal>
 
     <!-- 승인/반려 모달 -->
-    <BaseModal :show="showApproveModal" :title="approveDecision === 'APPROVED' ? '승인' : '반려'" @close="showApproveModal = false">
+    <BaseModal :show="showApproveModal" :title="approveDecision === 'APPROVED' ? t('status.APPROVED') : t('status.REJECTED')" @close="showApproveModal = false">
       <div class="form-group">
-        <label>의견</label>
-        <textarea v-model="approveComment" rows="3" placeholder="의견을 입력하세요"></textarea>
+        <label><!-- 의견 -->의견</label>
+        <textarea v-model="approveComment" rows="3"></textarea>
       </div>
       <template #footer>
-        <button class="btn btn-secondary" @click="showApproveModal = false">취소</button>
+        <button class="btn btn-secondary" @click="showApproveModal = false">{{ t('common.cancel') }}</button>
         <button :class="['btn', approveDecision === 'APPROVED' ? 'btn-primary' : 'btn-danger']"
                 @click="submitApprove">
-          {{ approveDecision === 'APPROVED' ? '승인' : '반려' }}
+          {{ approveDecision === 'APPROVED' ? t('status.APPROVED') : t('status.REJECTED') }}
         </button>
       </template>
     </BaseModal>
@@ -155,11 +155,13 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { changeApi } from '@/api/change.js'
 import { useCommonCodeStore } from '@/stores/commonCode.js'
 import BaseStatusBadge from '@/components/common/BaseStatusBadge.vue'
 import BaseModal from '@/components/common/BaseModal.vue'
 
+const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const commonCodeStore = useCommonCodeStore()
@@ -179,20 +181,20 @@ const approveTargetUserId = ref(null)
 
 const STATUS_TRANSITIONS = {
   DRAFT: [
-    { status: 'APPROVAL_REQUESTED', label: '승인요청', class: 'btn-primary' },
-    { status: 'CANCELLED', label: '취소', class: 'btn-secondary' }
+    { status: 'APPROVAL_REQUESTED', label: t('status.REQUESTED'), class: 'btn-primary' },
+    { status: 'CANCELLED', label: t('status.CANCELLED'), class: 'btn-secondary' }
   ],
   APPROVED: [
-    { status: 'IN_PROGRESS', label: '실행 시작', class: 'btn-primary' }
+    { status: 'IN_PROGRESS', label: t('status.IN_PROGRESS'), class: 'btn-primary' }
   ],
   IN_PROGRESS: [
-    { status: 'COMPLETED', label: '완료', class: 'btn-success' }
+    { status: 'COMPLETED', label: t('status.COMPLETED'), class: 'btn-success' }
   ],
   COMPLETED: [
-    { status: 'CLOSED', label: '종료', class: 'btn-primary' }
+    { status: 'CLOSED', label: t('status.CLOSED'), class: 'btn-primary' }
   ],
   REJECTED: [
-    { status: 'DRAFT', label: '초안으로 되돌리기', class: 'btn-primary' }
+    { status: 'DRAFT', label: t('status.DRAFT'), class: 'btn-primary' }
   ],
   APPROVAL_REQUESTED: [],
   CLOSED: [],
@@ -209,13 +211,8 @@ const canEdit = computed(() => {
   return ['DRAFT', 'REJECTED'].includes(change.value.statusCd)
 })
 
-const priorityLabel = (code) => {
-  const map = { CRITICAL: '긴급', HIGH: '높음', MEDIUM: '보통', LOW: '낮음' }
-  return map[code] || code
-}
-
 const approveStatusLabel = (status) => {
-  const map = { PENDING: '대기', APPROVED: '승인', REJECTED: '반려' }
+  const map = { PENDING: t('status.PENDING'), APPROVED: t('status.APPROVED'), REJECTED: t('status.REJECTED') }
   return map[status] || status
 }
 
@@ -232,8 +229,8 @@ const loadDetail = async () => {
     const res = await changeApi.getDetail(changeId.value)
     change.value = res.data.data || res.data
   } catch (e) {
-    console.error('변경요청 조회 실패:', e)
-    alert('변경요청 정보를 불러올 수 없습니다.')
+    console.error(t('message.loadFail'), e)
+    alert(t('message.loadFail'))
   }
 }
 
@@ -265,13 +262,13 @@ const loadHistory = async () => {
 }
 
 const handleChangeStatus = async (status) => {
-  if (!confirm(`상태를 "${status}"(으)로 변경하시겠습니까?`)) return
+  if (!confirm(`${status}?`)) return
   try {
     await changeApi.changeStatus(changeId.value, { status })
     await loadDetail()
     await loadHistory()
   } catch (e) {
-    alert(e.response?.data?.error?.message || '상태 변경에 실패했습니다.')
+    alert(e.response?.data?.error?.message || t('message.saveFail'))
   }
 }
 
@@ -284,18 +281,18 @@ const handleAddApprover = async () => {
     await loadApprovers()
     await loadDetail()
   } catch (e) {
-    alert(e.response?.data?.error?.message || '승인자 추가에 실패했습니다.')
+    alert(e.response?.data?.error?.message || t('message.saveFail'))
   }
 }
 
 const handleRemoveApprover = async (userId) => {
-  if (!confirm('승인자를 삭제하시겠습니까?')) return
+  if (!confirm(t('message.deleteConfirm'))) return
   try {
     await changeApi.removeApprover(changeId.value, userId)
     await loadApprovers()
     await loadDetail()
   } catch (e) {
-    alert('승인자 삭제에 실패했습니다.')
+    alert(t('message.deleteFail'))
   }
 }
 
@@ -315,7 +312,7 @@ const submitApprove = async () => {
     showApproveModal.value = false
     await Promise.all([loadDetail(), loadApprovers(), loadHistory()])
   } catch (e) {
-    alert(e.response?.data?.error?.message || '승인/반려 처리에 실패했습니다.')
+    alert(e.response?.data?.error?.message || t('message.saveFail'))
   }
 }
 
@@ -326,17 +323,17 @@ const handleAddComment = async () => {
     newComment.value = ''
     await loadComments()
   } catch (e) {
-    alert('댓글 등록에 실패했습니다.')
+    alert(t('message.saveFail'))
   }
 }
 
 const handleDeleteComment = async (commentId) => {
-  if (!confirm('댓글을 삭제하시겠습니까?')) return
+  if (!confirm(t('message.deleteConfirm'))) return
   try {
     await changeApi.deleteComment(changeId.value, commentId)
     await loadComments()
   } catch (e) {
-    alert('댓글 삭제에 실패했습니다.')
+    alert(t('message.deleteFail'))
   }
 }
 

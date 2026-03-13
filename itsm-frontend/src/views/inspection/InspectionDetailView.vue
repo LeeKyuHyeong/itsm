@@ -2,12 +2,12 @@
   <div class="inspection-detail">
     <div class="page-header">
       <div>
-        <h2>점검 상세 #{{ inspection.inspectionId }}</h2>
+        <h2>{{ t('inspection.detail') }} #{{ inspection.inspectionId }}</h2>
         <BaseStatusBadge v-if="inspection.statusCd" :status="inspection.statusCd" />
       </div>
       <div class="header-actions">
         <button v-if="inspection.statusCd === 'SCHEDULED'" class="btn btn-secondary"
-                @click="$router.push(`/inspections/${inspection.inspectionId}?edit=true`)">수정</button>
+                @click="$router.push(`/inspections/${inspection.inspectionId}?edit=true`)">{{ t('common.edit') }}</button>
         <button v-for="s in availableTransitions" :key="s" class="btn btn-primary"
                 @click="doChangeStatus(s)">{{ statusLabel(s) }}</button>
       </div>
@@ -15,41 +15,41 @@
 
     <div class="detail-grid">
       <div class="detail-section">
-        <h3>기본 정보</h3>
+        <h3><!-- 기본 정보 -->기본 정보</h3>
         <div class="info-table">
-          <div class="info-row"><span class="label">제목</span><span>{{ inspection.title }}</span></div>
-          <div class="info-row"><span class="label">유형</span><span>{{ inspection.inspectionTypeCd }}</span></div>
-          <div class="info-row"><span class="label">예정일</span><span>{{ inspection.scheduledAt || '-' }}</span></div>
-          <div class="info-row"><span class="label">고객사</span><span>{{ inspection.companyNm || '-' }}</span></div>
-          <div class="info-row"><span class="label">설명</span><span>{{ inspection.description || '-' }}</span></div>
+          <div class="info-row"><span class="label">{{ t('incident.incidentTitle') }}</span><span>{{ inspection.title }}</span></div>
+          <div class="info-row"><span class="label">{{ t('asset.assetType', '유형') }}</span><span>{{ inspection.inspectionTypeCd }}</span></div>
+          <div class="info-row"><span class="label">{{ t('status.SCHEDULED', '예정일') }}</span><span>{{ inspection.scheduledAt || '-' }}</span></div>
+          <div class="info-row"><span class="label">{{ t('incident.company') }}</span><span>{{ inspection.companyNm || '-' }}</span></div>
+          <div class="info-row"><span class="label">{{ t('incident.description') }}</span><span>{{ inspection.description || '-' }}</span></div>
           <div class="info-row" v-if="inspection.completedAt">
-            <span class="label">완료일시</span><span>{{ formatDate(inspection.completedAt) }}</span>
+            <span class="label"><!-- 완료일시 -->완료일시</span><span>{{ formatDate(inspection.completedAt) }}</span>
           </div>
         </div>
       </div>
 
       <div class="detail-section">
         <div class="section-header">
-          <h3>점검 항목 ({{ items.length }})</h3>
-          <button v-if="canEditItems" class="btn btn-sm" @click="showAddItem = true">항목 추가</button>
+          <h3>{{ t('inspection.checklist') }} ({{ items.length }})</h3>
+          <button v-if="canEditItems" class="btn btn-sm" @click="showAddItem = true">{{ t('common.add') }}</button>
         </div>
         <div v-if="showAddItem" class="add-item-form">
           <input v-model="newItem.itemNm" placeholder="항목명" />
           <select v-model="newItem.isRequired">
-            <option value="Y">필수</option>
-            <option value="N">선택</option>
+            <option value="Y">{{ t('common.required') }}</option>
+            <option value="N"><!-- 선택 -->선택</option>
           </select>
-          <button class="btn btn-primary btn-xs" @click="addItem">추가</button>
-          <button class="btn btn-secondary btn-xs" @click="showAddItem = false">취소</button>
+          <button class="btn btn-primary btn-xs" @click="addItem">{{ t('common.add') }}</button>
+          <button class="btn btn-secondary btn-xs" @click="showAddItem = false">{{ t('common.cancel') }}</button>
         </div>
         <table v-if="items.length" class="data-table">
           <thead>
             <tr>
               <th width="40">#</th>
-              <th>항목명</th>
-              <th width="60">필수</th>
-              <th width="120">결과</th>
-              <th width="60">정상</th>
+              <th><!-- 항목명 -->항목명</th>
+              <th width="60">{{ t('common.required') }}</th>
+              <th width="120"><!-- 결과 -->결과</th>
+              <th width="60"><!-- 정상 -->정상</th>
               <th v-if="canEditItems" width="50"></th>
             </tr>
           </thead>
@@ -67,8 +67,8 @@
               <td>
                 <template v-if="isInProgress">
                   <select v-model="resultMap[item.itemId].isNormal" class="input-sm">
-                    <option value="Y">정상</option>
-                    <option value="N">비정상</option>
+                    <option value="Y"><!-- 정상 -->정상</option>
+                    <option value="N"><!-- 비정상 -->비정상</option>
                   </select>
                 </template>
                 <template v-else>
@@ -83,13 +83,13 @@
             </tr>
           </tbody>
         </table>
-        <p v-else class="empty-msg">등록된 점검 항목이 없습니다.</p>
+        <p v-else class="empty-msg">{{ t('common.noData') }}</p>
         <button v-if="isInProgress && items.length" class="btn btn-primary" style="margin-top: 8px"
-                @click="saveResults">결과 저장</button>
+                @click="saveResults">{{ t('common.save') }}</button>
       </div>
 
       <div class="detail-section">
-        <h3>변경 이력</h3>
+        <h3><!-- 변경 이력 -->변경 이력</h3>
         <div v-if="history.length" class="timeline">
           <div v-for="h in history" :key="h.historyId" class="timeline-item">
             <div class="timeline-header">
@@ -103,7 +103,7 @@
             </div>
           </div>
         </div>
-        <p v-else class="empty-msg">변경 이력이 없습니다.</p>
+        <p v-else class="empty-msg">{{ t('common.noData') }}</p>
       </div>
     </div>
   </div>
@@ -112,9 +112,11 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { inspectionApi } from '@/api/inspection.js'
 import BaseStatusBadge from '@/components/common/BaseStatusBadge.vue'
 
+const { t } = useI18n()
 const route = useRoute()
 const inspectionId = route.params.id
 
@@ -135,8 +137,11 @@ const TRANSITIONS = {
 }
 
 const STATUS_LABELS = {
-  SCHEDULED: '예정', IN_PROGRESS: '진행 시작', ON_HOLD: '보류',
-  COMPLETED: '완료', CLOSED: '종료'
+  SCHEDULED: t('status.SCHEDULED'),
+  IN_PROGRESS: t('status.IN_PROGRESS'),
+  ON_HOLD: '보류',
+  COMPLETED: t('status.COMPLETED'),
+  CLOSED: t('status.CLOSED')
 }
 
 const availableTransitions = computed(() => TRANSITIONS[inspection.value.statusCd] || [])
@@ -191,17 +196,17 @@ const loadAll = async () => {
     history.value = (historyRes.data.data || historyRes.data) || []
     initResultMap()
   } catch (e) {
-    console.error('점검 상세 조회 실패:', e)
+    console.error(t('message.loadFail'), e)
   }
 }
 
 const doChangeStatus = async (status) => {
-  if (!confirm(`상태를 '${statusLabel(status)}'(으)로 변경하시겠습니까?`)) return
+  if (!confirm(`${statusLabel(status)}?`)) return
   try {
     await inspectionApi.changeStatus(inspectionId, { status })
     loadAll()
   } catch (e) {
-    alert(e.response?.data?.error || '상태 변경에 실패했습니다.')
+    alert(e.response?.data?.error || t('message.saveFail'))
   }
 }
 
@@ -217,17 +222,17 @@ const addItem = async () => {
     showAddItem.value = false
     loadAll()
   } catch (e) {
-    alert('항목 추가에 실패했습니다.')
+    alert(t('message.saveFail'))
   }
 }
 
 const removeItem = async (itemId) => {
-  if (!confirm('항목을 삭제하시겠습니까?')) return
+  if (!confirm(t('message.deleteConfirm'))) return
   try {
     await inspectionApi.deleteItem(inspectionId, itemId)
     loadAll()
   } catch (e) {
-    alert('항목 삭제에 실패했습니다.')
+    alert(t('message.deleteFail'))
   }
 }
 
@@ -242,10 +247,10 @@ const saveResults = async () => {
         remark: r.remark
       })
     }
-    alert('결과가 저장되었습니다.')
+    alert(t('message.saveSuccess'))
     loadAll()
   } catch (e) {
-    alert('결과 저장에 실패했습니다.')
+    alert(t('message.saveFail'))
   }
 }
 

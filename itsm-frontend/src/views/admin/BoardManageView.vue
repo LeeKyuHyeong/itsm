@@ -1,22 +1,22 @@
 <template>
   <div class="board-manage">
     <div class="page-header">
-      <h2>게시판 관리</h2>
-      <button class="btn btn-primary" @click="openCreateModal">게시판 추가</button>
+      <h2>{{ t('admin.boardManage') }}</h2>
+      <button class="btn btn-primary" @click="openCreateModal">{{ t('admin.boardAdd') }}</button>
     </div>
 
     <table class="data-table" v-if="boards.length">
       <thead>
         <tr>
           <th width="60">ID</th>
-          <th>게시판명</th>
-          <th width="100">유형</th>
-          <th width="80">댓글허용</th>
-          <th width="80">상태</th>
-          <th width="60">순서</th>
-          <th width="150">허용확장자</th>
-          <th width="100">파일크기(MB)</th>
-          <th width="120">작업</th>
+          <th>{{ t('admin.boardName') }}</th>
+          <th width="100">{{ t('admin.boardType') }}</th>
+          <th width="80">{{ t('admin.allowComment') }}</th>
+          <th width="80">{{ t('admin.isActive') }}</th>
+          <th width="60">{{ t('admin.sortOrder') }}</th>
+          <th width="150">{{ t('admin.allowExt') }}</th>
+          <th width="100">{{ t('admin.maxFileSize') }}</th>
+          <th width="120">{{ t('common.edit') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -27,72 +27,72 @@
           <td>{{ b.allowComment === 'Y' ? 'O' : 'X' }}</td>
           <td>
             <span :class="['status-badge', b.isActive === 'Y' ? 'active' : 'inactive']">
-              {{ b.isActive === 'Y' ? '활성' : '비활성' }}
+              {{ b.isActive === 'Y' ? t('admin.active') : t('admin.inactive') }}
             </span>
           </td>
           <td>{{ b.sortOrder }}</td>
           <td>{{ b.allowExt || '-' }}</td>
           <td>{{ b.maxFileSize || '-' }}</td>
           <td>
-            <button class="btn-link" @click="openEditModal(b)">수정</button>
-            <button class="btn-link text-danger" @click="handleDelete(b.boardId)">삭제</button>
+            <button class="btn-link" @click="openEditModal(b)">{{ t('common.edit') }}</button>
+            <button class="btn-link text-danger" @click="handleDelete(b.boardId)">{{ t('common.delete') }}</button>
           </td>
         </tr>
       </tbody>
     </table>
-    <p v-else class="empty-msg">등록된 게시판이 없습니다.</p>
+    <p v-else class="empty-msg">{{ t('common.noData') }}</p>
 
     <div v-if="showModal" class="modal-overlay" @click.self="showModal = false">
       <div class="modal">
-        <h3>{{ isEditMode ? '게시판 수정' : '게시판 추가' }}</h3>
+        <h3>{{ isEditMode ? t('admin.boardEdit') : t('admin.boardAdd') }}</h3>
         <form @submit.prevent="handleSave">
           <div class="form-group">
-            <label class="required">게시판명</label>
+            <label class="required">{{ t('admin.boardName') }}</label>
             <input v-model="form.boardNm" required />
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label class="required">유형코드</label>
+              <label class="required">{{ t('admin.boardType') }}</label>
               <input v-model="form.boardTypeCd" required />
             </div>
             <div class="form-group">
-              <label>정렬순서</label>
+              <label>{{ t('admin.sortOrder') }}</label>
               <input v-model.number="form.sortOrder" type="number" />
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label>허용 확장자</label>
+              <label>{{ t('admin.allowExt') }}</label>
               <input v-model="form.allowExt" placeholder="pdf,doc,hwp" />
             </div>
             <div class="form-group">
-              <label>최대 파일크기(MB)</label>
+              <label>{{ t('admin.maxFileSize') }}</label>
               <input v-model.number="form.maxFileSize" type="number" />
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label>댓글 허용</label>
+              <label>{{ t('admin.allowComment') }}</label>
               <select v-model="form.allowComment">
-                <option value="Y">허용</option>
-                <option value="N">비허용</option>
+                <option value="Y">{{ t('admin.allow') }}</option>
+                <option value="N">{{ t('admin.disallow') }}</option>
               </select>
             </div>
             <div class="form-group">
-              <label>활성 상태</label>
+              <label>{{ t('admin.isActive') }}</label>
               <select v-model="form.isActive">
-                <option value="Y">활성</option>
-                <option value="N">비활성</option>
+                <option value="Y">{{ t('admin.active') }}</option>
+                <option value="N">{{ t('admin.inactive') }}</option>
               </select>
             </div>
           </div>
           <div class="form-group">
-            <label class="required">권한 설정 (JSON)</label>
+            <label class="required">{{ t('admin.rolePermission') }}</label>
             <textarea v-model="form.rolePermission" rows="3" required></textarea>
           </div>
           <div class="modal-actions">
-            <button type="button" class="btn btn-secondary" @click="showModal = false">취소</button>
-            <button type="submit" class="btn btn-primary">{{ isEditMode ? '수정' : '추가' }}</button>
+            <button type="button" class="btn btn-secondary" @click="showModal = false">{{ t('common.cancel') }}</button>
+            <button type="submit" class="btn btn-primary">{{ isEditMode ? t('common.edit') : t('common.add') }}</button>
           </div>
         </form>
       </div>
@@ -102,8 +102,10 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { boardApi } from '@/api/board.js'
 
+const { t } = useI18n()
 const boards = ref([])
 const showModal = ref(false)
 const isEditMode = ref(false)
@@ -172,17 +174,17 @@ const handleSave = async () => {
     showModal.value = false
     loadBoards()
   } catch (e) {
-    alert('저장에 실패했습니다.')
+    alert(t('message.saveFail'))
   }
 }
 
 const handleDelete = async (boardId) => {
-  if (!confirm('게시판을 삭제하시겠습니까?')) return
+  if (!confirm(t('message.deleteConfirm'))) return
   try {
     await boardApi.deleteConfig(boardId)
     loadBoards()
   } catch (e) {
-    alert('삭제에 실패했습니다.')
+    alert(t('message.deleteFail'))
   }
 }
 

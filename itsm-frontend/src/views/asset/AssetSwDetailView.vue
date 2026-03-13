@@ -2,8 +2,8 @@
   <div class="asset-sw-detail">
     <div class="page-header">
       <div class="page-header-left">
-        <button class="btn btn-default" @click="$router.push({ name: 'AssetSwList' })">&larr; 목록</button>
-        <h1 class="page-title">SW 자산 상세</h1>
+        <button class="btn btn-default" @click="$router.push({ name: 'AssetSwList' })">&larr; {{ t('common.list') }}</button>
+        <h1 class="page-title">{{ t('asset.swDetail') }}</h1>
       </div>
       <div class="page-header-right">
         <button v-if="asset && asset.status === 'ACTIVE'" class="btn btn-default" @click="changeStatus('INACTIVE')">비활성화</button>
@@ -26,9 +26,9 @@
           <div class="detail-item"><span class="detail-label">라이선스 수량</span><span class="detail-value">{{ asset.licenseCnt != null ? `${asset.licenseCnt}건` : '-' }}</span></div>
           <div class="detail-item"><span class="detail-label">설치일</span><span class="detail-value">{{ asset.installedAt || '-' }}</span></div>
           <div class="detail-item"><span class="detail-label">라이선스 만료일</span><span class="detail-value">{{ asset.expiredAt || '-' }}</span></div>
-          <div class="detail-item"><span class="detail-label">고객사</span><span class="detail-value">{{ asset.companyNm || '-' }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ t('asset.company') }}</span><span class="detail-value">{{ asset.companyNm || '-' }}</span></div>
           <div class="detail-item"><span class="detail-label">담당자</span><span class="detail-value">{{ asset.managerNm || '-' }}</span></div>
-          <div class="detail-item"><span class="detail-label">상태</span>
+          <div class="detail-item"><span class="detail-label">{{ t('asset.status') }}</span>
             <span :class="['status-badge', `status-${asset.status?.toLowerCase()}`]">{{ statusLabel(asset.status) }}</span>
           </div>
           <div class="detail-item"><span class="detail-label">등록일</span><span class="detail-value">{{ formatDate(asset.createdAt) }}</span></div>
@@ -70,10 +70,12 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import { assetSwApi } from '@/api/asset.js'
 import { useCommonCodeStore } from '@/stores/commonCode.js'
 
+const { t } = useI18n()
 const route = useRoute()
 const commonCodeStore = useCommonCodeStore()
 const assetSwId = Number(route.params.id)

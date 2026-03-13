@@ -1,37 +1,37 @@
 <template>
   <div class="incident-list">
     <div class="page-header">
-      <h2>장애 목록</h2>
-      <button class="btn btn-primary" @click="$router.push('/incidents/new')">장애 등록</button>
+      <h2>{{ t('incident.list') }}</h2>
+      <button class="btn btn-primary" @click="$router.push('/incidents/new')">{{ t('incident.create') }}</button>
     </div>
 
     <div class="filter-bar">
       <select v-model="filters.statusCd" @change="search">
-        <option value="">전체 상태</option>
-        <option value="RECEIVED">접수</option>
-        <option value="IN_PROGRESS">처리중</option>
-        <option value="COMPLETED">완료</option>
-        <option value="CLOSED">종료</option>
-        <option value="REJECTED">반려</option>
+        <option value="">{{ t('common.all') }} {{ t('incident.status') }}</option>
+        <option value="RECEIVED">{{ t('status.RECEIVED') }}</option>
+        <option value="IN_PROGRESS">{{ t('status.IN_PROGRESS') }}</option>
+        <option value="COMPLETED">{{ t('status.COMPLETED') }}</option>
+        <option value="CLOSED">{{ t('status.CLOSED') }}</option>
+        <option value="REJECTED">{{ t('status.REJECTED') }}</option>
       </select>
       <select v-model="filters.priorityCd" @change="search">
-        <option value="">전체 우선순위</option>
-        <option value="CRITICAL">긴급</option>
-        <option value="HIGH">높음</option>
-        <option value="MEDIUM">보통</option>
-        <option value="LOW">낮음</option>
+        <option value="">{{ t('common.all') }} {{ t('incident.priority') }}</option>
+        <option value="CRITICAL">{{ t('priority.CRITICAL') }}</option>
+        <option value="HIGH">{{ t('priority.HIGH') }}</option>
+        <option value="MEDIUM">{{ t('priority.MEDIUM') }}</option>
+        <option value="LOW">{{ t('priority.LOW') }}</option>
       </select>
       <select v-model="filters.incidentTypeCd" @change="search">
-        <option value="">전체 유형</option>
-        <option v-for="t in incidentTypes" :key="t.code" :value="t.code">{{ t.name }}</option>
+        <option value="">{{ t('common.all') }} {{ t('incident.type') }}</option>
+        <option v-for="tp in incidentTypes" :key="tp.code" :value="tp.code">{{ tp.name }}</option>
       </select>
       <div class="search-box">
-        <input v-model="filters.keyword" placeholder="제목/내용 검색" @keyup.enter="search" />
-        <button class="btn btn-sm" @click="search">검색</button>
+        <input v-model="filters.keyword" :placeholder="t('incident.searchPlaceholder')" @keyup.enter="search" />
+        <button class="btn btn-sm" @click="search">{{ t('common.search') }}</button>
       </div>
     </div>
 
-    <BaseTable :columns="columns" :data="incidents" :loading="loading" empty-message="등록된 장애가 없습니다."
+    <BaseTable :columns="columns" :data="incidents" :loading="loading" :empty-message="t('incident.noData')"
                @row-click="goDetail">
       <template #priorityCd="{ row }">
         <span :class="['priority-badge', `priority-${row.priorityCd}`]">
@@ -56,8 +56,9 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { incidentApi } from '@/api/incident.js'
 import { useCommonCodeStore } from '@/stores/commonCode.js'
 import BaseTable from '@/components/common/BaseTable.vue'
@@ -65,6 +66,7 @@ import BasePagination from '@/components/common/BasePagination.vue'
 import BaseStatusBadge from '@/components/common/BaseStatusBadge.vue'
 import BaseSlaBar from '@/components/common/BaseSlaBar.vue'
 
+const { t } = useI18n()
 const router = useRouter()
 const commonCodeStore = useCommonCodeStore()
 
@@ -82,21 +84,20 @@ const filters = reactive({
   incidentTypeCd: ''
 })
 
-const columns = [
-  { key: 'incidentId', label: 'ID', width: '60px', align: 'center' },
-  { key: 'title', label: '제목' },
-  { key: 'incidentTypeCd', label: '유형', width: '120px' },
-  { key: 'priorityCd', label: '우선순위', width: '100px', align: 'center' },
-  { key: 'statusCd', label: '상태', width: '100px', align: 'center' },
-  { key: 'companyNm', label: '고객사', width: '120px' },
-  { key: 'mainManagerNm', label: '주담당자', width: '100px' },
-  { key: 'slaPercentage', label: 'SLA 경과율', width: '140px' },
-  { key: 'occurredAt', label: '발생일시', width: '150px' }
-]
+const columns = computed(() => [
+  { key: 'incidentId', label: t('incident.id'), width: '60px', align: 'center' },
+  { key: 'title', label: t('incident.incidentTitle') },
+  { key: 'incidentTypeCd', label: t('incident.type'), width: '120px' },
+  { key: 'priorityCd', label: t('incident.priority'), width: '100px', align: 'center' },
+  { key: 'statusCd', label: t('incident.status'), width: '100px', align: 'center' },
+  { key: 'companyNm', label: t('incident.company'), width: '120px' },
+  { key: 'mainManagerNm', label: t('incident.mainManager'), width: '100px' },
+  { key: 'slaPercentage', label: t('incident.slaPercentage'), width: '140px' },
+  { key: 'occurredAt', label: t('incident.occurredAt'), width: '150px' }
+])
 
 const priorityLabel = (code) => {
-  const map = { CRITICAL: '긴급', HIGH: '높음', MEDIUM: '보통', LOW: '낮음' }
-  return map[code] || code
+  return t(`priority.${code}`, code)
 }
 
 const formatDate = (dateStr) => {
