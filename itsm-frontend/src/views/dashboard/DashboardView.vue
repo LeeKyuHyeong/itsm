@@ -2,6 +2,38 @@
   <div class="dashboard">
     <h2>대시보드</h2>
 
+    <!-- 요약 카드 (4개) -->
+    <div class="summary-grid" v-if="stats">
+      <div class="summary-card summary-incident" @click="$router.push('/incidents')">
+        <div class="summary-icon">&#x1F6A8;</div>
+        <div class="summary-info">
+          <span class="summary-count">{{ stats.totalIncidentCount || 0 }}</span>
+          <span class="summary-label">장애</span>
+        </div>
+      </div>
+      <div class="summary-card summary-sr" @click="$router.push('/service-requests')">
+        <div class="summary-icon">&#x1F4CB;</div>
+        <div class="summary-info">
+          <span class="summary-count">{{ stats.totalSrCount || 0 }}</span>
+          <span class="summary-label">서비스요청</span>
+        </div>
+      </div>
+      <div class="summary-card summary-change" @click="$router.push('/changes')">
+        <div class="summary-icon">&#x1F504;</div>
+        <div class="summary-info">
+          <span class="summary-count">{{ stats.totalChangeCount || 0 }}</span>
+          <span class="summary-label">변경관리</span>
+        </div>
+      </div>
+      <div class="summary-card summary-inspection" @click="$router.push('/inspections')">
+        <div class="summary-icon">&#x1F50D;</div>
+        <div class="summary-info">
+          <span class="summary-count">{{ stats.totalInspectionCount || 0 }}</span>
+          <span class="summary-label">정기점검</span>
+        </div>
+      </div>
+    </div>
+
     <div class="stats-grid" v-if="stats">
       <!-- 상태별 장애 건수 -->
       <div class="stat-card">
@@ -9,17 +41,6 @@
         <div class="status-stats">
           <div v-for="(count, status) in stats.statusCounts" :key="status" class="status-item">
             <BaseStatusBadge :status="status" />
-            <span class="count">{{ count }}건</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- 우선순위별 미처리 -->
-      <div class="stat-card">
-        <h3>우선순위별 미처리</h3>
-        <div class="priority-stats">
-          <div v-for="(count, priority) in stats.priorityCounts" :key="priority" class="priority-item">
-            <span :class="['priority-badge', `priority-${priority}`]">{{ priorityLabel(priority) }}</span>
             <span class="count">{{ count }}건</span>
           </div>
         </div>
@@ -37,6 +58,107 @@
             <span class="sla-number">{{ stats.slaWarningCount }}</span>
             <span class="sla-label">임박 (80%+)</span>
           </div>
+        </div>
+      </div>
+
+      <!-- 운영 모니터링 -->
+      <div class="stat-card monitoring-card">
+        <h3>운영 모니터링</h3>
+        <div class="monitoring-stats">
+          <div class="monitoring-item" :class="{ alert: stats.unassignedIncidentCount > 0 }">
+            <span class="monitoring-number">{{ stats.unassignedIncidentCount }}</span>
+            <span class="monitoring-label">미배정 장애</span>
+          </div>
+          <div class="monitoring-item" :class="{ alert: stats.delayedIncidentCount > 0 }">
+            <span class="monitoring-number">{{ stats.delayedIncidentCount }}</span>
+            <span class="monitoring-label">지연 장애</span>
+          </div>
+          <div class="monitoring-item" :class="{ alert: stats.pendingSrCount > 0 }">
+            <span class="monitoring-number">{{ stats.pendingSrCount }}</span>
+            <span class="monitoring-label">완료대기 SR</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SR / 변경 / 점검 상태 -->
+    <div class="detail-grid" v-if="stats">
+      <div class="stat-card">
+        <h3>서비스요청 상태</h3>
+        <div class="status-stats">
+          <div v-for="(count, status) in stats.srStatusCounts" :key="status" class="status-item">
+            <BaseStatusBadge :status="status" />
+            <span class="count">{{ count }}건</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <h3>변경관리 상태</h3>
+        <div class="status-stats">
+          <div v-for="(count, status) in stats.changeStatusCounts" :key="status" class="status-item">
+            <BaseStatusBadge :status="status" />
+            <span class="count">{{ count }}건</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <h3>정기점검 상태</h3>
+        <div class="status-stats">
+          <div v-for="(count, status) in stats.inspectionStatusCounts" :key="status" class="status-item">
+            <BaseStatusBadge :status="status" />
+            <span class="count">{{ count }}건</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 월별 추이 -->
+    <div class="trend-card" v-if="stats && stats.monthlyTrend">
+      <h3>월별 추이 (최근 6개월)</h3>
+      <table class="trend-table">
+        <thead>
+          <tr>
+            <th>월</th>
+            <th>장애</th>
+            <th>서비스요청</th>
+            <th>변경관리</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="item in stats.monthlyTrend" :key="item.month">
+            <td>{{ item.month }}</td>
+            <td>
+              <div class="bar-cell">
+                <div class="bar bar-incident" :style="{ width: barWidth(item.incidentCount) }"></div>
+                <span>{{ item.incidentCount }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="bar-cell">
+                <div class="bar bar-sr" :style="{ width: barWidth(item.srCount) }"></div>
+                <span>{{ item.srCount }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="bar-cell">
+                <div class="bar bar-change" :style="{ width: barWidth(item.changeCount) }"></div>
+                <span>{{ item.changeCount }}</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 우선순위별 미처리 -->
+    <div class="priority-card" v-if="stats">
+      <h3>우선순위별 미처리 장애</h3>
+      <div class="priority-stats">
+        <div v-for="(count, priority) in stats.priorityCounts" :key="priority" class="priority-item">
+          <span :class="['priority-badge', `priority-${priority}`]">{{ priorityLabel(priority) }}</span>
+          <span class="count">{{ count }}건</span>
         </div>
       </div>
     </div>
@@ -61,7 +183,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '@/api/index.js'
 import BaseTable from '@/components/common/BaseTable.vue'
@@ -79,6 +201,20 @@ const columns = [
   { key: 'companyNm', label: '고객사', width: '120px' },
   { key: 'occurredAt', label: '발생일시', width: '150px' }
 ]
+
+const maxTrendCount = computed(() => {
+  if (!stats.value || !stats.value.monthlyTrend) return 1
+  let max = 1
+  stats.value.monthlyTrend.forEach(item => {
+    max = Math.max(max, item.incidentCount, item.srCount, item.changeCount)
+  })
+  return max
+})
+
+const barWidth = (count) => {
+  const pct = Math.min((count / maxTrendCount.value) * 100, 100)
+  return pct + '%'
+}
 
 const priorityLabel = (code) => {
   const map = { CRITICAL: '긴급', HIGH: '높음', MEDIUM: '보통', LOW: '낮음' }
@@ -122,12 +258,66 @@ onMounted(() => {
   margin: 0 0 var(--spacing-lg) 0;
   font-size: var(--font-size-xl);
 }
+
+/* Summary cards */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+.summary-card {
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: var(--spacing-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  cursor: pointer;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.summary-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+}
+.summary-icon {
+  font-size: 32px;
+}
+.summary-info {
+  display: flex;
+  flex-direction: column;
+}
+.summary-count {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.summary-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+.summary-incident { border-left: 4px solid #dc2626; }
+.summary-sr { border-left: 4px solid #2563eb; }
+.summary-change { border-left: 4px solid #7c3aed; }
+.summary-inspection { border-left: 4px solid #059669; }
+
+/* Stats grid */
 .stats-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: var(--spacing-md);
   margin-bottom: var(--spacing-lg);
 }
+
+/* Detail grid (SR/Change/Inspection) */
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
 .stat-card {
   background: #fff;
   border: 1px solid var(--color-border);
@@ -152,6 +342,8 @@ onMounted(() => {
   font-weight: 700;
   font-size: var(--font-size-md);
 }
+
+/* SLA */
 .sla-stats {
   display: flex;
   gap: var(--spacing-lg);
@@ -175,6 +367,37 @@ onMounted(() => {
   font-size: var(--font-size-xs);
   color: var(--color-text-muted);
 }
+
+/* Monitoring */
+.monitoring-stats {
+  display: flex;
+  gap: var(--spacing-lg);
+  justify-content: center;
+}
+.monitoring-item {
+  text-align: center;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: 8px;
+  background: #f8fafc;
+}
+.monitoring-item.alert {
+  background: #fef2f2;
+}
+.monitoring-number {
+  display: block;
+  font-size: 28px;
+  font-weight: 700;
+  color: #16a34a;
+}
+.monitoring-item.alert .monitoring-number {
+  color: #dc2626;
+}
+.monitoring-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+/* Priority badges */
 .priority-badge {
   display: inline-block;
   padding: 2px 8px;
@@ -186,6 +409,63 @@ onMounted(() => {
 .priority-HIGH { background: #fff7ed; color: #ea580c; }
 .priority-MEDIUM { background: #fefce8; color: #ca8a04; }
 .priority-LOW { background: #f0fdf4; color: #16a34a; }
+
+/* Priority card */
+.priority-card {
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+.priority-card h3 {
+  margin: 0 0 var(--spacing-md) 0;
+  font-size: var(--font-size-md);
+}
+
+/* Trend table */
+.trend-card {
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+.trend-card h3 {
+  margin: 0 0 var(--spacing-md) 0;
+  font-size: var(--font-size-md);
+}
+.trend-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.trend-table th,
+.trend-table td {
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+}
+.trend-table th {
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+.bar-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.bar {
+  height: 18px;
+  border-radius: 4px;
+  min-width: 2px;
+  transition: width 0.3s;
+}
+.bar-incident { background: #dc2626; }
+.bar-sr { background: #2563eb; }
+.bar-change { background: #7c3aed; }
+
+/* Recent card */
 .recent-card {
   background: #fff;
   border: 1px solid var(--color-border);
