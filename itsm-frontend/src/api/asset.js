@@ -50,3 +50,9 @@ export const assetSwApi = {
     return api.get(`/assets/sw/${id}/history`)
   }
 }
+
+export const assetStatApi = {
+  getStats() {
+    return api.get('/assets/stats')
+  }
+}

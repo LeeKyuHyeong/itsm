@@ -28,6 +28,12 @@ public class AssetHw extends BaseEntity {
     @Column(name = "asset_type_cd", nullable = false, length = 50)
     private String assetTypeCd;
 
+    @Column(name = "asset_category", length = 20)
+    private String assetCategory;
+
+    @Column(name = "asset_sub_category", length = 30)
+    private String assetSubCategory;
+
     @Column(name = "manufacturer", length = 100)
     private String manufacturer;
 
@@ -67,12 +73,15 @@ public class AssetHw extends BaseEntity {
     private String description;
 
     @Builder
-    public AssetHw(String assetNm, String assetTypeCd, String manufacturer, String modelNm,
+    public AssetHw(String assetNm, String assetTypeCd, String assetCategory, String assetSubCategory,
+                   String manufacturer, String modelNm,
                    String serialNo, String ipAddress, String macAddress, String location,
                    LocalDate introducedAt, LocalDate warrantyEndAt, Company company,
                    User manager, String status, String description) {
         this.assetNm = assetNm;
         this.assetTypeCd = assetTypeCd;
+        this.assetCategory = assetCategory != null ? assetCategory : "INFRA_HW";
+        this.assetSubCategory = assetSubCategory;
         this.manufacturer = manufacturer;
         this.modelNm = modelNm;
         this.serialNo = serialNo;
@@ -90,7 +99,7 @@ public class AssetHw extends BaseEntity {
     public void update(String assetNm, String assetTypeCd, String manufacturer, String modelNm,
                        String serialNo, String ipAddress, String macAddress, String location,
                        LocalDate introducedAt, LocalDate warrantyEndAt,
-                       User manager, String description) {
+                       User manager, String description, String assetCategory, String assetSubCategory) {
         this.assetNm = assetNm;
         this.assetTypeCd = assetTypeCd;
         this.manufacturer = manufacturer;
@@ -103,6 +112,8 @@ public class AssetHw extends BaseEntity {
         this.warrantyEndAt = warrantyEndAt;
         this.manager = manager;
         this.description = description;
+        this.assetCategory = assetCategory;
+        this.assetSubCategory = assetSubCategory;
     }
 
     public void changeStatus(String status) {

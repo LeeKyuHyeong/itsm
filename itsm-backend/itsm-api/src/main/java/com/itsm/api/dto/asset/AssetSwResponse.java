@@ -17,6 +17,8 @@ public class AssetSwResponse {
     private Long assetSwId;
     private String swNm;
     private String swTypeCd;
+    private String assetCategory;
+    private String assetSubCategory;
     private String version;
     private String licenseKey;
     private Integer licenseCnt;

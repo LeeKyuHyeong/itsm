@@ -21,6 +21,8 @@
         <div class="detail-grid">
           <div class="detail-item"><span class="detail-label">{{ t('asset.swNm') }}</span><span class="detail-value">{{ asset.swNm }}</span></div>
           <div class="detail-item"><span class="detail-label">{{ t('asset.swType') }}</span><span class="detail-value">{{ getCodeName('ASSET_SW_TYPE', asset.swTypeCd) }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ t('asset.category') }}</span><span class="detail-value">{{ getCodeName('ASSET_CATEGORY', asset.assetCategory) }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ t('asset.subCategory') }}</span><span class="detail-value">{{ getSubCategoryName(asset.assetSubCategory) }}</span></div>
           <div class="detail-item"><span class="detail-label">{{ t('asset.version') }}</span><span class="detail-value">{{ asset.version || '-' }}</span></div>
           <div class="detail-item"><span class="detail-label">{{ t('asset.licenseKey') }}</span><span class="detail-value">{{ asset.licenseKey || '-' }}</span></div>
           <div class="detail-item"><span class="detail-label">{{ t('asset.licenseCnt') }}</span><span class="detail-value">{{ asset.licenseCnt != null ? t('asset.countUnit', { n: asset.licenseCnt }) : '-' }}</span></div>
@@ -98,8 +100,17 @@ function formatDate(dt) {
   return dt.replace('T', ' ').substring(0, 16)
 }
 
+function getSubCategoryName(subCategory) {
+  if (!subCategory) return '-'
+  return commonCodeStore.getCodeName('ASSET_SUB_INFRA_SW', subCategory) || subCategory
+}
+
 onMounted(async () => {
-  await commonCodeStore.fetchCodes('ASSET_SW_TYPE')
+  await Promise.all([
+    commonCodeStore.fetchCodes('ASSET_SW_TYPE'),
+    commonCodeStore.fetchCodes('ASSET_CATEGORY'),
+    commonCodeStore.fetchCodes('ASSET_SUB_INFRA_SW')
+  ])
   loadDetail()
   loadHistory()
 })

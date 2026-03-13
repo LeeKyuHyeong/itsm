@@ -66,13 +66,35 @@ class AssetSwControllerTest {
                 .companyId(1L).companyNm("테스트회사").status("ACTIVE")
                 .createdAt(LocalDateTime.now()).build();
         Page<AssetSwResponse> page = new PageImpl<>(List.of(response), PageRequest.of(0, 20), 1);
-        given(assetSwService.search(any(), any(), any(), any(), any())).willReturn(page);
+        given(assetSwService.search(any(), any(), any(), any(), any(), any(), any())).willReturn(page);
 
         // when & then
         mockMvc.perform(get("/api/v1/assets/sw"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data.content[0].swNm").value("Oracle DB"));
+    }
+
+    @Test
+    @DisplayName("GET /api/v1/assets/sw?assetCategory=INFRA_SW - 카테고리 필터 검색 시 200을 반환한다")
+    void search_withCategoryFilter_returns200() throws Exception {
+        // given
+        AssetSwResponse response = AssetSwResponse.builder()
+                .assetSwId(1L).swNm("Oracle DB").swTypeCd("DATABASE")
+                .assetCategory("INFRA_SW").assetSubCategory("SW_DB")
+                .companyId(1L).companyNm("테스트회사").status("ACTIVE")
+                .createdAt(LocalDateTime.now()).build();
+        Page<AssetSwResponse> page = new PageImpl<>(List.of(response), PageRequest.of(0, 20), 1);
+        given(assetSwService.search(any(), any(), any(), any(), eq("INFRA_SW"), eq("SW_DB"), any())).willReturn(page);
+
+        // when & then
+        mockMvc.perform(get("/api/v1/assets/sw")
+                        .param("assetCategory", "INFRA_SW")
+                        .param("assetSubCategory", "SW_DB"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.content[0].assetCategory").value("INFRA_SW"))
+                .andExpect(jsonPath("$.data.content[0].assetSubCategory").value("SW_DB"));
     }
 
     @Test
@@ -97,7 +119,8 @@ class AssetSwControllerTest {
     void create_returns200() throws Exception {
         // given
         AssetSwCreateRequest req = new AssetSwCreateRequest(
-                "MySQL", "DATABASE", "8.0", "LIC-001", 5,
+                "MySQL", "DATABASE", "INFRA_SW", "SW_DB",
+                "8.0", "LIC-001", 5,
                 LocalDate.of(2025, 1, 1), LocalDate.of(2027, 1, 1),
                 1L, null, "새 DB");
         AssetSwResponse response = AssetSwResponse.builder()
@@ -120,7 +143,8 @@ class AssetSwControllerTest {
     void update_returns200() throws Exception {
         // given
         AssetSwUpdateRequest req = new AssetSwUpdateRequest(
-                "Oracle DB-변경", "DATABASE", "21c", "LIC-002", 20,
+                "Oracle DB-변경", "DATABASE", "INFRA_SW", "SW_DB",
+                "21c", "LIC-002", 20,
                 null, null, null, "변경됨");
         AssetSwResponse response = AssetSwResponse.builder()
                 .assetSwId(1L).swNm("Oracle DB-변경").version("21c")

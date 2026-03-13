@@ -66,7 +66,7 @@ class AssetHwControllerTest {
                 .companyId(1L).companyNm("테스트회사").status("ACTIVE")
                 .createdAt(LocalDateTime.now()).build();
         Page<AssetHwResponse> page = new PageImpl<>(List.of(response), PageRequest.of(0, 20), 1);
-        given(assetHwService.search(any(), any(), any(), any(), any())).willReturn(page);
+        given(assetHwService.search(any(), any(), any(), any(), any(), any(), any())).willReturn(page);
 
         // when & then
         mockMvc.perform(get("/api/v1/assets/hw"))
@@ -74,6 +74,28 @@ class AssetHwControllerTest {
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data.content[0].assetHwId").value(1))
                 .andExpect(jsonPath("$.data.content[0].assetNm").value("서버#1"));
+    }
+
+    @Test
+    @DisplayName("GET /api/v1/assets/hw?assetCategory=INFRA_HW - 카테고리 필터 검색 시 200을 반환한다")
+    void search_withCategoryFilter_returns200() throws Exception {
+        // given
+        AssetHwResponse response = AssetHwResponse.builder()
+                .assetHwId(1L).assetNm("서버#1").assetTypeCd("SERVER")
+                .assetCategory("INFRA_HW").assetSubCategory("SERVER_RACK")
+                .companyId(1L).companyNm("테스트회사").status("ACTIVE")
+                .createdAt(LocalDateTime.now()).build();
+        Page<AssetHwResponse> page = new PageImpl<>(List.of(response), PageRequest.of(0, 20), 1);
+        given(assetHwService.search(any(), any(), any(), any(), eq("INFRA_HW"), eq("SERVER_RACK"), any())).willReturn(page);
+
+        // when & then
+        mockMvc.perform(get("/api/v1/assets/hw")
+                        .param("assetCategory", "INFRA_HW")
+                        .param("assetSubCategory", "SERVER_RACK"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.content[0].assetCategory").value("INFRA_HW"))
+                .andExpect(jsonPath("$.data.content[0].assetSubCategory").value("SERVER_RACK"));
     }
 
     @Test
@@ -100,7 +122,8 @@ class AssetHwControllerTest {
     void create_returns200() throws Exception {
         // given
         AssetHwCreateRequest req = new AssetHwCreateRequest(
-                "서버#2", "SERVER", "HP", "DL380", "SN-002",
+                "서버#2", "SERVER", "INFRA_HW", "SERVER_RACK",
+                "HP", "DL380", "SN-002",
                 "10.0.0.1", null, "IDC 2층",
                 LocalDate.of(2025, 1, 1), LocalDate.of(2028, 1, 1),
                 1L, null, "새 서버");
@@ -124,7 +147,8 @@ class AssetHwControllerTest {
     void update_returns200() throws Exception {
         // given
         AssetHwUpdateRequest req = new AssetHwUpdateRequest(
-                "서버#1-변경", "SERVER", "Dell", "R740", "SN-001",
+                "서버#1-변경", "SERVER", "INFRA_HW", "SERVER_RACK",
+                "Dell", "R740", "SN-001",
                 "192.168.1.200", null, "IDC 1층", null, null, null, "변경됨");
         AssetHwResponse response = AssetHwResponse.builder()
                 .assetHwId(1L).assetNm("서버#1-변경").status("ACTIVE")

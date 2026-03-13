@@ -43,6 +43,45 @@ class AssetSwTest {
         assertThat(sw.getCompany()).isNotNull();
         assertThat(sw.getStatus()).isEqualTo("ACTIVE");
         assertThat(sw.getDescription()).isEqualTo("메인 DB");
+        assertThat(sw.getAssetCategory()).isEqualTo("INFRA_SW");
+    }
+
+    @Test
+    @DisplayName("Builder로 AssetSw 생성 시 assetCategory 미지정이면 INFRA_SW가 기본값이다")
+    void builder_defaultAssetCategory() {
+        // given
+        Company company = Company.builder().companyNm("테스트회사").bizNo("123-45-67890").build();
+
+        // when
+        AssetSw sw = AssetSw.builder()
+                .swNm("Oracle DB")
+                .swTypeCd("DATABASE")
+                .company(company)
+                .build();
+
+        // then
+        assertThat(sw.getAssetCategory()).isEqualTo("INFRA_SW");
+        assertThat(sw.getAssetSubCategory()).isNull();
+    }
+
+    @Test
+    @DisplayName("Builder로 AssetSw 생성 시 assetCategory를 지정하면 해당 값이 설정된다")
+    void builder_customAssetCategory() {
+        // given
+        Company company = Company.builder().companyNm("테스트회사").bizNo("123-45-67890").build();
+
+        // when
+        AssetSw sw = AssetSw.builder()
+                .swNm("Oracle DB")
+                .swTypeCd("DATABASE")
+                .assetCategory("INFRA_SW")
+                .assetSubCategory("SW_DB")
+                .company(company)
+                .build();
+
+        // then
+        assertThat(sw.getAssetCategory()).isEqualTo("INFRA_SW");
+        assertThat(sw.getAssetSubCategory()).isEqualTo("SW_DB");
     }
 
     @Test
@@ -59,7 +98,7 @@ class AssetSwTest {
         // when
         sw.update("MySQL", "DATABASE", "8.0", "MYSQL-LIC-001", 5,
                 LocalDate.of(2025, 1, 1), LocalDate.of(2027, 1, 1),
-                null, "변경됨");
+                null, "변경됨", "INFRA_SW", "SW_DB");
 
         // then
         assertThat(sw.getSwNm()).isEqualTo("MySQL");
@@ -67,6 +106,8 @@ class AssetSwTest {
         assertThat(sw.getLicenseKey()).isEqualTo("MYSQL-LIC-001");
         assertThat(sw.getLicenseCnt()).isEqualTo(5);
         assertThat(sw.getDescription()).isEqualTo("변경됨");
+        assertThat(sw.getAssetCategory()).isEqualTo("INFRA_SW");
+        assertThat(sw.getAssetSubCategory()).isEqualTo("SW_DB");
     }
 
     @Test

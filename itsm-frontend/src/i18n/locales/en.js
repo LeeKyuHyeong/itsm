@@ -97,7 +97,8 @@ export default {
     month: 'Month',
     priorityOpen: 'Open Incidents by Priority',
     recentIncidents: 'Recent Incidents',
-    noIncidents: 'No incidents found.'
+    noIncidents: 'No incidents found.',
+    assetByCategory: 'Assets by Category'
   },
 
   incident: {
@@ -281,7 +282,47 @@ export default {
     changedAt: 'Changed At',
     noHistory: 'No change history.',
     basicInfo: 'Basic Information',
-    countUnit: '{n}'
+    countUnit: '{n}',
+    category: 'Category',
+    subCategory: 'Sub-category',
+    categoryInfraHw: 'Infrastructure HW',
+    categoryInfraSw: 'Infrastructure SW',
+    categoryOa: 'OA Assets',
+    subServerRack: 'Rackmount Server',
+    subServerBlade: 'Blade Server',
+    subServerTower: 'Tower Server',
+    subStorageSan: 'SAN Storage',
+    subStorageNas: 'NAS',
+    subNetworkSwitch: 'Network Switch',
+    subNetworkRouter: 'Router',
+    subNetworkFw: 'Firewall',
+    subNetworkLb: 'Load Balancer',
+    subNetworkAp: 'Wireless AP',
+    subSecurityIds: 'IDS/IPS',
+    subSecurityWaf: 'WAF',
+    subPowerUps: 'UPS',
+    subPowerPdu: 'PDU',
+    subInfraKvm: 'KVM/Console',
+    subSwOs: 'Operating System',
+    subSwDb: 'Database',
+    subSwWas: 'WAS/Web Server',
+    subSwMiddleware: 'Middleware',
+    subSwMonitoring: 'Monitoring',
+    subSwBackup: 'Backup Solution',
+    subSwSecurity: 'Security Solution',
+    subSwVirtualization: 'Virtualization',
+    subSwContainer: 'Container/Orchestration',
+    subSwCicd: 'CI/CD',
+    subSwLicense: 'Commercial License',
+    subOaDesktop: 'Desktop',
+    subOaLaptop: 'Laptop',
+    subOaMonitor: 'Monitor',
+    subOaPrinter: 'Printer/MFP',
+    subOaPhone: 'Phone/VoIP',
+    subOaTablet: 'Tablet',
+    subOaPeripheral: 'Peripheral',
+    subOaProjector: 'Projector',
+    assetList: 'Asset List'
   },
 
   inspection: {
@@ -457,7 +498,16 @@ export default {
     policyEdit: 'Edit Notification Policy',
     policyAdd: 'Add Notification Policy',
     notificationTypeCode: 'Notification Type Code',
-    targetRoleCode: 'Target Role Code'
+    targetRoleCode: 'Target Role Code',
+    batchManage: 'Batch Management',
+    batchJobName: 'Job Name',
+    batchDescription: 'Description',
+    cronExpression: 'CRON Expression',
+    lastExecutedAt: 'Last Executed',
+    lastResult: 'Last Result',
+    noBatchJobs: 'No batch jobs registered.',
+    batchEdit: 'Edit Batch Job',
+    cronHint: 'e.g., 0 0 7 * * * (every day at 7 AM)'
   },
 
   auth: {
@@ -519,7 +569,9 @@ export default {
     notificationPolicy: 'Notification Policy',
     account: 'Accounts',
     accountManage: 'User Management',
-    orgManage: 'Organization Management'
+    orgManage: 'Organization Management',
+    assetList: 'Asset List',
+    batchManage: 'Batch Jobs'
   },
 
   notification: {

@@ -36,8 +36,10 @@ public class AssetHwService {
 
     @Transactional(readOnly = true)
     public Page<AssetHwResponse> search(String keyword, Long companyId, String status,
-                                         String assetTypeCd, Pageable pageable) {
-        return assetHwRepository.search(keyword, companyId, status, assetTypeCd, pageable)
+                                         String assetTypeCd, String assetCategory,
+                                         String assetSubCategory, Pageable pageable) {
+        return assetHwRepository.search(keyword, companyId, status, assetTypeCd,
+                        assetCategory, assetSubCategory, pageable)
                 .map(this::toResponse);
     }
 
@@ -60,6 +62,8 @@ public class AssetHwService {
         AssetHw asset = AssetHw.builder()
                 .assetNm(req.getAssetNm())
                 .assetTypeCd(req.getAssetTypeCd())
+                .assetCategory(req.getAssetCategory())
+                .assetSubCategory(req.getAssetSubCategory())
                 .manufacturer(req.getManufacturer())
                 .modelNm(req.getModelNm())
                 .serialNo(req.getSerialNo())
@@ -95,7 +99,7 @@ public class AssetHwService {
         asset.update(req.getAssetNm(), req.getAssetTypeCd(), req.getManufacturer(),
                 req.getModelNm(), req.getSerialNo(), req.getIpAddress(), req.getMacAddress(),
                 req.getLocation(), req.getIntroducedAt(), req.getWarrantyEndAt(),
-                manager, req.getDescription());
+                manager, req.getDescription(), req.getAssetCategory(), req.getAssetSubCategory());
         asset.setUpdatedBy(currentUserId);
 
         return toResponse(asset);
@@ -190,6 +194,8 @@ public class AssetHwService {
                 asset.getWarrantyEndAt() != null ? asset.getWarrantyEndAt().toString() : null,
                 req.getWarrantyEndAt() != null ? req.getWarrantyEndAt().toString() : null, userId);
         addHistoryIfChanged(histories, id, "description", asset.getDescription(), req.getDescription(), userId);
+        addHistoryIfChanged(histories, id, "assetCategory", asset.getAssetCategory(), req.getAssetCategory(), userId);
+        addHistoryIfChanged(histories, id, "assetSubCategory", asset.getAssetSubCategory(), req.getAssetSubCategory(), userId);
 
         return histories;
     }
@@ -212,6 +218,8 @@ public class AssetHwService {
                 .assetHwId(asset.getAssetHwId())
                 .assetNm(asset.getAssetNm())
                 .assetTypeCd(asset.getAssetTypeCd())
+                .assetCategory(asset.getAssetCategory())
+                .assetSubCategory(asset.getAssetSubCategory())
                 .manufacturer(asset.getManufacturer())
                 .modelNm(asset.getModelNm())
                 .serialNo(asset.getSerialNo())

@@ -18,6 +18,9 @@ public class AssetHwUpdateRequest {
     @NotBlank(message = "자산유형코드는 필수입니다.")
     private String assetTypeCd;
 
+    private String assetCategory;
+    private String assetSubCategory;
+
     private String manufacturer;
     private String modelNm;
     private String serialNo;

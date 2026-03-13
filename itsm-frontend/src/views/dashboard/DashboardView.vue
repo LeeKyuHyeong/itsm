@@ -34,6 +34,17 @@
       </div>
     </div>
 
+    <!-- 자산 분류별 현황 -->
+    <div class="asset-category-card" v-if="assetStats">
+      <h3>{{ t('dashboard.assetByCategory') }}</h3>
+      <div class="asset-category-grid">
+        <div class="asset-cat-item" v-for="(count, cat) in assetStats.categoryCounts" :key="cat">
+          <span class="asset-cat-count">{{ count }}</span>
+          <span class="asset-cat-label">{{ t(`asset.category${catKey(cat)}`) }}</span>
+        </div>
+      </div>
+    </div>
+
     <div class="stats-grid" v-if="stats">
       <!-- 상태별 장애 건수 -->
       <div class="stat-card">
@@ -187,13 +198,20 @@ import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import api from '@/api/index.js'
+import { assetStatApi } from '@/api/asset.js'
 import BaseTable from '@/components/common/BaseTable.vue'
 import BaseStatusBadge from '@/components/common/BaseStatusBadge.vue'
 
 const { t } = useI18n()
 const router = useRouter()
 const stats = ref(null)
+const assetStats = ref(null)
 const loading = ref(false)
+
+const catKey = (cat) => {
+  const map = { INFRA_HW: 'InfraHw', INFRA_SW: 'InfraSw', OA: 'Oa' }
+  return map[cat] || cat
+}
 
 const columns = computed(() => [
   { key: 'incidentId', label: 'ID', width: '60px', align: 'center' },
@@ -242,8 +260,18 @@ const loadStats = async () => {
   }
 }
 
+const loadAssetStats = async () => {
+  try {
+    const res = await assetStatApi.getStats()
+    assetStats.value = res.data.data || res.data
+  } catch (e) {
+    console.error('자산 통계 조회 실패:', e)
+  }
+}
+
 onMounted(() => {
   loadStats()
+  loadAssetStats()
 })
 </script>
 
@@ -473,4 +501,12 @@ onMounted(() => {
   margin: 0 0 var(--spacing-md) 0;
   font-size: var(--font-size-md);
 }
+
+/* Asset category card */
+.asset-category-card { background: var(--color-bg-white); border: 1px solid var(--color-border); border-radius: 8px; padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.asset-category-card h3 { margin: 0 0 var(--spacing-md) 0; font-size: var(--font-size-md); }
+.asset-category-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-md); }
+.asset-cat-item { text-align: center; padding: var(--spacing-md); background: var(--color-stats-row-bg); border-radius: 8px; }
+.asset-cat-count { display: block; font-size: 28px; font-weight: 700; color: var(--color-primary); }
+.asset-cat-label { font-size: var(--font-size-sm); color: var(--color-text-muted); }
 </style>

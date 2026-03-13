@@ -33,8 +33,10 @@ public class AssetSwService {
 
     @Transactional(readOnly = true)
     public Page<AssetSwResponse> search(String keyword, Long companyId, String status,
-                                         String swTypeCd, Pageable pageable) {
-        return assetSwRepository.search(keyword, companyId, status, swTypeCd, pageable)
+                                         String swTypeCd, String assetCategory,
+                                         String assetSubCategory, Pageable pageable) {
+        return assetSwRepository.search(keyword, companyId, status, swTypeCd,
+                        assetCategory, assetSubCategory, pageable)
                 .map(this::toResponse);
     }
 
@@ -57,6 +59,8 @@ public class AssetSwService {
         AssetSw sw = AssetSw.builder()
                 .swNm(req.getSwNm())
                 .swTypeCd(req.getSwTypeCd())
+                .assetCategory(req.getAssetCategory())
+                .assetSubCategory(req.getAssetSubCategory())
                 .version(req.getVersion())
                 .licenseKey(req.getLicenseKey())
                 .licenseCnt(req.getLicenseCnt())
@@ -88,7 +92,7 @@ public class AssetSwService {
 
         sw.update(req.getSwNm(), req.getSwTypeCd(), req.getVersion(), req.getLicenseKey(),
                 req.getLicenseCnt(), req.getInstalledAt(), req.getExpiredAt(),
-                manager, req.getDescription());
+                manager, req.getDescription(), req.getAssetCategory(), req.getAssetSubCategory());
         sw.setUpdatedBy(currentUserId);
 
         return toResponse(sw);
@@ -140,6 +144,8 @@ public class AssetSwService {
                 sw.getExpiredAt() != null ? sw.getExpiredAt().toString() : null,
                 req.getExpiredAt() != null ? req.getExpiredAt().toString() : null, userId);
         addHistoryIfChanged(histories, id, "description", sw.getDescription(), req.getDescription(), userId);
+        addHistoryIfChanged(histories, id, "assetCategory", sw.getAssetCategory(), req.getAssetCategory(), userId);
+        addHistoryIfChanged(histories, id, "assetSubCategory", sw.getAssetSubCategory(), req.getAssetSubCategory(), userId);
 
         return histories;
     }
@@ -162,6 +168,8 @@ public class AssetSwService {
                 .assetSwId(sw.getAssetSwId())
                 .swNm(sw.getSwNm())
                 .swTypeCd(sw.getSwTypeCd())
+                .assetCategory(sw.getAssetCategory())
+                .assetSubCategory(sw.getAssetSubCategory())
                 .version(sw.getVersion())
                 .licenseKey(sw.getLicenseKey())
                 .licenseCnt(sw.getLicenseCnt())

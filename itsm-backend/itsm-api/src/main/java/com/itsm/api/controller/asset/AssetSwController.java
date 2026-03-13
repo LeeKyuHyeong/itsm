@@ -26,8 +26,11 @@ public class AssetSwController {
             @RequestParam(required = false) Long companyId,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String swTypeCd,
+            @RequestParam(required = false) String assetCategory,
+            @RequestParam(required = false) String assetSubCategory,
             Pageable pageable) {
-        return ApiResponse.success(assetSwService.search(keyword, companyId, status, swTypeCd, pageable));
+        return ApiResponse.success(assetSwService.search(keyword, companyId, status, swTypeCd,
+                assetCategory, assetSubCategory, pageable));
     }
 
     @GetMapping("/{assetSwId}")

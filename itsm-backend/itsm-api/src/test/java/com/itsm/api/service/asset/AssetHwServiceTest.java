@@ -79,6 +79,8 @@ class AssetHwServiceTest {
         assetHw = AssetHw.builder()
                 .assetNm("서버#1")
                 .assetTypeCd("SERVER")
+                .assetCategory("INFRA_HW")
+                .assetSubCategory("SERVER_RACK")
                 .manufacturer("Dell")
                 .modelNm("PowerEdge R740")
                 .serialNo("SN-001")
@@ -96,10 +98,10 @@ class AssetHwServiceTest {
         // given
         Pageable pageable = PageRequest.of(0, 20);
         Page<AssetHw> page = new PageImpl<>(List.of(assetHw), pageable, 1);
-        given(assetHwRepository.search(null, null, null, null, pageable)).willReturn(page);
+        given(assetHwRepository.search(null, null, null, null, null, null, pageable)).willReturn(page);
 
         // when
-        Page<AssetHwResponse> result = assetHwService.search(null, null, null, null, pageable);
+        Page<AssetHwResponse> result = assetHwService.search(null, null, null, null, null, null, pageable);
 
         // then
         assertThat(result.getContent()).hasSize(1);
@@ -140,7 +142,8 @@ class AssetHwServiceTest {
     void create_success() {
         // given
         AssetHwCreateRequest req = new AssetHwCreateRequest(
-                "서버#2", "SERVER", "HP", "DL380", "SN-002",
+                "서버#2", "SERVER", "INFRA_HW", "SERVER_RACK",
+                "HP", "DL380", "SN-002",
                 "10.0.0.1", "11:22:33:44:55:66", "IDC 2층",
                 LocalDate.of(2025, 1, 1), LocalDate.of(2028, 1, 1),
                 1L, 10L, "새 서버");
@@ -159,6 +162,8 @@ class AssetHwServiceTest {
         // then
         assertThat(result.getAssetNm()).isEqualTo("서버#2");
         assertThat(result.getAssetTypeCd()).isEqualTo("SERVER");
+        assertThat(result.getAssetCategory()).isEqualTo("INFRA_HW");
+        assertThat(result.getAssetSubCategory()).isEqualTo("SERVER_RACK");
         verify(assetHwRepository).save(any(AssetHw.class));
     }
 
@@ -167,7 +172,8 @@ class AssetHwServiceTest {
     void update_savesHistory() {
         // given
         AssetHwUpdateRequest req = new AssetHwUpdateRequest(
-                "서버#1-변경", "SERVER", "Dell", "PowerEdge R740", "SN-001",
+                "서버#1-변경", "SERVER", "INFRA_HW", "SERVER_RACK",
+                "Dell", "PowerEdge R740", "SN-001",
                 "192.168.1.200", "AA:BB:CC:DD:EE:FF", "IDC 1층",
                 null, null, 10L, "변경됨");
 

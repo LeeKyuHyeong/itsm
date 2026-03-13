@@ -17,6 +17,8 @@ public class AssetHwResponse {
     private Long assetHwId;
     private String assetNm;
     private String assetTypeCd;
+    private String assetCategory;
+    private String assetSubCategory;
     private String manufacturer;
     private String modelNm;
     private String serialNo;

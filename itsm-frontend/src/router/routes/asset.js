@@ -1,5 +1,11 @@
 export default [
   {
+    path: '/assets',
+    name: 'AssetList',
+    component: () => import('@/views/asset/AssetListView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/assets/hw',
     name: 'AssetHwList',
     component: () => import('@/views/asset/AssetHwListView.vue'),

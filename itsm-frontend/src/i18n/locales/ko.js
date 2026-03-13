@@ -100,7 +100,8 @@ export default {
     month: '월',
     priorityOpen: '우선순위별 미처리 장애',
     recentIncidents: '최근 장애',
-    noIncidents: '등록된 장애가 없습니다.'
+    noIncidents: '등록된 장애가 없습니다.',
+    assetByCategory: '자산 분류별 현황'
   },
 
   // 장애관리
@@ -288,7 +289,47 @@ export default {
     changedAt: '변경일시',
     noHistory: '변경 이력이 없습니다.',
     basicInfo: '기본 정보',
-    countUnit: '{n}건'
+    countUnit: '{n}건',
+    category: '대분류',
+    subCategory: '중분류',
+    categoryInfraHw: '운영장비',
+    categoryInfraSw: '운영SW',
+    categoryOa: 'OA자산',
+    subServerRack: '랙마운트 서버',
+    subServerBlade: '블레이드 서버',
+    subServerTower: '타워 서버',
+    subStorageSan: 'SAN 스토리지',
+    subStorageNas: 'NAS',
+    subNetworkSwitch: '네트워크 스위치',
+    subNetworkRouter: '라우터',
+    subNetworkFw: '방화벽',
+    subNetworkLb: '로드밸런서',
+    subNetworkAp: '무선AP',
+    subSecurityIds: 'IDS/IPS',
+    subSecurityWaf: 'WAF',
+    subPowerUps: 'UPS',
+    subPowerPdu: 'PDU',
+    subInfraKvm: 'KVM/콘솔',
+    subSwOs: '운영체제',
+    subSwDb: '데이터베이스',
+    subSwWas: 'WAS/웹서버',
+    subSwMiddleware: '미들웨어',
+    subSwMonitoring: '모니터링',
+    subSwBackup: '백업솔루션',
+    subSwSecurity: '보안솔루션',
+    subSwVirtualization: '가상화',
+    subSwContainer: '컨테이너/오케',
+    subSwCicd: 'CI/CD',
+    subSwLicense: '상용라이선스',
+    subOaDesktop: '데스크톱',
+    subOaLaptop: '노트북',
+    subOaMonitor: '모니터',
+    subOaPrinter: '프린터/복합기',
+    subOaPhone: '전화/VoIP',
+    subOaTablet: '태블릿',
+    subOaPeripheral: '주변기기',
+    subOaProjector: '프로젝터',
+    assetList: '자산 목록'
   },
 
   // 정기점검
@@ -468,7 +509,16 @@ export default {
     policyEdit: '알림 정책 수정',
     policyAdd: '알림 정책 추가',
     notificationTypeCode: '알림유형코드',
-    targetRoleCode: '대상역할코드'
+    targetRoleCode: '대상역할코드',
+    batchManage: '배치관리',
+    batchJobName: '배치명',
+    batchDescription: '설명',
+    cronExpression: 'CRON 표현식',
+    lastExecutedAt: '마지막 실행',
+    lastResult: '실행 결과',
+    noBatchJobs: '등록된 배치 작업이 없습니다.',
+    batchEdit: '배치 작업 수정',
+    cronHint: '예: 0 0 7 * * * (매일 오전 7시)'
   },
 
   // 인증
@@ -532,7 +582,9 @@ export default {
     notificationPolicy: '알림 정책 관리',
     account: '계정관리',
     accountManage: '사용자 관리',
-    orgManage: '조직 관리'
+    orgManage: '조직 관리',
+    assetList: '자산 목록',
+    batchManage: '배치관리'
   },
 
   // 알림

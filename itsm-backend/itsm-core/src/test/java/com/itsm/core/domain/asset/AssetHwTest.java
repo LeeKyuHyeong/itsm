@@ -49,6 +49,45 @@ class AssetHwTest {
         assertThat(asset.getCompany()).isNotNull();
         assertThat(asset.getStatus()).isEqualTo("ACTIVE");
         assertThat(asset.getDescription()).isEqualTo("메인 서버");
+        assertThat(asset.getAssetCategory()).isEqualTo("INFRA_HW");
+    }
+
+    @Test
+    @DisplayName("Builder로 AssetHw 생성 시 assetCategory 미지정이면 INFRA_HW가 기본값이다")
+    void builder_defaultAssetCategory() {
+        // given
+        Company company = Company.builder().companyNm("테스트회사").bizNo("123-45-67890").build();
+
+        // when
+        AssetHw asset = AssetHw.builder()
+                .assetNm("서버#1")
+                .assetTypeCd("SERVER")
+                .company(company)
+                .build();
+
+        // then
+        assertThat(asset.getAssetCategory()).isEqualTo("INFRA_HW");
+        assertThat(asset.getAssetSubCategory()).isNull();
+    }
+
+    @Test
+    @DisplayName("Builder로 AssetHw 생성 시 assetCategory를 지정하면 해당 값이 설정된다")
+    void builder_customAssetCategory() {
+        // given
+        Company company = Company.builder().companyNm("테스트회사").bizNo("123-45-67890").build();
+
+        // when
+        AssetHw asset = AssetHw.builder()
+                .assetNm("데스크톱#1")
+                .assetTypeCd("DESKTOP")
+                .assetCategory("OA")
+                .assetSubCategory("OA_DESKTOP")
+                .company(company)
+                .build();
+
+        // then
+        assertThat(asset.getAssetCategory()).isEqualTo("OA");
+        assertThat(asset.getAssetSubCategory()).isEqualTo("OA_DESKTOP");
     }
 
     @Test
@@ -66,7 +105,7 @@ class AssetHwTest {
         asset.update("서버#2", "NETWORK", "HP", "ProLiant DL380",
                 "SN-002", "10.0.0.1", "11:22:33:44:55:66",
                 "IDC 2층", LocalDate.of(2025, 6, 1), LocalDate.of(2028, 6, 1),
-                null, "변경된 서버");
+                null, "변경된 서버", "INFRA_HW", "NETWORK_SWITCH");
 
         // then
         assertThat(asset.getAssetNm()).isEqualTo("서버#2");
@@ -77,6 +116,8 @@ class AssetHwTest {
         assertThat(asset.getIpAddress()).isEqualTo("10.0.0.1");
         assertThat(asset.getLocation()).isEqualTo("IDC 2층");
         assertThat(asset.getDescription()).isEqualTo("변경된 서버");
+        assertThat(asset.getAssetCategory()).isEqualTo("INFRA_HW");
+        assertThat(asset.getAssetSubCategory()).isEqualTo("NETWORK_SWITCH");
     }
 
     @Test

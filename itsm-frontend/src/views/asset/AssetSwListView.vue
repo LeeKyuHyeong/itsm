@@ -17,6 +17,13 @@
         </select>
       </div>
       <div class="filter-group">
+        <label class="filter-label">{{ t('asset.subCategory') }}</label>
+        <select v-model="filters.assetSubCategory" class="filter-select" @change="loadAssets">
+          <option value="">{{ t('common.all') }}</option>
+          <option v-for="sc in subCategoriesInfraSw" :key="sc.code" :value="sc.code">{{ sc.name }}</option>
+        </select>
+      </div>
+      <div class="filter-group">
         <label class="filter-label">{{ t('asset.swType') }}</label>
         <select v-model="filters.swTypeCd" class="filter-select" @change="loadAssets">
           <option value="">{{ t('common.all') }}</option>
@@ -116,6 +123,16 @@
           </div>
           <div class="form-row">
             <div class="form-group">
+              <label class="form-label">{{ t('asset.subCategory') }}</label>
+              <select v-model="form.assetSubCategory" class="form-input">
+                <option value="">{{ t('common.select') }}</option>
+                <option v-for="sc in subCategoriesInfraSw" :key="sc.code" :value="sc.code">{{ sc.name }}</option>
+              </select>
+            </div>
+            <div class="form-group"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
               <label class="form-label">{{ t('asset.version') }}</label>
               <input v-model="form.version" type="text" class="form-input" />
             </div>
@@ -191,6 +208,7 @@ const assets = ref([])
 const companies = ref([])
 const users = ref([])
 const swTypes = ref([])
+const subCategoriesInfraSw = ref([])
 const loading = ref(false)
 const saving = ref(false)
 const saveError = ref('')
@@ -198,11 +216,11 @@ const showModal = ref(false)
 const isEditing = ref(false)
 const editingId = ref(null)
 
-const filters = reactive({ status: '', swTypeCd: '', companyId: '', keyword: '' })
+const filters = reactive({ status: '', assetSubCategory: '', swTypeCd: '', companyId: '', keyword: '' })
 const pagination = reactive({ page: 1, size: 20, total: 0 })
 
 const form = reactive({
-  swNm: '', swTypeCd: '', version: '', licenseKey: '', licenseCnt: null,
+  swNm: '', assetCategory: 'INFRA_SW', assetSubCategory: '', swTypeCd: '', version: '', licenseKey: '', licenseCnt: null,
   installedAt: '', expiredAt: '', companyId: '', managerId: '', description: ''
 })
 
@@ -225,8 +243,12 @@ function getCodeName(group, code) {
 }
 
 onMounted(async () => {
-  await commonCodeStore.fetchCodes('ASSET_SW_TYPE')
+  await Promise.all([
+    commonCodeStore.fetchCodes('ASSET_SW_TYPE'),
+    commonCodeStore.fetchCodes('ASSET_SUB_INFRA_SW')
+  ])
   swTypes.value = commonCodeStore.getCodes('ASSET_SW_TYPE')
+  subCategoriesInfraSw.value = commonCodeStore.getCodes('ASSET_SUB_INFRA_SW')
   loadCompanies()
   loadUsers()
   loadAssets()
@@ -253,6 +275,7 @@ async function loadAssets() {
   try {
     const params = { page: pagination.page - 1, size: pagination.size }
     if (filters.status) params.status = filters.status
+    if (filters.assetSubCategory) params.assetSubCategory = filters.assetSubCategory
     if (filters.swTypeCd) params.swTypeCd = filters.swTypeCd
     if (filters.companyId) params.companyId = filters.companyId
     if (filters.keyword) params.keyword = filters.keyword
@@ -273,7 +296,7 @@ function openCreateModal() {
   isEditing.value = false
   editingId.value = null
   Object.assign(form, {
-    swNm: '', swTypeCd: '', version: '', licenseKey: '', licenseCnt: null,
+    swNm: '', assetCategory: 'INFRA_SW', assetSubCategory: '', swTypeCd: '', version: '', licenseKey: '', licenseCnt: null,
     installedAt: '', expiredAt: '', companyId: '', managerId: '', description: ''
   })
   saveError.value = ''
@@ -285,6 +308,8 @@ function openEditModal(asset) {
   editingId.value = asset.assetSwId
   Object.assign(form, {
     swNm: asset.swNm || '',
+    assetCategory: asset.assetCategory || 'INFRA_SW',
+    assetSubCategory: asset.assetSubCategory || '',
     swTypeCd: asset.swTypeCd || '',
     version: asset.version || '',
     licenseKey: asset.licenseKey || '',

@@ -25,14 +25,27 @@ public interface AssetHwRepository extends JpaRepository<AssetHw, Long> {
             "(:keyword IS NULL OR a.assetNm LIKE %:keyword% OR a.serialNo LIKE %:keyword% OR a.ipAddress LIKE %:keyword%) " +
             "AND (:companyId IS NULL OR a.company.companyId = :companyId) " +
             "AND (:status IS NULL OR a.status = :status) " +
-            "AND (:assetTypeCd IS NULL OR a.assetTypeCd = :assetTypeCd)")
+            "AND (:assetTypeCd IS NULL OR a.assetTypeCd = :assetTypeCd) " +
+            "AND (:assetCategory IS NULL OR a.assetCategory = :assetCategory) " +
+            "AND (:assetSubCategory IS NULL OR a.assetSubCategory = :assetSubCategory)")
     Page<AssetHw> search(@Param("keyword") String keyword,
                          @Param("companyId") Long companyId,
                          @Param("status") String status,
                          @Param("assetTypeCd") String assetTypeCd,
+                         @Param("assetCategory") String assetCategory,
+                         @Param("assetSubCategory") String assetSubCategory,
                          Pageable pageable);
 
     Optional<AssetHw> findBySerialNo(String serialNo);
 
     List<AssetHw> findByManagerUserId(Long managerId);
+
+    @Query("SELECT a.assetCategory, COUNT(a) FROM AssetHw a WHERE a.status != 'DISPOSED' GROUP BY a.assetCategory")
+    List<Object[]> countByCategory();
+
+    @Query("SELECT a.assetSubCategory, COUNT(a) FROM AssetHw a WHERE a.assetCategory = :category AND a.status != 'DISPOSED' GROUP BY a.assetSubCategory")
+    List<Object[]> countBySubCategory(@Param("category") String category);
+
+    @Query("SELECT a.status, COUNT(a) FROM AssetHw a GROUP BY a.status")
+    List<Object[]> countByStatus();
 }

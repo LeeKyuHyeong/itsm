@@ -28,6 +28,12 @@ public class AssetSw extends BaseEntity {
     @Column(name = "sw_type_cd", nullable = false, length = 50)
     private String swTypeCd;
 
+    @Column(name = "asset_category", length = 20)
+    private String assetCategory;
+
+    @Column(name = "asset_sub_category", length = 30)
+    private String assetSubCategory;
+
     @Column(name = "version", length = 50)
     private String version;
 
@@ -58,11 +64,14 @@ public class AssetSw extends BaseEntity {
     private String description;
 
     @Builder
-    public AssetSw(String swNm, String swTypeCd, String version, String licenseKey,
+    public AssetSw(String swNm, String swTypeCd, String assetCategory, String assetSubCategory,
+                   String version, String licenseKey,
                    Integer licenseCnt, LocalDate installedAt, LocalDate expiredAt,
                    Company company, User manager, String status, String description) {
         this.swNm = swNm;
         this.swTypeCd = swTypeCd;
+        this.assetCategory = assetCategory != null ? assetCategory : "INFRA_SW";
+        this.assetSubCategory = assetSubCategory;
         this.version = version;
         this.licenseKey = licenseKey;
         this.licenseCnt = licenseCnt;
@@ -76,7 +85,7 @@ public class AssetSw extends BaseEntity {
 
     public void update(String swNm, String swTypeCd, String version, String licenseKey,
                        Integer licenseCnt, LocalDate installedAt, LocalDate expiredAt,
-                       User manager, String description) {
+                       User manager, String description, String assetCategory, String assetSubCategory) {
         this.swNm = swNm;
         this.swTypeCd = swTypeCd;
         this.version = version;
@@ -86,6 +95,8 @@ public class AssetSw extends BaseEntity {
         this.expiredAt = expiredAt;
         this.manager = manager;
         this.description = description;
+        this.assetCategory = assetCategory;
+        this.assetSubCategory = assetSubCategory;
     }
 
     public void changeStatus(String status) {

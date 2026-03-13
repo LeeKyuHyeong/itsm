@@ -17,6 +17,20 @@
         </select>
       </div>
       <div class="filter-group">
+        <label class="filter-label">{{ t('asset.category') }}</label>
+        <select v-model="filters.assetCategory" class="filter-select" @change="onCategoryChange">
+          <option value="">{{ t('common.all') }}</option>
+          <option v-for="cat in assetCategories" :key="cat.code" :value="cat.code">{{ cat.name }}</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">{{ t('asset.subCategory') }}</label>
+        <select v-model="filters.assetSubCategory" class="filter-select" @change="loadAssets">
+          <option value="">{{ t('common.all') }}</option>
+          <option v-for="sc in filteredSubCategories" :key="sc.code" :value="sc.code">{{ sc.name }}</option>
+        </select>
+      </div>
+      <div class="filter-group">
         <label class="filter-label">{{ t('asset.assetType') }}</label>
         <select v-model="filters.assetTypeCd" class="filter-select" @change="loadAssets">
           <option value="">{{ t('common.all') }}</option>
@@ -111,6 +125,22 @@
               <select v-model="form.assetTypeCd" class="form-input" required>
                 <option value="">{{ t('common.select') }}</option>
                 <option v-for="tp in assetTypes" :key="tp.code" :value="tp.code">{{ tp.name }}</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">{{ t('asset.category') }}</label>
+              <select v-model="form.assetCategory" class="form-input">
+                <option value="">{{ t('common.select') }}</option>
+                <option v-for="cat in assetCategories" :key="cat.code" :value="cat.code">{{ cat.name }}</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">{{ t('asset.subCategory') }}</label>
+              <select v-model="form.assetSubCategory" class="form-input">
+                <option value="">{{ t('common.select') }}</option>
+                <option v-for="sc in formSubCategories" :key="sc.code" :value="sc.code">{{ sc.name }}</option>
               </select>
             </div>
           </div>
@@ -211,11 +241,27 @@ const showModal = ref(false)
 const isEditing = ref(false)
 const editingId = ref(null)
 
-const filters = reactive({ status: '', assetTypeCd: '', companyId: '', keyword: '' })
+const assetCategories = ref([])
+const subCategoriesInfraHw = ref([])
+const subCategoriesOa = ref([])
+
+const filters = reactive({ status: '', assetCategory: '', assetSubCategory: '', assetTypeCd: '', companyId: '', keyword: '' })
+
+const filteredSubCategories = computed(() => {
+  if (filters.assetCategory === 'INFRA_HW') return subCategoriesInfraHw.value
+  if (filters.assetCategory === 'OA') return subCategoriesOa.value
+  return [...subCategoriesInfraHw.value, ...subCategoriesOa.value]
+})
+
+const formSubCategories = computed(() => {
+  if (form.assetCategory === 'INFRA_HW') return subCategoriesInfraHw.value
+  if (form.assetCategory === 'OA') return subCategoriesOa.value
+  return [...subCategoriesInfraHw.value, ...subCategoriesOa.value]
+})
 const pagination = reactive({ page: 1, size: 20, total: 0 })
 
 const form = reactive({
-  assetNm: '', assetTypeCd: '', manufacturer: '', modelNm: '',
+  assetNm: '', assetCategory: '', assetSubCategory: '', assetTypeCd: '', manufacturer: '', modelNm: '',
   serialNo: '', ipAddress: '', macAddress: '', location: '',
   introducedAt: '', warrantyEndAt: '', companyId: '', managerId: '', description: ''
 })
@@ -238,9 +284,22 @@ function getCodeName(group, code) {
   return commonCodeStore.getCodeName(group, code) || code
 }
 
+function onCategoryChange() {
+  filters.assetSubCategory = ''
+  loadAssets()
+}
+
 onMounted(async () => {
-  await commonCodeStore.fetchCodes('ASSET_HW_TYPE')
+  await Promise.all([
+    commonCodeStore.fetchCodes('ASSET_HW_TYPE'),
+    commonCodeStore.fetchCodes('ASSET_CATEGORY'),
+    commonCodeStore.fetchCodes('ASSET_SUB_INFRA_HW'),
+    commonCodeStore.fetchCodes('ASSET_SUB_OA')
+  ])
   assetTypes.value = commonCodeStore.getCodes('ASSET_HW_TYPE')
+  assetCategories.value = commonCodeStore.getCodes('ASSET_CATEGORY').filter(c => c.code === 'INFRA_HW' || c.code === 'OA')
+  subCategoriesInfraHw.value = commonCodeStore.getCodes('ASSET_SUB_INFRA_HW')
+  subCategoriesOa.value = commonCodeStore.getCodes('ASSET_SUB_OA')
   loadCompanies()
   loadUsers()
   loadAssets()
@@ -267,6 +326,8 @@ async function loadAssets() {
   try {
     const params = { page: pagination.page - 1, size: pagination.size }
     if (filters.status) params.status = filters.status
+    if (filters.assetCategory) params.assetCategory = filters.assetCategory
+    if (filters.assetSubCategory) params.assetSubCategory = filters.assetSubCategory
     if (filters.assetTypeCd) params.assetTypeCd = filters.assetTypeCd
     if (filters.companyId) params.companyId = filters.companyId
     if (filters.keyword) params.keyword = filters.keyword
@@ -287,7 +348,7 @@ function openCreateModal() {
   isEditing.value = false
   editingId.value = null
   Object.assign(form, {
-    assetNm: '', assetTypeCd: '', manufacturer: '', modelNm: '',
+    assetNm: '', assetCategory: '', assetSubCategory: '', assetTypeCd: '', manufacturer: '', modelNm: '',
     serialNo: '', ipAddress: '', macAddress: '', location: '',
     introducedAt: '', warrantyEndAt: '', companyId: '', managerId: '', description: ''
   })
@@ -300,6 +361,8 @@ function openEditModal(asset) {
   editingId.value = asset.assetHwId
   Object.assign(form, {
     assetNm: asset.assetNm || '',
+    assetCategory: asset.assetCategory || '',
+    assetSubCategory: asset.assetSubCategory || '',
     assetTypeCd: asset.assetTypeCd || '',
     manufacturer: asset.manufacturer || '',
     modelNm: asset.modelNm || '',

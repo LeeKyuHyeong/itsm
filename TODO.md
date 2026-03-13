@@ -4,21 +4,17 @@
 
 ---
 
-## Phase 11: UI 테마 (라이트/다크 모드)
+## Phase 11: UI 테마 (라이트/다크 모드) ✅
 
 ### 프론트엔드
-- [ ] CSS 변수 기반 테마 시스템 구축 (`:root` / `[data-theme="dark"]`)
-- [ ] 다크 테마 색상 팔레트 정의
-  - [ ] 배경색 (surface, card, sidebar, header)
-  - [ ] 텍스트 색상 (primary, secondary, disabled)
-  - [ ] 보더, 쉐도우, 오버레이 색상
-  - [ ] 상태 뱃지 색상 (green, red, blue, gray 계열 다크 대응)
-  - [ ] 차트 색상 대응
-- [ ] 테마 토글 버튼 (AppHeader에 추가)
-- [ ] localStorage 기반 테마 설정 유지 (`itsm-theme`)
-- [ ] 사이드바 다크 테마 대응 (현재 이미 다크 계열이므로 라이트 모드 사이드바 추가)
-- [ ] 테이블, 모달, 폼 등 공통 컴포넌트 테마 대응
-- [ ] 로그인 화면 테마 대응
+- [x] CSS 변수 기반 테마 시스템 구축 (`:root` / `[data-theme="dark"]`) — 라이트 80+ / 다크 80+ 변수
+- [x] 다크 테마 색상 팔레트 정의 (배경, 텍스트, 보더, 뱃지, 차트 등 전 영역)
+- [x] 테마 토글 버튼 (AppHeader 해/달 아이콘)
+- [x] localStorage 기반 테마 설정 유지 (`itsm-theme`)
+- [x] 전체 41개 파일 하드코딩 색상 → CSS 변수 교체 (200건+)
+- [x] i18n 누락 전수 검사 및 보완 (471개 번역 키, 사이드바 메뉴 포함)
+- [x] @vuepic/vue-datepicker 도입 (날짜 입력 locale 대응)
+- [x] 역할코드 ROLE_ 접두사 불일치 수정 (설정관리 메뉴 접근 불가 해결)
 
 ---
 
@@ -80,21 +76,21 @@
 | OA_PROJECTOR | 프로젝터 | Epson, BenQ |
 
 ### DB 스키마 변경
-- [ ] `tb_asset_hw` 테이블에 `asset_category` (대분류), `asset_sub_category` (중분류) 컬럼 추가
-- [ ] `tb_asset_sw` 테이블에 `asset_category`, `asset_sub_category` 컬럼 추가
-- [ ] 공통코드에 자산 대분류/중분류 코드 등록 (ASSET_CATEGORY, ASSET_SUB_CATEGORY 그룹)
-- [ ] 마이그레이션 SQL 작성 (기존 데이터 분류 매핑)
+- [x] `tb_asset_hw` 테이블에 `asset_category` (대분류), `asset_sub_category` (중분류) 컬럼 추가
+- [x] `tb_asset_sw` 테이블에 `asset_category`, `asset_sub_category` 컬럼 추가
+- [x] 공통코드에 자산 대분류/중분류 코드 등록 (ASSET_CATEGORY, ASSET_SUB_CATEGORY 그룹)
+- [x] 마이그레이션 SQL 작성 (기존 데이터 분류 매핑)
 
 ### 백엔드
-- [ ] `AssetHw`, `AssetSw` 엔티티에 분류 필드 추가
-- [ ] 자산 목록 API에 대분류/중분류 필터 추가
-- [ ] 자산 통계 API (분류별 자산 현황)
+- [x] `AssetHw`, `AssetSw` 엔티티에 분류 필드 추가
+- [x] 자산 목록 API에 대분류/중분류 필터 추가
+- [x] 자산 통계 API (분류별 자산 현황)
 
 ### 프론트엔드
-- [ ] 자산 목록 뷰 3탭 구성 (운영장비 / 운영SW / OA)
-- [ ] 중분류 필터 드롭다운 (대분류 선택 시 중분류 연동)
-- [ ] 자산 등록/수정 폼에 대분류/중분류 선택 추가
-- [ ] 대시보드에 자산 분류별 현황 위젯 추가
+- [x] 자산 목록 뷰 3탭 구성 (운영장비 / 운영SW / OA)
+- [x] 중분류 필터 드롭다운 (대분류 선택 시 중분류 연동)
+- [x] 자산 등록/수정 폼에 대분류/중분류 선택 추가
+- [x] 대시보드에 자산 분류별 현황 위젯 추가
 
 ---
 

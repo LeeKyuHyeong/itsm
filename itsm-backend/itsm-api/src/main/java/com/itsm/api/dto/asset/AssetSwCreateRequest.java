@@ -19,6 +19,9 @@ public class AssetSwCreateRequest {
     @NotBlank(message = "SW유형코드는 필수입니다.")
     private String swTypeCd;
 
+    private String assetCategory;
+    private String assetSubCategory;
+
     private String version;
     private String licenseKey;
     private Integer licenseCnt;

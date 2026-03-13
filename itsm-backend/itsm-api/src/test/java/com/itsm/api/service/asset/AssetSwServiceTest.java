@@ -69,6 +69,8 @@ class AssetSwServiceTest {
         assetSw = AssetSw.builder()
                 .swNm("Oracle DB")
                 .swTypeCd("DATABASE")
+                .assetCategory("INFRA_SW")
+                .assetSubCategory("SW_DB")
                 .version("19c")
                 .licenseKey("ORACLE-LIC-001")
                 .licenseCnt(10)
@@ -85,10 +87,10 @@ class AssetSwServiceTest {
         // given
         Pageable pageable = PageRequest.of(0, 20);
         Page<AssetSw> page = new PageImpl<>(List.of(assetSw), pageable, 1);
-        given(assetSwRepository.search(null, null, null, null, pageable)).willReturn(page);
+        given(assetSwRepository.search(null, null, null, null, null, null, pageable)).willReturn(page);
 
         // when
-        Page<AssetSwResponse> result = assetSwService.search(null, null, null, null, pageable);
+        Page<AssetSwResponse> result = assetSwService.search(null, null, null, null, null, null, pageable);
 
         // then
         assertThat(result.getContent()).hasSize(1);
@@ -127,7 +129,8 @@ class AssetSwServiceTest {
     void create_success() {
         // given
         AssetSwCreateRequest req = new AssetSwCreateRequest(
-                "MySQL", "DATABASE", "8.0", "MYSQL-LIC-001", 5,
+                "MySQL", "DATABASE", "INFRA_SW", "SW_DB",
+                "8.0", "MYSQL-LIC-001", 5,
                 LocalDate.of(2025, 1, 1), LocalDate.of(2027, 1, 1),
                 1L, 10L, "새 DB");
 
@@ -144,6 +147,8 @@ class AssetSwServiceTest {
 
         // then
         assertThat(result.getSwNm()).isEqualTo("MySQL");
+        assertThat(result.getAssetCategory()).isEqualTo("INFRA_SW");
+        assertThat(result.getAssetSubCategory()).isEqualTo("SW_DB");
         verify(assetSwRepository).save(any(AssetSw.class));
     }
 
@@ -152,7 +157,8 @@ class AssetSwServiceTest {
     void update_savesHistory() {
         // given
         AssetSwUpdateRequest req = new AssetSwUpdateRequest(
-                "Oracle DB-변경", "DATABASE", "21c", "ORACLE-LIC-002", 20,
+                "Oracle DB-변경", "DATABASE", "INFRA_SW", "SW_DB",
+                "21c", "ORACLE-LIC-002", 20,
                 null, null, 10L, "변경됨");
 
         given(assetSwRepository.findById(1L)).willReturn(Optional.of(assetSw));

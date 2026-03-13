@@ -21,6 +21,8 @@
         <div class="detail-grid">
           <div class="detail-item"><span class="detail-label">{{ t('asset.assetNm') }}</span><span class="detail-value">{{ asset.assetNm }}</span></div>
           <div class="detail-item"><span class="detail-label">{{ t('asset.assetType') }}</span><span class="detail-value">{{ getCodeName('ASSET_HW_TYPE', asset.assetTypeCd) }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ t('asset.category') }}</span><span class="detail-value">{{ getCodeName('ASSET_CATEGORY', asset.assetCategory) }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ t('asset.subCategory') }}</span><span class="detail-value">{{ getSubCategoryName(asset.assetCategory, asset.assetSubCategory) }}</span></div>
           <div class="detail-item"><span class="detail-label">{{ t('asset.manufacturer') }}</span><span class="detail-value">{{ asset.manufacturer || '-' }}</span></div>
           <div class="detail-item"><span class="detail-label">{{ t('asset.model') }}</span><span class="detail-value">{{ asset.modelNm || '-' }}</span></div>
           <div class="detail-item"><span class="detail-label">{{ t('asset.serialNo') }}</span><span class="detail-value">{{ asset.serialNo || '-' }}</span></div>
@@ -170,8 +172,21 @@ function formatDate(dt) {
   return dt.replace('T', ' ').substring(0, 16)
 }
 
+function getSubCategoryName(category, subCategory) {
+  if (!subCategory) return '-'
+  const groupMap = { INFRA_HW: 'ASSET_SUB_INFRA_HW', OA: 'ASSET_SUB_OA' }
+  const group = groupMap[category]
+  if (!group) return subCategory
+  return commonCodeStore.getCodeName(group, subCategory) || subCategory
+}
+
 onMounted(async () => {
-  await commonCodeStore.fetchCodes('ASSET_HW_TYPE')
+  await Promise.all([
+    commonCodeStore.fetchCodes('ASSET_HW_TYPE'),
+    commonCodeStore.fetchCodes('ASSET_CATEGORY'),
+    commonCodeStore.fetchCodes('ASSET_SUB_INFRA_HW'),
+    commonCodeStore.fetchCodes('ASSET_SUB_OA')
+  ])
   loadDetail()
   loadRelations()
   loadHistory()
