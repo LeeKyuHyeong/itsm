@@ -8,9 +8,9 @@ spring:
       maximum-pool-size: 20
       minimum-idle: 10
 
-  flyway:
-    enabled: true
-    baseline-on-migrate: true
+  jpa:
+    hibernate:
+      ddl-auto: update
 
 jwt:
   secret: ${JWT_SECRET}
