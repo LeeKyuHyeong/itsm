@@ -234,7 +234,7 @@ CREATE TABLE `tb_batch_job` (
   `updated_by` bigint DEFAULT NULL,
   PRIMARY KEY (`batch_job_id`),
   UNIQUE KEY `job_name` (`job_name`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -581,7 +581,7 @@ CREATE TABLE `tb_daily_statistics` (
   UNIQUE KEY `idx_daily_stat_unique` (`stat_date`,`stat_type`,`stat_key`),
   KEY `idx_daily_stat_date` (`stat_date`),
   KEY `idx_daily_stat_type` (`stat_type`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -931,7 +931,7 @@ CREATE TABLE `tb_login_history` (
   PRIMARY KEY (`login_history_id`),
   KEY `idx_login_history_user` (`user_id`),
   KEY `idx_login_history_login_at` (`login_at`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1268,7 +1268,7 @@ CREATE TABLE `tb_sim_menu_access_log` (
   PRIMARY KEY (`access_log_id`),
   KEY `idx_sim_menu_access_user` (`user_id`),
   KEY `idx_sim_menu_access_at` (`accessed_at`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
