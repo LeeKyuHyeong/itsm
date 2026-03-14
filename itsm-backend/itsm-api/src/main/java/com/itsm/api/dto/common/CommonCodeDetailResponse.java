@@ -16,6 +16,7 @@ public class CommonCodeDetailResponse {
     private Long detailId;
     private String codeVal;
     private String codeNm;
+    private String codeNmEn;
     private Integer sortOrder;
     private String isActive;
     private LocalDateTime createdAt;

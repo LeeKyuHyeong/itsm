@@ -46,6 +46,7 @@ class CommonCodeServiceTest {
     void setUp() {
         commonCode = CommonCode.builder()
                 .groupNm("우선순위")
+                .groupNmEn("Priority")
                 .groupCd("PRIORITY")
                 .description("우선순위 코드")
                 .isActive("Y")
@@ -57,6 +58,7 @@ class CommonCodeServiceTest {
                 .commonCode(commonCode)
                 .codeVal("HIGH")
                 .codeNm("높음")
+                .codeNmEn("High")
                 .sortOrder(1)
                 .isActive("Y")
                 .createdBy(1L)
@@ -76,6 +78,7 @@ class CommonCodeServiceTest {
         // then
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getGroupNm()).isEqualTo("우선순위");
+        assertThat(result.get(0).getGroupNmEn()).isEqualTo("Priority");
         assertThat(result.get(0).getGroupCd()).isEqualTo("PRIORITY");
     }
 
@@ -84,7 +87,7 @@ class CommonCodeServiceTest {
     void createGroup_success() {
         // given
         CommonCodeGroupCreateRequest req = new CommonCodeGroupCreateRequest(
-                "상태", "STATUS", "상태 코드");
+                "상태", "Status", "STATUS", "상태 코드");
         given(commonCodeRepository.existsByGroupCd("STATUS")).willReturn(false);
         given(commonCodeRepository.save(any(CommonCode.class))).willAnswer(invocation -> {
             CommonCode saved = invocation.getArgument(0);
@@ -97,6 +100,7 @@ class CommonCodeServiceTest {
 
         // then
         assertThat(result.getGroupNm()).isEqualTo("상태");
+        assertThat(result.getGroupNmEn()).isEqualTo("Status");
         assertThat(result.getGroupCd()).isEqualTo("STATUS");
         verify(commonCodeRepository).save(any(CommonCode.class));
     }
@@ -106,7 +110,7 @@ class CommonCodeServiceTest {
     void createGroup_duplicateGroupCd_throwsException() {
         // given
         CommonCodeGroupCreateRequest req = new CommonCodeGroupCreateRequest(
-                "우선순위", "PRIORITY", "중복 코드");
+                "우선순위", "Priority", "PRIORITY", "중복 코드");
         given(commonCodeRepository.existsByGroupCd("PRIORITY")).willReturn(true);
 
         // when & then
@@ -121,7 +125,7 @@ class CommonCodeServiceTest {
     void updateGroup_success() {
         // given
         CommonCodeGroupUpdateRequest req = new CommonCodeGroupUpdateRequest(
-                "우선순위(수정)", "수정된 설명");
+                "우선순위(수정)", "Priority(Modified)", "수정된 설명");
         given(commonCodeRepository.findById(1L)).willReturn(Optional.of(commonCode));
 
         // when
@@ -147,6 +151,7 @@ class CommonCodeServiceTest {
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getCodeVal()).isEqualTo("HIGH");
         assertThat(result.get(0).getCodeNm()).isEqualTo("높음");
+        assertThat(result.get(0).getCodeNmEn()).isEqualTo("High");
     }
 
     @Test
@@ -154,7 +159,7 @@ class CommonCodeServiceTest {
     void createDetail_success() {
         // given
         CommonCodeDetailCreateRequest req = new CommonCodeDetailCreateRequest(
-                "LOW", "낮음", 3);
+                "LOW", "낮음", "Low", 3);
         given(commonCodeRepository.findById(1L)).willReturn(Optional.of(commonCode));
         given(commonCodeDetailRepository.existsByCommonCode_GroupIdAndCodeVal(1L, "LOW")).willReturn(false);
         given(commonCodeDetailRepository.save(any(CommonCodeDetail.class))).willAnswer(invocation -> {
@@ -169,6 +174,7 @@ class CommonCodeServiceTest {
         // then
         assertThat(result.getCodeVal()).isEqualTo("LOW");
         assertThat(result.getCodeNm()).isEqualTo("낮음");
+        assertThat(result.getCodeNmEn()).isEqualTo("Low");
         assertThat(result.getSortOrder()).isEqualTo(3);
         verify(commonCodeDetailRepository).save(any(CommonCodeDetail.class));
     }
@@ -178,7 +184,7 @@ class CommonCodeServiceTest {
     void createDetail_duplicateCodeVal_throwsException() {
         // given
         CommonCodeDetailCreateRequest req = new CommonCodeDetailCreateRequest(
-                "HIGH", "높음", 1);
+                "HIGH", "높음", "High", 1);
         given(commonCodeRepository.findById(1L)).willReturn(Optional.of(commonCode));
         given(commonCodeDetailRepository.existsByCommonCode_GroupIdAndCodeVal(1L, "HIGH")).willReturn(true);
 

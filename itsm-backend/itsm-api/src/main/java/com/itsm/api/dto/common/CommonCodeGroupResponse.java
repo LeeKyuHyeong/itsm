@@ -15,6 +15,7 @@ public class CommonCodeGroupResponse {
 
     private Long groupId;
     private String groupNm;
+    private String groupNmEn;
     private String groupCd;
     private String description;
     private String isActive;

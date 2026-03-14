@@ -1,9 +1,12 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import api from '@/api/index.js'
 
 export const useCommonCodeStore = defineStore('commonCode', () => {
-  // { groupCode: [{ code, name, ... }, ...] }
+  const { locale } = useI18n()
+
+  // { groupCode: [{ code, name, nameEn, ... }, ...] }
   const codeMap = ref({})
 
   function setCodes(groupCode, details) {
@@ -11,13 +14,22 @@ export const useCommonCodeStore = defineStore('commonCode', () => {
   }
 
   function getCodes(groupCode) {
-    return codeMap.value[groupCode] || []
+    const list = codeMap.value[groupCode] || []
+    if (locale.value === 'en') {
+      return list.map(item => ({
+        ...item,
+        name: item.nameEn || item.name
+      }))
+    }
+    return list
   }
 
   function getCodeName(groupCode, code) {
     const list = codeMap.value[groupCode] || []
     const found = list.find(item => item.code === code)
-    return found?.name || code
+    if (!found) return code
+    if (locale.value === 'en' && found.nameEn) return found.nameEn
+    return found.name || code
   }
 
   function clearCodes() {
@@ -29,7 +41,11 @@ export const useCommonCodeStore = defineStore('commonCode', () => {
     try {
       const { data } = await api.get(`/common-codes/${groupCd}`)
       const details = data.data || data || []
-      codeMap.value[groupCd] = details.map(d => ({ code: d.codeVal, name: d.codeNm }))
+      codeMap.value[groupCd] = details.map(d => ({
+        code: d.codeVal,
+        name: d.codeNm,
+        nameEn: d.codeNmEn || ''
+      }))
     } catch (e) {
       console.error(`공통코드 로드 실패: ${groupCd}`, e)
     }

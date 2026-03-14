@@ -55,6 +55,7 @@ class CommonCodeControllerTest {
         CommonCodeGroupResponse groupResponse = CommonCodeGroupResponse.builder()
                 .groupId(1L)
                 .groupNm("우선순위")
+                .groupNmEn("Priority")
                 .groupCd("PRIORITY")
                 .description("우선순위 코드")
                 .isActive("Y")
@@ -70,6 +71,7 @@ class CommonCodeControllerTest {
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data[0].groupId").value(1))
                 .andExpect(jsonPath("$.data[0].groupNm").value("우선순위"))
+                .andExpect(jsonPath("$.data[0].groupNmEn").value("Priority"))
                 .andExpect(jsonPath("$.data[0].groupCd").value("PRIORITY"));
     }
 
@@ -78,11 +80,12 @@ class CommonCodeControllerTest {
     void createGroup_returns200() throws Exception {
         // given
         CommonCodeGroupCreateRequest req = new CommonCodeGroupCreateRequest(
-                "상태", "STATUS", "상태 코드");
+                "상태", "Status", "STATUS", "상태 코드");
 
         CommonCodeGroupResponse response = CommonCodeGroupResponse.builder()
                 .groupId(2L)
                 .groupNm("상태")
+                .groupNmEn("Status")
                 .groupCd("STATUS")
                 .description("상태 코드")
                 .isActive("Y")
@@ -113,6 +116,7 @@ class CommonCodeControllerTest {
                 .detailId(1L)
                 .codeVal("HIGH")
                 .codeNm("높음")
+                .codeNmEn("High")
                 .sortOrder(1)
                 .isActive("Y")
                 .createdAt(LocalDateTime.now())
@@ -134,12 +138,13 @@ class CommonCodeControllerTest {
     void createDetail_returns200() throws Exception {
         // given
         CommonCodeDetailCreateRequest req = new CommonCodeDetailCreateRequest(
-                "LOW", "낮음", 3);
+                "LOW", "낮음", "Low", 3);
 
         CommonCodeDetailResponse response = CommonCodeDetailResponse.builder()
                 .detailId(2L)
                 .codeVal("LOW")
                 .codeNm("낮음")
+                .codeNmEn("Low")
                 .sortOrder(3)
                 .isActive("Y")
                 .createdAt(LocalDateTime.now())
@@ -168,6 +173,7 @@ class CommonCodeControllerTest {
                 .detailId(1L)
                 .codeVal("HIGH")
                 .codeNm("높음")
+                .codeNmEn("High")
                 .sortOrder(1)
                 .isActive("Y")
                 .createdAt(LocalDateTime.now())

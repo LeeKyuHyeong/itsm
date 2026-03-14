@@ -13,5 +13,7 @@ public class CommonCodeGroupUpdateRequest {
     @NotBlank(message = "그룹명은 필수입니다.")
     private String groupNm;
 
+    private String groupNmEn;
+
     private String description;
 }

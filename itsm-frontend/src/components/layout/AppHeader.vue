@@ -64,10 +64,9 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth.js'
-import { ROLE_LABEL } from '@/constants/roles.js'
 import { setLocale } from '@/i18n/index.js'
 
-const { t, locale: currentLocale } = useI18n()
+const { t, te, locale: currentLocale } = useI18n()
 
 const isDark = ref(false)
 
@@ -103,7 +102,8 @@ const user = computed(() => authStore.user)
 const primaryRole = computed(() => {
   const roles = user.value?.roles
   if (!roles || roles.length === 0) return ''
-  return ROLE_LABEL[roles[0]] || roles[0]
+  const roleKey = `role.${roles[0]}`
+  return te(roleKey) ? t(roleKey) : roles[0]
 })
 
 function switchLocale(code) {

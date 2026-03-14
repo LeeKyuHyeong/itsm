@@ -18,16 +18,17 @@
               <tr>
                 <th>{{ t('admin.groupCode') }}</th>
                 <th>{{ t('admin.groupName') }}</th>
+                <th>{{ t('admin.groupNameEn') }}</th>
                 <th>{{ t('admin.useYn') }}</th>
                 <th>{{ t('admin.manage') }}</th>
               </tr>
             </thead>
             <tbody>
               <tr v-if="loadingGroups">
-                <td colspan="4" class="text-center">{{ t('common.loading') }}</td>
+                <td colspan="5" class="text-center">{{ t('common.loading') }}</td>
               </tr>
               <tr v-else-if="groups.length === 0">
-                <td colspan="4" class="text-center">{{ t('admin.noCodeGroups') }}</td>
+                <td colspan="5" class="text-center">{{ t('admin.noCodeGroups') }}</td>
               </tr>
               <tr
                 v-for="group in groups"
@@ -38,6 +39,7 @@
               >
                 <td>{{ group.groupCd }}</td>
                 <td>{{ group.groupNm }}</td>
+                <td>{{ group.groupNmEn }}</td>
                 <td>
                   <span class="status-badge" :class="group.active !== false ? 'status-active' : 'status-inactive'">
                     {{ group.active !== false ? t('admin.inUse') : t('admin.notInUse') }}
@@ -74,6 +76,7 @@
               <tr>
                 <th>{{ t('admin.codeValue') }}</th>
                 <th>{{ t('admin.codeName') }}</th>
+                <th>{{ t('admin.codeNameEn') }}</th>
                 <th>{{ t('admin.sortOrder') }}</th>
                 <th>{{ t('admin.useYn') }}</th>
                 <th>{{ t('admin.manage') }}</th>
@@ -81,17 +84,18 @@
             </thead>
             <tbody>
               <tr v-if="!selectedGroupId">
-                <td colspan="5" class="text-center text-secondary">{{ t('admin.selectCodeGroup') }}</td>
+                <td colspan="6" class="text-center text-secondary">{{ t('admin.selectCodeGroup') }}</td>
               </tr>
               <tr v-else-if="loadingDetails">
-                <td colspan="5" class="text-center">{{ t('common.loading') }}</td>
+                <td colspan="6" class="text-center">{{ t('common.loading') }}</td>
               </tr>
               <tr v-else-if="details.length === 0">
-                <td colspan="5" class="text-center">{{ t('admin.noCodes') }}</td>
+                <td colspan="6" class="text-center">{{ t('admin.noCodes') }}</td>
               </tr>
               <tr v-for="detail in details" :key="detail.id">
                 <td>{{ detail.codeVal }}</td>
                 <td>{{ detail.codeNm }}</td>
+                <td>{{ detail.codeNmEn }}</td>
                 <td>{{ detail.sortOrder }}</td>
                 <td>
                   <span class="status-badge" :class="detail.active !== false ? 'status-active' : 'status-inactive'">
@@ -125,6 +129,10 @@
             <input v-model="groupForm.groupNm" type="text" class="form-input" required />
           </div>
           <div class="form-group">
+            <label class="form-label">{{ t('admin.groupNameEn') }}</label>
+            <input v-model="groupForm.groupNmEn" type="text" class="form-input" />
+          </div>
+          <div class="form-group">
             <label class="form-label">{{ t('admin.description') }}</label>
             <input v-model="groupForm.description" type="text" class="form-input" />
           </div>
@@ -154,6 +162,10 @@
           <div class="form-group">
             <label class="form-label">{{ t('admin.codeName') }}</label>
             <input v-model="detailForm.codeNm" type="text" class="form-input" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">{{ t('admin.codeNameEn') }}</label>
+            <input v-model="detailForm.codeNmEn" type="text" class="form-input" />
           </div>
           <div class="form-group">
             <label class="form-label">{{ t('admin.sortOrder') }}</label>
@@ -198,6 +210,7 @@ const groupSaveError = ref('')
 const groupForm = reactive({
   groupCd: '',
   groupNm: '',
+  groupNmEn: '',
   description: ''
 })
 
@@ -209,6 +222,7 @@ const detailSaveError = ref('')
 const detailForm = reactive({
   codeVal: '',
   codeNm: '',
+  codeNmEn: '',
   sortOrder: 0
 })
 
@@ -257,12 +271,14 @@ function openGroupDialog(group = null) {
     Object.assign(groupForm, {
       groupCd: group.groupCd || '',
       groupNm: group.groupNm || '',
+      groupNmEn: group.groupNmEn || '',
       description: group.description || ''
     })
   } else {
     Object.assign(groupForm, {
       groupCd: '',
       groupNm: '',
+      groupNmEn: '',
       description: ''
     })
   }
@@ -300,12 +316,14 @@ function openDetailDialog(detail = null) {
     Object.assign(detailForm, {
       codeVal: detail.codeVal || '',
       codeNm: detail.codeNm || '',
+      codeNmEn: detail.codeNmEn || '',
       sortOrder: detail.sortOrder || 0
     })
   } else {
     Object.assign(detailForm, {
       codeVal: '',
       codeNm: '',
+      codeNmEn: '',
       sortOrder: 0
     })
   }

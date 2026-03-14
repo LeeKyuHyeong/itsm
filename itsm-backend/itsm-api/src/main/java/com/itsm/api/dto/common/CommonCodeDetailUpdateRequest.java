@@ -13,5 +13,7 @@ public class CommonCodeDetailUpdateRequest {
     @NotBlank(message = "코드명은 필수입니다.")
     private String codeNm;
 
+    private String codeNmEn;
+
     private Integer sortOrder;
 }

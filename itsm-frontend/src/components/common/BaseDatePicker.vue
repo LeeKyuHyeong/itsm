@@ -1,7 +1,7 @@
 <template>
   <VueDatePicker
     v-model="model"
-    :locale="currentLocale"
+    :locale="dateFnsLocale"
     :enable-time-picker="enableTime"
     :format="displayFormat"
     :placeholder="placeholder"
@@ -20,11 +20,16 @@
 
 <script setup>
 import { computed } from 'vue'
-import VueDatePicker from '@vuepic/vue-datepicker'
+import { VueDatePicker } from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
 import { useI18n } from 'vue-i18n'
+import { ko } from 'date-fns/locale/ko'
+import { enUS } from 'date-fns/locale/en-US'
 
 const { t, locale: currentLocale } = useI18n()
+
+const localeMap = { ko, en: enUS }
+const dateFnsLocale = computed(() => localeMap[currentLocale.value] || enUS)
 
 const props = defineProps({
   modelValue: {

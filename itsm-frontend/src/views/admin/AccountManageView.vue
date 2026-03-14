@@ -242,9 +242,9 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { userApi } from '@/api/user.js'
 import { companyApi } from '@/api/company.js'
-import { ROLE_LABEL } from '@/constants/roles.js'
+import { ROLES } from '@/constants/roles.js'
 
-const { t } = useI18n()
+const { t, te } = useI18n()
 
 const users = ref([])
 const loading = ref(false)
@@ -303,15 +303,16 @@ function statusLabel(status) {
 }
 
 function roleLabel(role) {
-  return ROLE_LABEL[role] || role
+  const key = `role.${role}`
+  return te(key) ? t(key) : role
 }
 
 const availableRoles = computed(() => {
   const assigned = roleTarget.value?.roles || []
   const result = {}
-  for (const [key, label] of Object.entries(ROLE_LABEL)) {
-    if (!assigned.includes(key)) {
-      result[key] = label
+  for (const roleCode of Object.values(ROLES)) {
+    if (!assigned.includes(roleCode)) {
+      result[roleCode] = roleLabel(roleCode)
     }
   }
   return result

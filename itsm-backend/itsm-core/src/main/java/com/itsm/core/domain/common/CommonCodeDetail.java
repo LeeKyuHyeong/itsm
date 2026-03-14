@@ -33,6 +33,9 @@ public class CommonCodeDetail {
     @Column(name = "code_nm", nullable = false, length = 100)
     private String codeNm;
 
+    @Column(name = "code_nm_en", length = 100)
+    private String codeNmEn;
+
     @Column(name = "sort_order", nullable = false)
     private Integer sortOrder;
 
@@ -47,17 +50,19 @@ public class CommonCodeDetail {
     private Long createdBy;
 
     @Builder
-    public CommonCodeDetail(CommonCode commonCode, String codeVal, String codeNm, Integer sortOrder, String isActive, Long createdBy) {
+    public CommonCodeDetail(CommonCode commonCode, String codeVal, String codeNm, String codeNmEn, Integer sortOrder, String isActive, Long createdBy) {
         this.commonCode = commonCode;
         this.codeVal = codeVal;
         this.codeNm = codeNm;
+        this.codeNmEn = codeNmEn;
         this.sortOrder = sortOrder != null ? sortOrder : 0;
         this.isActive = isActive != null ? isActive : "Y";
         this.createdBy = createdBy;
     }
 
-    public void update(String codeNm, Integer sortOrder) {
+    public void update(String codeNm, String codeNmEn, Integer sortOrder) {
         this.codeNm = codeNm;
+        this.codeNmEn = codeNmEn;
         this.sortOrder = sortOrder;
     }
 

@@ -36,6 +36,7 @@ public class CommonCodeService {
 
         CommonCode commonCode = CommonCode.builder()
                 .groupNm(req.getGroupNm())
+                .groupNmEn(req.getGroupNmEn())
                 .groupCd(req.getGroupCd())
                 .description(req.getDescription())
                 .isActive("Y")
@@ -50,7 +51,7 @@ public class CommonCodeService {
         CommonCode commonCode = commonCodeRepository.findById(groupId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND, "공통코드 그룹을 찾을 수 없습니다."));
 
-        commonCode.update(req.getGroupNm(), req.getDescription());
+        commonCode.update(req.getGroupNm(), req.getGroupNmEn(), req.getDescription());
         return toGroupResponse(commonCode);
     }
 
@@ -88,6 +89,7 @@ public class CommonCodeService {
                 .commonCode(commonCode)
                 .codeVal(req.getCodeVal())
                 .codeNm(req.getCodeNm())
+                .codeNmEn(req.getCodeNmEn())
                 .sortOrder(req.getSortOrder())
                 .isActive("Y")
                 .createdBy(currentUserId)
@@ -101,7 +103,7 @@ public class CommonCodeService {
         CommonCodeDetail detail = commonCodeDetailRepository.findById(detailId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND, "공통코드 상세를 찾을 수 없습니다."));
 
-        detail.update(req.getCodeNm(), req.getSortOrder());
+        detail.update(req.getCodeNm(), req.getCodeNmEn(), req.getSortOrder());
         return toDetailResponse(detail);
     }
 
@@ -132,6 +134,7 @@ public class CommonCodeService {
         return CommonCodeGroupResponse.builder()
                 .groupId(commonCode.getGroupId())
                 .groupNm(commonCode.getGroupNm())
+                .groupNmEn(commonCode.getGroupNmEn())
                 .groupCd(commonCode.getGroupCd())
                 .description(commonCode.getDescription())
                 .isActive(commonCode.getIsActive())
@@ -145,6 +148,7 @@ public class CommonCodeService {
                 .detailId(detail.getDetailId())
                 .codeVal(detail.getCodeVal())
                 .codeNm(detail.getCodeNm())
+                .codeNmEn(detail.getCodeNmEn())
                 .sortOrder(detail.getSortOrder())
                 .isActive(detail.getIsActive())
                 .createdAt(detail.getCreatedAt())

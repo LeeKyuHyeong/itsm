@@ -27,6 +27,9 @@ public class CommonCode {
     @Column(name = "group_nm", nullable = false, length = 100)
     private String groupNm;
 
+    @Column(name = "group_nm_en", length = 100)
+    private String groupNmEn;
+
     @Column(name = "group_cd", nullable = false, length = 50, unique = true)
     private String groupCd;
 
@@ -47,16 +50,18 @@ public class CommonCode {
     private List<CommonCodeDetail> details = new ArrayList<>();
 
     @Builder
-    public CommonCode(String groupNm, String groupCd, String description, String isActive, Long createdBy) {
+    public CommonCode(String groupNm, String groupNmEn, String groupCd, String description, String isActive, Long createdBy) {
         this.groupNm = groupNm;
+        this.groupNmEn = groupNmEn;
         this.groupCd = groupCd;
         this.description = description;
         this.isActive = isActive != null ? isActive : "Y";
         this.createdBy = createdBy;
     }
 
-    public void update(String groupNm, String description) {
+    public void update(String groupNm, String groupNmEn, String description) {
         this.groupNm = groupNm;
+        this.groupNmEn = groupNmEn;
         this.description = description;
     }
 
