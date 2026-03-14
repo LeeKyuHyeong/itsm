@@ -1,0 +1,135 @@
+-- MySQL dump 10.13  Distrib 8.0.42, for Win64 (x86_64)
+--
+-- Host: localhost    Database: ITSM
+-- ------------------------------------------------------
+-- Server version	8.0.42
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Dumping data for table `tb_common_code`
+--
+
+LOCK TABLES `tb_common_code` WRITE;
+/*!40000 ALTER TABLE `tb_common_code` DISABLE KEYS */;
+INSERT INTO `tb_common_code` (`group_id`, `group_nm`, `group_nm_en`, `group_cd`, `description`, `is_active`, `created_at`, `created_by`) VALUES (1,'우선순위','Priority','PRIORITY','장애/서비스요청/변경 우선순위','Y','2026-03-10 23:23:49',1),(2,'장애유형','Incident Type','INCIDENT_TYPE','장애 유형 분류','Y','2026-03-10 23:23:49',1),(3,'서비스요청 유형','Request Type','REQUEST_TYPE','서비스 요청 유형 분류','Y','2026-03-10 23:23:49',1),(4,'변경유형','Change Type','CHANGE_TYPE','변경 요청 유형 분류','Y','2026-03-10 23:23:49',1),(5,'HW 자산유형','HW Asset Type','ASSET_HW_TYPE','HW 자산 유형 분류','Y','2026-03-10 23:23:49',1),(6,'SW 자산유형','SW Asset Type','ASSET_SW_TYPE','SW 자산 유형 분류','Y','2026-03-10 23:23:49',1),(7,'점검유형','Inspection Type','INSPECTION_TYPE','정기점검 유형 분류','Y','2026-03-10 23:23:49',1),(8,'보고서 양식유형','Report Form Type','REPORT_FORM_TYPE','보고서 양식 유형 분류','Y','2026-03-10 23:23:49',1),(9,'게시판유형','Board Type','BOARD_TYPE','게시판 유형 분류','Y','2026-03-10 23:23:49',1),(10,'알림유형','Notification Type','NOTIFICATION_TYPE','알림 유형 분류','Y','2026-03-10 23:23:49',1),(11,'자산 대분류','Asset Category','ASSET_CATEGORY','자산관리 대분류 코드','Y','2026-03-13 22:48:49',1),(12,'운영장비 중분류','Infra HW Sub-category','ASSET_SUB_INFRA_HW','운영장비 자산 중분류 코드','Y','2026-03-13 22:48:49',1),(13,'운영SW 중분류','Infra SW Sub-category','ASSET_SUB_INFRA_SW','운영SW 자산 중분류 코드','Y','2026-03-13 22:48:49',1),(14,'OA자산 중분류','OA Sub-category','ASSET_SUB_OA','OA자산 중분류 코드','Y','2026-03-13 22:48:49',1);
+/*!40000 ALTER TABLE `tb_common_code` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Dumping data for table `tb_common_code_detail`
+--
+
+LOCK TABLES `tb_common_code_detail` WRITE;
+/*!40000 ALTER TABLE `tb_common_code_detail` DISABLE KEYS */;
+INSERT INTO `tb_common_code_detail` (`detail_id`, `group_id`, `code_val`, `code_nm`, `code_nm_en`, `sort_order`, `is_active`, `created_at`, `created_by`) VALUES (1,1,'CRITICAL','긴급','Critical',1,'Y','2026-03-10 23:23:49',1),(2,1,'HIGH','높음','High',2,'Y','2026-03-10 23:23:49',1),(3,1,'MEDIUM','보통','Medium',3,'Y','2026-03-10 23:23:49',1),(4,1,'LOW','낮음','Low',4,'Y','2026-03-10 23:23:49',1),(5,2,'SYSTEM_DOWN','시스템 장애','System Down',1,'Y','2026-03-10 23:23:49',1),(6,2,'NETWORK_ISSUE','네트워크 장애','Network Issue',2,'Y','2026-03-10 23:23:49',1),(7,2,'SECURITY','보안 사고','Security Incident',3,'Y','2026-03-10 23:23:49',1),(8,2,'PERFORMANCE','성능 저하','Performance Degradation',4,'Y','2026-03-10 23:23:49',1),(9,2,'DATA_ISSUE','데이터 오류','Data Error',5,'Y','2026-03-10 23:23:49',1),(10,2,'OTHER','기타','Other',6,'Y','2026-03-10 23:23:49',1),(11,3,'ACCOUNT','계정 요청','Account Request',1,'Y','2026-03-10 23:23:49',1),(12,3,'INSTALL','설치 요청','Installation Request',2,'Y','2026-03-10 23:23:49',1),(13,3,'CONFIGURATION','설정 변경','Configuration Change',3,'Y','2026-03-10 23:23:49',1),(14,3,'DATA_REQUEST','데이터 요청','Data Request',4,'Y','2026-03-10 23:23:49',1),(15,3,'INQUIRY','문의','Inquiry',5,'Y','2026-03-10 23:23:49',1),(16,3,'OTHER','기타','Other',6,'Y','2026-03-10 23:23:49',1),(17,4,'EMERGENCY','긴급 변경','Emergency Change',1,'Y','2026-03-10 23:23:49',1),(18,4,'NORMAL','일반 변경','Normal Change',2,'Y','2026-03-10 23:23:49',1),(19,4,'STANDARD','정기 변경','Standard Change',3,'Y','2026-03-10 23:23:49',1),(20,5,'SERVER','서버','Server',1,'Y','2026-03-10 23:23:49',1),(21,5,'NETWORK','네트워크장비','Network Equipment',2,'Y','2026-03-10 23:23:49',1),(22,5,'PC','PC/노트북','PC/Laptop',3,'Y','2026-03-10 23:23:49',1),(23,5,'STORAGE','스토리지','Storage',4,'Y','2026-03-10 23:23:49',1),(24,5,'SECURITY','보안장비','Security Equipment',5,'Y','2026-03-10 23:23:49',1),(25,5,'OTHER','기타','Other',6,'Y','2026-03-10 23:23:49',1),(26,6,'OS','운영체제','Operating System',1,'Y','2026-03-10 23:23:49',1),(27,6,'WAS','WAS','WAS',2,'Y','2026-03-10 23:23:49',1),(28,6,'DB','DBMS','DBMS',3,'Y','2026-03-10 23:23:49',1),(29,6,'SECURITY','보안 소프트웨어','Security Software',4,'Y','2026-03-10 23:23:49',1),(30,6,'OFFICE','오피스/업무용','Office/Business',5,'Y','2026-03-10 23:23:49',1),(31,6,'OTHER','기타','Other',6,'Y','2026-03-10 23:23:49',1),(32,7,'MONTHLY','월간 점검','Monthly Inspection',1,'Y','2026-03-10 23:23:49',1),(33,7,'QUARTERLY','분기 점검','Quarterly Inspection',2,'Y','2026-03-10 23:23:49',1),(34,7,'ANNUAL','연간 점검','Annual Inspection',3,'Y','2026-03-10 23:23:49',1),(35,7,'SPECIAL','특별 점검','Special Inspection',4,'Y','2026-03-10 23:23:49',1),(36,8,'INCIDENT','장애 보고서','Incident Report',1,'Y','2026-03-10 23:23:49',1),(37,8,'SERVICE_REQUEST','서비스요청 보고서','Service Request Report',2,'Y','2026-03-10 23:23:49',1),(38,8,'CHANGE','변경 보고서','Change Report',3,'Y','2026-03-10 23:23:49',1),(39,8,'INSPECTION','점검 보고서','Inspection Report',4,'Y','2026-03-10 23:23:49',1),(40,9,'NOTICE','공지형','Notice',1,'Y','2026-03-10 23:23:49',1),(41,9,'FREE','자유형','Free Board',2,'Y','2026-03-10 23:23:49',1),(42,9,'ARCHIVE','자료형','Archive',3,'Y','2026-03-10 23:23:49',1),(43,10,'INCIDENT','장애 알림','Incident Notification',1,'Y','2026-03-10 23:23:49',1),(44,10,'SERVICE_REQUEST','서비스요청 알림','Service Request Notification',2,'Y','2026-03-10 23:23:49',1),(45,10,'CHANGE','변경 알림','Change Notification',3,'Y','2026-03-10 23:23:49',1),(46,10,'INSPECTION','점검 알림','Inspection Notification',4,'Y','2026-03-10 23:23:49',1),(47,10,'SLA_WARNING','SLA 경고 알림','SLA Warning',5,'Y','2026-03-10 23:23:49',1),(48,10,'SYSTEM','시스템 알림','System Notification',6,'Y','2026-03-10 23:23:49',1),(49,11,'INFRA_HW','운영장비','Infrastructure HW',1,'Y','2026-03-13 22:48:49',1),(50,11,'INFRA_SW','운영SW','Infrastructure SW',2,'Y','2026-03-13 22:48:49',1),(51,11,'OA','OA자산','OA Assets',3,'Y','2026-03-13 22:48:49',1),(52,12,'SERVER_RACK','랙마운트 서버','Rack Mount Server',1,'Y','2026-03-13 22:48:49',1),(53,12,'SERVER_BLADE','블레이드 서버','Blade Server',2,'Y','2026-03-13 22:48:49',1),(54,12,'SERVER_TOWER','타워 서버','Tower Server',3,'Y','2026-03-13 22:48:49',1),(55,12,'STORAGE_SAN','SAN 스토리지','SAN Storage',4,'Y','2026-03-13 22:48:49',1),(56,12,'STORAGE_NAS','NAS','NAS',5,'Y','2026-03-13 22:48:49',1),(57,12,'NETWORK_SWITCH','네트워크 스위치','Network Switch',6,'Y','2026-03-13 22:48:49',1),(58,12,'NETWORK_ROUTER','라우터','Router',7,'Y','2026-03-13 22:48:49',1),(59,12,'NETWORK_FW','방화벽','Firewall',8,'Y','2026-03-13 22:48:49',1),(60,12,'NETWORK_LB','로드밸런서','Load Balancer',9,'Y','2026-03-13 22:48:49',1),(61,12,'NETWORK_AP','무선AP','Wireless AP',10,'Y','2026-03-13 22:48:49',1),(62,12,'SECURITY_IDS','IDS/IPS','IDS/IPS',11,'Y','2026-03-13 22:48:49',1),(63,12,'SECURITY_WAF','WAF','WAF',12,'Y','2026-03-13 22:48:49',1),(64,12,'POWER_UPS','UPS','UPS',13,'Y','2026-03-13 22:48:49',1),(65,12,'POWER_PDU','PDU','PDU',14,'Y','2026-03-13 22:48:49',1),(66,12,'INFRA_KVM','KVM/콘솔','KVM/Console',15,'Y','2026-03-13 22:48:49',1),(67,13,'SW_OS','운영체제','Operating System',1,'Y','2026-03-13 22:48:49',1),(68,13,'SW_DB','데이터베이스','Database',2,'Y','2026-03-13 22:48:49',1),(69,13,'SW_WAS','WAS/웹서버','WAS/Web Server',3,'Y','2026-03-13 22:48:49',1),(70,13,'SW_MIDDLEWARE','미들웨어','Middleware',4,'Y','2026-03-13 22:48:49',1),(71,13,'SW_MONITORING','모니터링','Monitoring',5,'Y','2026-03-13 22:48:49',1),(72,13,'SW_BACKUP','백업솔루션','Backup Solution',6,'Y','2026-03-13 22:48:49',1),(73,13,'SW_SECURITY','보안솔루션','Security Solution',7,'Y','2026-03-13 22:48:49',1),(74,13,'SW_VIRTUALIZATION','가상화','Virtualization',8,'Y','2026-03-13 22:48:49',1),(75,13,'SW_CONTAINER','컨테이너/오케','Container/Orchestration',9,'Y','2026-03-13 22:48:49',1),(76,13,'SW_CICD','CI/CD','CI/CD',10,'Y','2026-03-13 22:48:49',1),(77,13,'SW_LICENSE','상용라이선스','Commercial License',11,'Y','2026-03-13 22:48:49',1),(78,14,'OA_DESKTOP','데스크톱','Desktop',1,'Y','2026-03-13 22:48:49',1),(79,14,'OA_LAPTOP','노트북','Laptop',2,'Y','2026-03-13 22:48:49',1),(80,14,'OA_MONITOR','모니터','Monitor',3,'Y','2026-03-13 22:48:49',1),(81,14,'OA_PRINTER','프린터/복합기','Printer/MFP',4,'Y','2026-03-13 22:48:49',1),(82,14,'OA_PHONE','전화/VoIP','Phone/VoIP',5,'Y','2026-03-13 22:48:49',1),(83,14,'OA_TABLET','태블릿','Tablet',6,'Y','2026-03-13 22:48:49',1),(84,14,'OA_PERIPHERAL','주변기기','Peripheral',7,'Y','2026-03-13 22:48:49',1),(85,14,'OA_PROJECTOR','프로젝터','Projector',8,'Y','2026-03-13 22:48:49',1);
+/*!40000 ALTER TABLE `tb_common_code_detail` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Dumping data for table `tb_menu`
+--
+
+LOCK TABLES `tb_menu` WRITE;
+/*!40000 ALTER TABLE `tb_menu` DISABLE KEYS */;
+INSERT INTO `tb_menu` (`menu_id`, `parent_menu_id`, `menu_nm`, `menu_nm_en`, `menu_url`, `icon`, `sort_order`, `is_visible`, `status`, `created_at`, `created_by`, `updated_at`, `updated_by`) VALUES (1,NULL,'대시보드','Dashboard','/dashboard','mdi-view-dashboard',1,'Y','ACTIVE','2026-03-10 23:23:49',1,NULL,NULL),(2,NULL,'장애관리','Incident Management',NULL,'mdi-alert-circle',2,'Y','ACTIVE','2026-03-10 23:23:49',1,NULL,NULL),(3,NULL,'서비스요청','Service Request',NULL,'mdi-file-document',3,'Y','ACTIVE','2026-03-10 23:23:49',1,NULL,NULL),(4,NULL,'변경관리','Change Management',NULL,'mdi-swap-horizontal',4,'Y','ACTIVE','2026-03-10 23:23:49',1,NULL,NULL),(5,NULL,'자산관리','Asset Management',NULL,'mdi-server',5,'Y','ACTIVE','2026-03-10 23:23:49',1,NULL,NULL),(6,NULL,'정기점검관리','Inspection Management',NULL,'mdi-clipboard-check',6,'Y','ACTIVE','2026-03-10 23:23:49',1,NULL,NULL),(7,NULL,'보고관리','Report Management',NULL,'mdi-chart-bar',7,'Y','ACTIVE','2026-03-10 23:23:49',1,NULL,NULL),(8,NULL,'게시판','Board',NULL,'mdi-bulletin-board',8,'Y','ACTIVE','2026-03-10 23:23:49',1,NULL,NULL),(9,NULL,'설정관리','Settings',NULL,'mdi-cog',9,'Y','ACTIVE','2026-03-10 23:23:49',1,NULL,NULL),(10,NULL,'계정관리','Account Management',NULL,'mdi-account-group',10,'Y','ACTIVE','2026-03-10 23:23:49',1,NULL,NULL),(11,2,'장애 목록','Incident List','/incidents',NULL,1,'Y','ACTIVE','2026-03-10 23:23:49',1,NULL,NULL),(12,2,'장애 등록','Register Incident','/incidents/new',NULL,2,'Y','ACTIVE','2026-03-10 23:23:49',1,NULL,NULL),(14,3,'요청 목록','Request List','/service-requests',NULL,1,'Y','ACTIVE','2026-03-10 23:23:49',1,NULL,NULL),(15,3,'요청 등록','Register Request','/service-requests/new',NULL,2,'Y','ACTIVE','2026-03-10 23:23:49',1,NULL,NULL),(16,4,'변경 목록','Change List','/changes',NULL,1,'Y','ACTIVE','2026-03-10 23:23:49',1,NULL,NULL),(17,4,'변경 등록','Register Change','/changes/new',NULL,2,'Y','ACTIVE','2026-03-10 23:23:49',1,NULL,NULL),(18,5,'HW 자산 목록','HW Asset List','/assets/hw',NULL,1,'Y','ACTIVE','2026-03-10 23:23:49',1,NULL,NULL),(19,5,'SW 자산 목록','SW Asset List','/assets/sw',NULL,2,'Y','ACTIVE','2026-03-10 23:23:49',1,NULL,NULL),(21,6,'점검 목록','Inspection List','/inspections',NULL,1,'Y','ACTIVE','2026-03-10 23:23:49',1,NULL,NULL),(22,6,'점검 등록','Register Inspection','/inspections/new',NULL,2,'Y','ACTIVE','2026-03-10 23:23:49',1,NULL,NULL),(23,7,'보고서 목록','Report List','/reports',NULL,1,'Y','ACTIVE','2026-03-10 23:23:49',1,NULL,NULL),(25,9,'메뉴 관리','Menu Management','/admin/menus',NULL,1,'Y','ACTIVE','2026-03-10 23:23:49',1,NULL,NULL),(27,9,'공통코드 관리','Common Code','/admin/common-codes',NULL,2,'Y','ACTIVE','2026-03-10 23:23:49',1,NULL,NULL),(30,9,'게시판 관리','Board Management','/admin/boards',NULL,3,'Y','ACTIVE','2026-03-10 23:23:49',1,NULL,NULL),(32,9,'SLA 관리','SLA Management','/admin/sla',NULL,4,'Y','ACTIVE','2026-03-10 23:23:49',1,NULL,NULL),(33,9,'알림 정책 관리','Notification Policy','/admin/notification-policy',NULL,5,'Y','ACTIVE','2026-03-10 23:23:49',1,NULL,NULL),(39,10,'사용자 관리','User Management','/admin/accounts',NULL,1,'Y','ACTIVE','2026-03-10 23:23:49',1,NULL,NULL),(40,10,'조직 관리','Organization Management','/admin/organizations',NULL,2,'Y','ACTIVE','2026-03-10 23:23:49',1,NULL,NULL),(41,9,'배치 관리','Batch Management','/admin/batch-jobs',NULL,6,'Y','ACTIVE','2026-03-14 10:43:16',1,NULL,NULL);
+/*!40000 ALTER TABLE `tb_menu` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Dumping data for table `tb_role`
+--
+
+LOCK TABLES `tb_role` WRITE;
+/*!40000 ALTER TABLE `tb_role` DISABLE KEYS */;
+INSERT INTO `tb_role` (`role_id`, `role_nm`, `role_cd`, `description`, `status`, `created_at`, `created_by`) VALUES (1,'슈퍼관리자','ROLE_SUPER_ADMIN','시스템 전체 설정, ITSM관리자 계정 관리','ACTIVE','2026-03-10 23:23:49',1),(2,'ITSM관리자','ROLE_ITSM_ADMIN','운영 전반 관리','ACTIVE','2026-03-10 23:23:49',1),(3,'유지보수팀 - PM','ROLE_PM','프로젝트 관리','ACTIVE','2026-03-10 23:23:49',1),(4,'유지보수팀 - 개발자','ROLE_DEVELOPER','개발 담당','ACTIVE','2026-03-10 23:23:49',1),(5,'유지보수팀 - 보안담당자','ROLE_SECURITY','보안 담당','ACTIVE','2026-03-10 23:23:49',1),(6,'유지보수팀 - DB담당자','ROLE_DBA','DB 담당','ACTIVE','2026-03-10 23:23:49',1),(7,'유지보수팀 - 네트워크담당자','ROLE_NETWORK','네트워크 담당','ACTIVE','2026-03-10 23:23:49',1),(8,'유지보수팀 - 서버담당자','ROLE_SERVER','서버 담당','ACTIVE','2026-03-10 23:23:49',1),(9,'고객사 인원','ROLE_CUSTOMER','부서별 일반 사용자','ACTIVE','2026-03-10 23:23:49',1),(10,'외부사용자','ROLE_EXTERNAL','협력업체 등 정기점검 인원','ACTIVE','2026-03-10 23:23:49',1),(11,'감사자','ROLE_AUDITOR','읽기 전용, 전체 이력 조회','ACTIVE','2026-03-10 23:23:49',1);
+/*!40000 ALTER TABLE `tb_role` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Dumping data for table `tb_role_menu`
+--
+
+LOCK TABLES `tb_role_menu` WRITE;
+/*!40000 ALTER TABLE `tb_role_menu` DISABLE KEYS */;
+INSERT INTO `tb_role_menu` (`role_id`, `menu_id`, `can_read`, `can_write`, `created_at`, `created_by`) VALUES (1,1,'Y','Y','2026-03-10 23:23:49',1),(1,2,'Y','Y','2026-03-10 23:23:49',1),(1,3,'Y','Y','2026-03-10 23:23:49',1),(1,4,'Y','Y','2026-03-10 23:23:49',1),(1,5,'Y','Y','2026-03-10 23:23:49',1),(1,6,'Y','Y','2026-03-10 23:23:49',1),(1,7,'Y','Y','2026-03-10 23:23:49',1),(1,8,'Y','Y','2026-03-10 23:23:49',1),(1,9,'Y','Y','2026-03-10 23:23:49',1),(1,10,'Y','Y','2026-03-10 23:23:49',1),(1,11,'Y','Y','2026-03-10 23:23:49',1),(1,12,'Y','Y','2026-03-10 23:23:49',1),(1,14,'Y','Y','2026-03-10 23:23:49',1),(1,15,'Y','Y','2026-03-10 23:23:49',1),(1,16,'Y','Y','2026-03-10 23:23:49',1),(1,17,'Y','Y','2026-03-10 23:23:49',1),(1,18,'Y','Y','2026-03-10 23:23:49',1),(1,19,'Y','Y','2026-03-10 23:23:49',1),(1,21,'Y','Y','2026-03-10 23:23:49',1),(1,22,'Y','Y','2026-03-10 23:23:49',1),(1,23,'Y','Y','2026-03-10 23:23:49',1),(1,25,'Y','Y','2026-03-10 23:23:49',1),(1,27,'Y','Y','2026-03-10 23:23:49',1),(1,30,'Y','Y','2026-03-10 23:23:49',1),(1,32,'Y','Y','2026-03-10 23:23:49',1),(1,33,'Y','Y','2026-03-10 23:23:49',1),(1,39,'Y','Y','2026-03-10 23:23:49',1),(1,40,'Y','Y','2026-03-10 23:23:49',1),(1,41,'Y','Y','2026-03-14 10:43:16',1),(2,1,'Y','Y','2026-03-10 23:23:49',1),(2,2,'Y','Y','2026-03-10 23:23:49',1),(2,3,'Y','Y','2026-03-10 23:23:49',1),(2,4,'Y','Y','2026-03-10 23:23:49',1),(2,5,'Y','Y','2026-03-10 23:23:49',1),(2,6,'Y','Y','2026-03-10 23:23:49',1),(2,7,'Y','Y','2026-03-10 23:23:49',1),(2,8,'Y','Y','2026-03-10 23:23:49',1),(2,9,'Y','Y','2026-03-10 23:23:49',1),(2,10,'Y','Y','2026-03-10 23:23:49',1),(2,11,'Y','Y','2026-03-10 23:23:49',1),(2,12,'Y','Y','2026-03-10 23:23:49',1),(2,14,'Y','Y','2026-03-10 23:23:49',1),(2,15,'Y','Y','2026-03-10 23:23:49',1),(2,16,'Y','Y','2026-03-10 23:23:49',1),(2,17,'Y','Y','2026-03-10 23:23:49',1),(2,18,'Y','Y','2026-03-10 23:23:49',1),(2,19,'Y','Y','2026-03-10 23:23:49',1),(2,21,'Y','Y','2026-03-10 23:23:49',1),(2,22,'Y','Y','2026-03-10 23:23:49',1),(2,23,'Y','Y','2026-03-10 23:23:49',1),(2,25,'Y','Y','2026-03-10 23:23:49',1),(2,27,'Y','Y','2026-03-10 23:23:49',1),(2,30,'Y','Y','2026-03-10 23:23:49',1),(2,32,'Y','Y','2026-03-10 23:23:49',1),(2,33,'Y','Y','2026-03-10 23:23:49',1),(2,39,'Y','Y','2026-03-10 23:23:49',1),(2,40,'Y','Y','2026-03-10 23:23:49',1),(2,41,'Y','Y','2026-03-14 10:43:16',1),(3,1,'Y','Y','2026-03-10 23:23:49',1),(3,2,'Y','Y','2026-03-10 23:23:49',1),(3,3,'Y','Y','2026-03-10 23:23:49',1),(3,4,'Y','Y','2026-03-10 23:23:49',1),(3,5,'Y','Y','2026-03-10 23:23:49',1),(3,6,'Y','Y','2026-03-10 23:23:49',1),(3,7,'Y','Y','2026-03-10 23:23:49',1),(3,11,'Y','Y','2026-03-10 23:23:49',1),(3,12,'Y','Y','2026-03-10 23:23:49',1),(3,14,'Y','Y','2026-03-10 23:23:49',1),(3,15,'Y','Y','2026-03-10 23:23:49',1),(3,16,'Y','Y','2026-03-10 23:23:49',1),(3,17,'Y','Y','2026-03-10 23:23:49',1),(3,18,'Y','Y','2026-03-10 23:23:49',1),(3,19,'Y','Y','2026-03-10 23:23:49',1),(3,21,'Y','Y','2026-03-10 23:23:49',1),(3,22,'Y','Y','2026-03-10 23:23:49',1),(3,23,'Y','Y','2026-03-10 23:23:49',1),(4,1,'Y','Y','2026-03-10 23:23:49',1),(4,2,'Y','Y','2026-03-10 23:23:49',1),(4,3,'Y','Y','2026-03-10 23:23:49',1),(4,4,'Y','Y','2026-03-10 23:23:49',1),(4,5,'Y','Y','2026-03-10 23:23:49',1),(4,11,'Y','Y','2026-03-10 23:23:49',1),(4,12,'Y','Y','2026-03-10 23:23:49',1),(4,14,'Y','Y','2026-03-10 23:23:49',1),(4,15,'Y','Y','2026-03-10 23:23:49',1),(4,16,'Y','Y','2026-03-10 23:23:49',1),(4,17,'Y','Y','2026-03-10 23:23:49',1),(4,18,'Y','Y','2026-03-10 23:23:49',1),(4,19,'Y','Y','2026-03-10 23:23:49',1),(5,1,'Y','Y','2026-03-10 23:23:49',1),(5,2,'Y','Y','2026-03-10 23:23:49',1),(5,3,'Y','Y','2026-03-10 23:23:49',1),(5,4,'Y','Y','2026-03-10 23:23:49',1),(5,5,'Y','Y','2026-03-10 23:23:49',1),(5,6,'Y','Y','2026-03-10 23:23:49',1),(5,11,'Y','Y','2026-03-10 23:23:49',1),(5,12,'Y','Y','2026-03-10 23:23:49',1),(5,14,'Y','Y','2026-03-10 23:23:49',1),(5,15,'Y','Y','2026-03-10 23:23:49',1),(5,16,'Y','Y','2026-03-10 23:23:49',1),(5,17,'Y','Y','2026-03-10 23:23:49',1),(5,18,'Y','Y','2026-03-10 23:23:49',1),(5,19,'Y','Y','2026-03-10 23:23:49',1),(5,21,'Y','Y','2026-03-10 23:23:49',1),(5,22,'Y','Y','2026-03-10 23:23:49',1),(6,1,'Y','Y','2026-03-10 23:23:49',1),(6,2,'Y','Y','2026-03-10 23:23:49',1),(6,3,'Y','Y','2026-03-10 23:23:49',1),(6,4,'Y','Y','2026-03-10 23:23:49',1),(6,5,'Y','Y','2026-03-10 23:23:49',1),(6,6,'Y','Y','2026-03-10 23:23:49',1),(6,11,'Y','Y','2026-03-10 23:23:49',1),(6,12,'Y','Y','2026-03-10 23:23:49',1),(6,14,'Y','Y','2026-03-10 23:23:49',1),(6,15,'Y','Y','2026-03-10 23:23:49',1),(6,16,'Y','Y','2026-03-10 23:23:49',1),(6,17,'Y','Y','2026-03-10 23:23:49',1),(6,18,'Y','Y','2026-03-10 23:23:49',1),(6,19,'Y','Y','2026-03-10 23:23:49',1),(6,21,'Y','Y','2026-03-10 23:23:49',1),(6,22,'Y','Y','2026-03-10 23:23:49',1),(7,1,'Y','Y','2026-03-10 23:23:49',1),(7,2,'Y','Y','2026-03-10 23:23:49',1),(7,3,'Y','Y','2026-03-10 23:23:49',1),(7,4,'Y','Y','2026-03-10 23:23:49',1),(7,5,'Y','Y','2026-03-10 23:23:49',1),(7,6,'Y','Y','2026-03-10 23:23:49',1),(7,11,'Y','Y','2026-03-10 23:23:49',1),(7,12,'Y','Y','2026-03-10 23:23:49',1),(7,14,'Y','Y','2026-03-10 23:23:49',1),(7,15,'Y','Y','2026-03-10 23:23:49',1),(7,16,'Y','Y','2026-03-10 23:23:49',1),(7,17,'Y','Y','2026-03-10 23:23:49',1),(7,18,'Y','Y','2026-03-10 23:23:49',1),(7,19,'Y','Y','2026-03-10 23:23:49',1),(7,21,'Y','Y','2026-03-10 23:23:49',1),(7,22,'Y','Y','2026-03-10 23:23:49',1),(8,1,'Y','Y','2026-03-10 23:23:49',1),(8,2,'Y','Y','2026-03-10 23:23:49',1),(8,3,'Y','Y','2026-03-10 23:23:49',1),(8,4,'Y','Y','2026-03-10 23:23:49',1),(8,5,'Y','Y','2026-03-10 23:23:49',1),(8,6,'Y','Y','2026-03-10 23:23:49',1),(8,11,'Y','Y','2026-03-10 23:23:49',1),(8,12,'Y','Y','2026-03-10 23:23:49',1),(8,14,'Y','Y','2026-03-10 23:23:49',1),(8,15,'Y','Y','2026-03-10 23:23:49',1),(8,16,'Y','Y','2026-03-10 23:23:49',1),(8,17,'Y','Y','2026-03-10 23:23:49',1),(8,18,'Y','Y','2026-03-10 23:23:49',1),(8,19,'Y','Y','2026-03-10 23:23:49',1),(8,21,'Y','Y','2026-03-10 23:23:49',1),(8,22,'Y','Y','2026-03-10 23:23:49',1),(9,1,'Y','Y','2026-03-10 23:23:49',1),(9,2,'Y','Y','2026-03-10 23:23:49',1),(9,3,'Y','Y','2026-03-10 23:23:49',1),(9,7,'Y','Y','2026-03-10 23:23:49',1),(9,11,'Y','Y','2026-03-10 23:23:49',1),(9,12,'Y','Y','2026-03-10 23:23:49',1),(9,14,'Y','Y','2026-03-10 23:23:49',1),(9,15,'Y','Y','2026-03-10 23:23:49',1),(9,23,'Y','Y','2026-03-10 23:23:49',1),(10,6,'Y','Y','2026-03-10 23:23:49',1),(10,21,'Y','Y','2026-03-10 23:23:49',1),(10,22,'Y','Y','2026-03-10 23:23:49',1),(11,1,'Y','N','2026-03-10 23:23:49',1),(11,2,'Y','N','2026-03-10 23:23:49',1),(11,3,'Y','N','2026-03-10 23:23:49',1),(11,4,'Y','N','2026-03-10 23:23:49',1),(11,5,'Y','N','2026-03-10 23:23:49',1),(11,6,'Y','N','2026-03-10 23:23:49',1),(11,7,'Y','N','2026-03-10 23:23:49',1),(11,11,'Y','N','2026-03-10 23:23:49',1),(11,12,'Y','N','2026-03-10 23:23:49',1),(11,14,'Y','N','2026-03-10 23:23:49',1),(11,15,'Y','N','2026-03-10 23:23:49',1),(11,16,'Y','N','2026-03-10 23:23:49',1),(11,17,'Y','N','2026-03-10 23:23:49',1),(11,18,'Y','N','2026-03-10 23:23:49',1),(11,19,'Y','N','2026-03-10 23:23:49',1),(11,21,'Y','N','2026-03-10 23:23:49',1),(11,22,'Y','N','2026-03-10 23:23:49',1),(11,23,'Y','N','2026-03-10 23:23:49',1);
+/*!40000 ALTER TABLE `tb_role_menu` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Dumping data for table `tb_user`
+--
+
+LOCK TABLES `tb_user` WRITE;
+/*!40000 ALTER TABLE `tb_user` DISABLE KEYS */;
+INSERT INTO `tb_user` (`user_id`, `login_id`, `password`, `user_nm`, `employee_no`, `dept_id`, `email`, `tel`, `status`, `valid_from`, `valid_to`, `last_login_at`, `pwd_changed_at`, `login_fail_cnt`, `created_at`, `created_by`, `updated_at`, `updated_by`) VALUES (1,'admin','$2a$10$c5Jwkaus0cKAjnVAyj8mrOAEWAdvJuXbeKYEcV5fGzYz7Y0TGcYsG','슈퍼관리자','EMP0001',1,'admin@itsm.local','000-0000-0000','ACTIVE','2026-03-10 23:23:49',NULL,'2026-03-14 11:07:22','2026-03-13 07:12:31',0,'2026-03-10 23:23:49',NULL,'2026-03-14 11:07:22',NULL);
+/*!40000 ALTER TABLE `tb_user` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Dumping data for table `tb_department`
+--
+
+LOCK TABLES `tb_department` WRITE;
+/*!40000 ALTER TABLE `tb_department` DISABLE KEYS */;
+INSERT INTO `tb_department` (`dept_id`, `dept_nm`, `company_id`, `status`, `created_at`, `created_by`, `updated_at`, `updated_by`) VALUES (1,'시스템관리',1,'ACTIVE','2026-03-10 23:23:49',NULL,NULL,NULL);
+/*!40000 ALTER TABLE `tb_department` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Dumping data for table `tb_batch_job`
+--
+
+LOCK TABLES `tb_batch_job` WRITE;
+/*!40000 ALTER TABLE `tb_batch_job` DISABLE KEYS */;
+INSERT INTO `tb_batch_job` (`batch_job_id`, `job_name`, `job_name_en`, `job_description`, `cron_expression`, `is_active`, `last_executed_at`, `last_result`, `last_result_message`, `created_at`, `created_by`, `updated_at`, `updated_by`) VALUES (1,'AssetExpiryJob','Asset Expiry Alert','HW 자산 보증 만료 알림 (30일 이내)','0 0 7 * * *','Y',NULL,NULL,NULL,'2026-03-14 10:02:18',1,'2026-03-14 10:02:18',NULL),(2,'SlaWarningJob','SLA Warning Alert','SLA 경고 알림 (경과율 80% 이상)','0 0 * * * *','Y',NULL,NULL,NULL,'2026-03-14 10:02:18',1,'2026-03-14 10:02:18',NULL),(3,'SlaOverdueJob','SLA Overdue Alert','SLA 초과 알림','0 10 * * * *','Y',NULL,NULL,NULL,'2026-03-14 10:02:18',1,'2026-03-14 10:02:18',NULL),(4,'UnassignedIncidentJob','Unassigned Incident Alert','미배정 장애 알림','0 20 * * * *','Y',NULL,NULL,NULL,'2026-03-14 10:02:18',1,'2026-03-14 10:02:18',NULL),(5,'RepeatIncidentJob','Repeat Incident Alert','반복 장애 자산 알림 (30일간 3건+)','0 0 8 * * *','Y',NULL,NULL,NULL,'2026-03-14 10:02:18',1,'2026-03-14 10:02:18',NULL),(6,'LongPendingSrJob',NULL,'장기 미처리 서비스요청 알림 (2일+)','0 0 9 * * *','Y',NULL,NULL,NULL,'2026-03-14 10:02:18',1,'2026-03-14 10:02:18',NULL),(7,'InspectionAlertJob',NULL,'점검 임박 알림 (7일 이내)','0 0 7 * * *','Y',NULL,NULL,NULL,'2026-03-14 10:02:18',1,'2026-03-14 10:02:18',NULL),(8,'MissedInspectionJob',NULL,'미실시 점검 알림','0 30 8 * * *','Y',NULL,NULL,NULL,'2026-03-14 10:02:18',1,'2026-03-14 10:02:18',NULL),(9,'AssetAutoRegisterJob','Asset Auto Register','자산 자동 등록 배치 (초기 세팅 + 월 1~2건 추가)','0 0 1 1 * *','Y',NULL,NULL,NULL,'2026-03-14 10:02:23',1,'2026-03-14 10:02:23',1),(10,'IncidentSimulationJob','Incident Simulation','장애 시뮬레이션 배치 (일 2~5건 자동 생성/처리)','0 */30 * * * *','Y',NULL,NULL,NULL,'2026-03-14 10:02:23',1,'2026-03-14 10:02:23',1),(11,'ServiceRequestSimulationJob','Service Request Simulation','서비스요청 시뮬레이션 배치 (일 3~8건 자동 생성/처리)','0 0 * * * *','Y',NULL,NULL,NULL,'2026-03-14 10:02:23',1,'2026-03-14 10:02:23',1),(12,'ChangeSimulationJob','Change Simulation','변경관리 시뮬레이션 배치 (주 2~4건 자동 생성/승인)','0 0 2 * * *','Y',NULL,NULL,NULL,'2026-03-14 10:02:23',1,'2026-03-14 10:02:23',1),(13,'InspectionSimulationJob','Inspection Simulation','정기점검 시뮬레이션 배치 (점검 자동 수행)','0 0 3 * * *','Y',NULL,NULL,NULL,'2026-03-14 10:02:23',1,'2026-03-14 10:02:23',1),(14,'TrafficSimulationJob',NULL,'트래픽/모니터링 시뮬레이션 배치 (로그인/메뉴접근 로그)','0 */15 * * * *','Y',NULL,NULL,NULL,'2026-03-14 10:02:23',1,'2026-03-14 10:02:23',1),(15,'StatisticsAggregationJob',NULL,'통계 집계 배치 (대시보드용 일별 통계)','0 0 2 * * *','Y',NULL,NULL,NULL,'2026-03-14 10:02:23',1,'2026-03-14 10:02:23',1);
+/*!40000 ALTER TABLE `tb_batch_job` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Dumping data for table `tb_board_config`
+--
+
+LOCK TABLES `tb_board_config` WRITE;
+/*!40000 ALTER TABLE `tb_board_config` DISABLE KEYS */;
+/*!40000 ALTER TABLE `tb_board_config` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Dumping data for table `tb_sla_policy`
+--
+
+LOCK TABLES `tb_sla_policy` WRITE;
+/*!40000 ALTER TABLE `tb_sla_policy` DISABLE KEYS */;
+INSERT INTO `tb_sla_policy` (`policy_id`, `company_id`, `priority_cd`, `deadline_hours`, `warning_pct`, `is_active`, `created_at`, `created_by`) VALUES (1,NULL,'CRITICAL',4,80,'Y','2026-03-10 23:23:49',1),(2,NULL,'HIGH',8,80,'Y','2026-03-10 23:23:49',1),(3,NULL,'MEDIUM',24,80,'Y','2026-03-10 23:23:49',1),(4,NULL,'LOW',72,80,'Y','2026-03-10 23:23:49',1),(5,NULL,'CRITICAL',4,80,'Y','2026-03-14 10:30:21',1),(6,NULL,'HIGH',8,80,'Y','2026-03-14 10:30:21',1),(7,NULL,'MEDIUM',24,80,'Y','2026-03-14 10:30:21',1),(8,NULL,'LOW',72,80,'Y','2026-03-14 10:30:21',1);
+/*!40000 ALTER TABLE `tb_sla_policy` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Dumping data for table `tb_notification_policy`
+--
+
+LOCK TABLES `tb_notification_policy` WRITE;
+/*!40000 ALTER TABLE `tb_notification_policy` DISABLE KEYS */;
+/*!40000 ALTER TABLE `tb_notification_policy` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2026-03-14 12:01:50
