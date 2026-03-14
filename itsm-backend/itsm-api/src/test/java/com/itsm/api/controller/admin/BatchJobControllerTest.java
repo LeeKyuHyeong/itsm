@@ -80,7 +80,7 @@ class BatchJobControllerTest {
     @Test
     @DisplayName("PATCH /api/v1/admin/batch-jobs/{id} - 배치 작업 수정 시 200을 반환한다")
     void updateJob_returns200() throws Exception {
-        BatchJobUpdateRequest req = new BatchJobUpdateRequest("0 30 * * * *", "N", "변경됨");
+        BatchJobUpdateRequest req = new BatchJobUpdateRequest("0 30 * * * *", "N", "변경됨", "Changed");
         BatchJobResponse response = BatchJobResponse.builder()
                 .batchJobId(1L).jobName("SlaWarningJob")
                 .cronExpression("0 30 * * * *").isActive("N")

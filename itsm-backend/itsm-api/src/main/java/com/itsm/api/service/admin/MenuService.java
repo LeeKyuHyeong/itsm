@@ -44,6 +44,7 @@ public class MenuService {
             MenuResponse response = MenuResponse.builder()
                     .menuId(menu.getMenuId())
                     .menuNm(menu.getMenuNm())
+                    .menuNmEn(menu.getMenuNmEn())
                     .menuUrl(menu.getMenuUrl())
                     .icon(menu.getIcon())
                     .sortOrder(menu.getSortOrder())

@@ -75,7 +75,7 @@ class BatchJobServiceTest {
     @Test
     @DisplayName("배치 작업을 수정한다")
     void updateJob_success() {
-        BatchJobUpdateRequest req = new BatchJobUpdateRequest("0 30 * * * *", "N", "변경됨");
+        BatchJobUpdateRequest req = new BatchJobUpdateRequest("0 30 * * * *", "N", "변경됨", "Changed");
         given(batchJobRepository.findById(1L)).willReturn(Optional.of(batchJob));
 
         BatchJobResponse result = batchJobService.updateJob(1L, req, 1L);

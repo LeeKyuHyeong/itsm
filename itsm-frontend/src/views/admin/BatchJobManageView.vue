@@ -10,6 +10,7 @@
           <tr>
             <th>{{ t('admin.number') }}</th>
             <th>{{ t('admin.batchJobName') }}</th>
+            <th>{{ t('admin.batchJobNameEn') }}</th>
             <th>{{ t('admin.batchDescription') }}</th>
             <th>{{ t('admin.cronExpression') }}</th>
             <th>{{ t('admin.isActive') }}</th>
@@ -20,14 +21,15 @@
         </thead>
         <tbody>
           <tr v-if="loading">
-            <td colspan="8" class="text-center">{{ t('common.loading') }}</td>
+            <td colspan="9" class="text-center">{{ t('common.loading') }}</td>
           </tr>
           <tr v-else-if="jobs.length === 0">
-            <td colspan="8" class="text-center">{{ t('admin.noBatchJobs') }}</td>
+            <td colspan="9" class="text-center">{{ t('admin.noBatchJobs') }}</td>
           </tr>
           <tr v-for="(job, index) in jobs" :key="job.batchJobId">
             <td>{{ index + 1 }}</td>
             <td class="job-name">{{ job.jobName }}</td>
+            <td>{{ job.jobNameEn || '-' }}</td>
             <td>{{ job.jobDescription || '-' }}</td>
             <td><code class="cron-code">{{ job.cronExpression }}</code></td>
             <td>
@@ -61,6 +63,10 @@
           <div class="form-group">
             <label class="form-label">{{ t('admin.batchJobName') }}</label>
             <input :value="editingJob?.jobName" type="text" class="form-input" disabled />
+          </div>
+          <div class="form-group">
+            <label class="form-label">{{ t('admin.batchJobNameEn') }}</label>
+            <input v-model="form.jobNameEn" type="text" class="form-input" />
           </div>
           <div class="form-group">
             <label class="form-label">{{ t('admin.cronExpression') }} <span class="required">*</span></label>
@@ -108,7 +114,8 @@ const editingJob = ref(null)
 const form = reactive({
   cronExpression: '',
   isActive: 'Y',
-  jobDescription: ''
+  jobDescription: '',
+  jobNameEn: ''
 })
 
 function formatDate(dt) {
@@ -137,7 +144,8 @@ function openEditModal(job) {
   Object.assign(form, {
     cronExpression: job.cronExpression,
     isActive: job.isActive,
-    jobDescription: job.jobDescription || ''
+    jobDescription: job.jobDescription || '',
+    jobNameEn: job.jobNameEn || ''
   })
   saveError.value = ''
   showModal.value = true

@@ -10,6 +10,7 @@
         <tr>
           <th width="60">ID</th>
           <th>{{ t('admin.boardName') }}</th>
+          <th>{{ t('admin.boardNameEn') }}</th>
           <th width="100">{{ t('admin.boardType') }}</th>
           <th width="80">{{ t('admin.allowComment') }}</th>
           <th width="80">{{ t('admin.isActive') }}</th>
@@ -23,6 +24,7 @@
         <tr v-for="b in boards" :key="b.boardId">
           <td>{{ b.boardId }}</td>
           <td>{{ b.boardNm }}</td>
+          <td>{{ b.boardNmEn || '-' }}</td>
           <td>{{ b.boardTypeCd }}</td>
           <td>{{ b.allowComment === 'Y' ? 'O' : 'X' }}</td>
           <td>
@@ -49,6 +51,10 @@
           <div class="form-group">
             <label class="required">{{ t('admin.boardName') }}</label>
             <input v-model="form.boardNm" required />
+          </div>
+          <div class="form-group">
+            <label>{{ t('admin.boardNameEn') }}</label>
+            <input v-model="form.boardNmEn" />
           </div>
           <div class="form-row">
             <div class="form-group">
@@ -113,6 +119,7 @@ const editBoardId = ref(null)
 
 const form = reactive({
   boardNm: '',
+  boardNmEn: '',
   boardTypeCd: '',
   allowExt: '',
   maxFileSize: null,
@@ -124,6 +131,7 @@ const form = reactive({
 
 const resetForm = () => {
   form.boardNm = ''
+  form.boardNmEn = ''
   form.boardTypeCd = ''
   form.allowExt = ''
   form.maxFileSize = null
@@ -151,6 +159,7 @@ const openCreateModal = () => {
 
 const openEditModal = (b) => {
   form.boardNm = b.boardNm
+  form.boardNmEn = b.boardNmEn || ''
   form.boardTypeCd = b.boardTypeCd
   form.allowExt = b.allowExt || ''
   form.maxFileSize = b.maxFileSize

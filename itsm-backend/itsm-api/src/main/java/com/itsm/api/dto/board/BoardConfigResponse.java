@@ -15,6 +15,7 @@ public class BoardConfigResponse {
 
     private Long boardId;
     private String boardNm;
+    private String boardNmEn;
     private String boardTypeCd;
     private String allowExt;
     private Integer maxFileSize;

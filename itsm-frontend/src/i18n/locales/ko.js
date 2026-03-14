@@ -412,6 +412,7 @@ export default {
     boardAdd: '게시판 추가',
     boardEdit: '게시판 수정',
     boardName: '게시판명',
+    boardNameEn: '게시판명(영문)',
     boardType: '유형코드',
     sortOrder: '정렬순서',
     allowExt: '허용 확장자',
@@ -469,6 +470,7 @@ export default {
     codeGroupList: '코드그룹 목록',
     groupCode: '그룹코드',
     groupName: '그룹명',
+    groupNameEn: '그룹명(영문)',
     useYn: '사용여부',
     noCodeGroups: '등록된 코드그룹이 없습니다.',
     inUse: '사용',
@@ -476,6 +478,7 @@ export default {
     codeDetailList: '코드상세 목록',
     codeValue: '코드값',
     codeName: '코드명',
+    codeNameEn: '코드명(영문)',
     selectCodeGroup: '코드그룹을 선택해주세요.',
     noCodes: '등록된 코드가 없습니다.',
     codeGroupEdit: '코드그룹 수정',
@@ -484,6 +487,7 @@ export default {
     codeEdit: '코드 수정',
     codeAdd: '코드 추가',
     menuName: '메뉴명',
+    menuNameEn: '메뉴명(영문)',
     path: '경로',
     icon: '아이콘',
     noMenus: '등록된 메뉴가 없습니다.',
@@ -512,6 +516,7 @@ export default {
     targetRoleCode: '대상역할코드',
     batchManage: '배치관리',
     batchJobName: '배치명',
+    batchJobNameEn: '배치명(영문)',
     batchDescription: '설명',
     cronExpression: 'CRON 표현식',
     lastExecutedAt: '마지막 실행',
@@ -585,6 +590,21 @@ export default {
     orgManage: '조직 관리',
     assetList: '자산 목록',
     batchManage: '배치관리'
+  },
+
+  // 역할명
+  role: {
+    ROLE_SUPER_ADMIN: '슈퍼관리자',
+    ROLE_ITSM_ADMIN: 'ITSM관리자',
+    ROLE_PM: 'PM',
+    ROLE_DEVELOPER: '개발자',
+    ROLE_SECURITY: '보안담당자',
+    ROLE_DBA: 'DB담당자',
+    ROLE_NETWORK: '네트워크담당자',
+    ROLE_SERVER: '서버담당자',
+    ROLE_CUSTOMER: '고객사 인원',
+    ROLE_EXTERNAL: '외부사용자',
+    ROLE_AUDITOR: '감사자'
   },
 
   // 알림

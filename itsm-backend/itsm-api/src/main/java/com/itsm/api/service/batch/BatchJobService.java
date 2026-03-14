@@ -32,7 +32,7 @@ public class BatchJobService {
 
     public BatchJobResponse updateJob(Long batchJobId, BatchJobUpdateRequest req, Long currentUserId) {
         BatchJob job = findById(batchJobId);
-        job.update(req.getCronExpression(), req.getIsActive(), req.getJobDescription());
+        job.update(req.getCronExpression(), req.getIsActive(), req.getJobDescription(), req.getJobNameEn());
         job.setUpdatedBy(currentUserId);
         return toResponse(job);
     }
@@ -51,6 +51,7 @@ public class BatchJobService {
         return BatchJobResponse.builder()
                 .batchJobId(job.getBatchJobId())
                 .jobName(job.getJobName())
+                .jobNameEn(job.getJobNameEn())
                 .jobDescription(job.getJobDescription())
                 .cronExpression(job.getCronExpression())
                 .isActive(job.getIsActive())

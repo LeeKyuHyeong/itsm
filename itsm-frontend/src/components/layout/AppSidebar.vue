@@ -110,11 +110,11 @@ import { useI18n } from 'vue-i18n'
 import { useMenuStore } from '@/stores/menu.js'
 import { menuApi } from '@/api/admin/menu.js'
 
-const { t, te } = useI18n()
+const { locale } = useI18n()
 
 function menuLabel(item) {
-  if (item.i18nKey && te(item.i18nKey)) {
-    return t(item.i18nKey)
+  if (locale.value === 'en' && item.nameEn) {
+    return item.nameEn
   }
   return item.name
 }

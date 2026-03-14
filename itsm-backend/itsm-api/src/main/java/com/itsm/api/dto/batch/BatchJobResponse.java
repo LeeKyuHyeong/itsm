@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 public class BatchJobResponse {
     private Long batchJobId;
     private String jobName;
+    private String jobNameEn;
     private String jobDescription;
     private String cronExpression;
     private String isActive;

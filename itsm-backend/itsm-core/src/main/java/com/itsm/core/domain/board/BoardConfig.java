@@ -21,6 +21,9 @@ public class BoardConfig extends BaseEntity {
     @Column(name = "board_nm", nullable = false, length = 100)
     private String boardNm;
 
+    @Column(name = "board_nm_en", length = 100)
+    private String boardNmEn;
+
     @Column(name = "board_type_cd", nullable = false, length = 20)
     private String boardTypeCd;
 
@@ -43,9 +46,10 @@ public class BoardConfig extends BaseEntity {
     private Integer sortOrder;
 
     @Builder
-    public BoardConfig(String boardNm, String boardTypeCd, String allowExt, Integer maxFileSize,
+    public BoardConfig(String boardNm, String boardNmEn, String boardTypeCd, String allowExt, Integer maxFileSize,
                        String allowComment, String rolePermission, String isActive, Integer sortOrder) {
         this.boardNm = boardNm;
+        this.boardNmEn = boardNmEn;
         this.boardTypeCd = boardTypeCd;
         this.allowExt = allowExt;
         this.maxFileSize = maxFileSize;
@@ -55,9 +59,10 @@ public class BoardConfig extends BaseEntity {
         this.sortOrder = sortOrder != null ? sortOrder : 0;
     }
 
-    public void update(String boardNm, String boardTypeCd, String allowExt, Integer maxFileSize,
+    public void update(String boardNm, String boardNmEn, String boardTypeCd, String allowExt, Integer maxFileSize,
                        String allowComment, String rolePermission, String isActive, Integer sortOrder) {
         this.boardNm = boardNm;
+        this.boardNmEn = boardNmEn;
         this.boardTypeCd = boardTypeCd;
         this.allowExt = allowExt;
         this.maxFileSize = maxFileSize;

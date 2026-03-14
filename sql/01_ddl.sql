@@ -139,6 +139,7 @@ CREATE TABLE IF NOT EXISTS tb_menu (
     menu_id         BIGINT          NOT NULL AUTO_INCREMENT  COMMENT '메뉴ID',
     parent_menu_id  BIGINT          NULL                     COMMENT '상위메뉴ID (NULL=최상위)',
     menu_nm         VARCHAR(100)    NOT NULL                 COMMENT '메뉴명',
+    menu_nm_en      VARCHAR(100)    NULL                     COMMENT '메뉴명(영문)',
     menu_url        VARCHAR(200)    NULL                     COMMENT 'URL',
     icon            VARCHAR(50)     NULL                     COMMENT '아이콘',
     sort_order      INT             NOT NULL DEFAULT 0       COMMENT '정렬순서',
@@ -713,6 +714,7 @@ CREATE TABLE IF NOT EXISTS tb_incident_report (
 CREATE TABLE IF NOT EXISTS tb_board_config (
     board_id        BIGINT          NOT NULL AUTO_INCREMENT  COMMENT '게시판ID',
     board_nm        VARCHAR(100)    NOT NULL                 COMMENT '게시판명',
+    board_nm_en     VARCHAR(100)    NULL                     COMMENT '게시판명(영문)',
     board_type_cd   VARCHAR(20)     NOT NULL                 COMMENT '게시판유형 (NOTICE/FREE/ARCHIVE 등)',
     allow_ext       VARCHAR(200)    NULL                     COMMENT '허용 확장자 (콤마 구분, NULL이면 전체 허용)',
     max_file_size   INT             NULL                     COMMENT '파일 최대 용량 (MB)',
@@ -786,6 +788,7 @@ CREATE TABLE IF NOT EXISTS tb_board_file (
 CREATE TABLE IF NOT EXISTS tb_common_code (
     group_id        BIGINT          NOT NULL AUTO_INCREMENT  COMMENT '코드그룹ID',
     group_nm        VARCHAR(100)    NOT NULL                 COMMENT '그룹명',
+    group_nm_en     VARCHAR(100)    NULL                     COMMENT '그룹명(영문)',
     group_cd        VARCHAR(50)     NOT NULL                 COMMENT '그룹코드',
     description     VARCHAR(200)    NULL                     COMMENT '설명',
     is_active       CHAR(1)         NOT NULL DEFAULT 'Y'     COMMENT '사용여부',
@@ -801,6 +804,7 @@ CREATE TABLE IF NOT EXISTS tb_common_code_detail (
     group_id        BIGINT          NOT NULL                 COMMENT '코드그룹ID',
     code_val        VARCHAR(50)     NOT NULL                 COMMENT '코드값',
     code_nm         VARCHAR(100)    NOT NULL                 COMMENT '코드명',
+    code_nm_en      VARCHAR(100)    NULL                     COMMENT '코드명(영문)',
     sort_order      INT             NOT NULL DEFAULT 0       COMMENT '정렬순서',
     is_active       CHAR(1)         NOT NULL DEFAULT 'Y'     COMMENT '사용여부',
     created_at      DATETIME        NOT NULL                 COMMENT '등록일시',

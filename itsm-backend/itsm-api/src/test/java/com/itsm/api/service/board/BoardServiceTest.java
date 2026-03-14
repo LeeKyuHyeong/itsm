@@ -81,7 +81,7 @@ class BoardServiceTest {
     @DisplayName("게시판 설정을 생성한다")
     void createConfig_success() {
         BoardConfigRequest req = new BoardConfigRequest(
-                "자유게시판", "FREE", "jpg,png", 5, "Y", "{}", "Y", 2);
+                "자유게시판", "Free Board", "FREE", "jpg,png", 5, "Y", "{}", "Y", 2);
 
         given(boardConfigRepository.save(any(BoardConfig.class))).willAnswer(inv -> {
             BoardConfig saved = inv.getArgument(0);
@@ -100,7 +100,7 @@ class BoardServiceTest {
     @DisplayName("게시판 설정을 수정한다")
     void updateConfig_success() {
         BoardConfigRequest req = new BoardConfigRequest(
-                "수정된 공지사항", "NOTICE", "pdf", 20, "N", "{}", "Y", 3);
+                "수정된 공지사항", "Updated Notice", "NOTICE", "pdf", 20, "N", "{}", "Y", 3);
 
         given(boardConfigRepository.findById(1L)).willReturn(Optional.of(boardConfig));
 
@@ -114,7 +114,7 @@ class BoardServiceTest {
     @DisplayName("존재하지 않는 게시판 설정 수정 시 예외가 발생한다")
     void updateConfig_notFound_throwsException() {
         BoardConfigRequest req = new BoardConfigRequest(
-                "수정", "FREE", null, null, "Y", "{}", "Y", 0);
+                "수정", null, "FREE", null, null, "Y", "{}", "Y", 0);
         given(boardConfigRepository.findById(999L)).willReturn(Optional.empty());
 
         assertThatThrownBy(() -> boardService.updateConfig(999L, req, 1L))

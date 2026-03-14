@@ -13,6 +13,8 @@ public class BoardConfigRequest {
     @NotBlank(message = "게시판명은 필수입니다.")
     private String boardNm;
 
+    private String boardNmEn;
+
     @NotBlank(message = "게시판유형코드는 필수입니다.")
     private String boardTypeCd;
 

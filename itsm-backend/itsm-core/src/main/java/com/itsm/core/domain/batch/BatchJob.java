@@ -22,13 +22,16 @@ public class BatchJob extends BaseEntity {
     @Column(name = "job_name", nullable = false, unique = true, length = 100)
     private String jobName;
 
+    @Column(name = "job_name_en", length = 100)
+    private String jobNameEn;
+
     @Column(name = "job_description", length = 300)
     private String jobDescription;
 
     @Column(name = "cron_expression", nullable = false, length = 50)
     private String cronExpression;
 
-    @Column(name = "is_active", nullable = false, length = 1)
+    @Column(name = "is_active", nullable = false, columnDefinition = "char(1)")
     private String isActive;
 
     @Column(name = "last_executed_at")
@@ -41,17 +44,19 @@ public class BatchJob extends BaseEntity {
     private String lastResultMessage;
 
     @Builder
-    public BatchJob(String jobName, String jobDescription, String cronExpression, String isActive) {
+    public BatchJob(String jobName, String jobNameEn, String jobDescription, String cronExpression, String isActive) {
         this.jobName = jobName;
+        this.jobNameEn = jobNameEn;
         this.jobDescription = jobDescription;
         this.cronExpression = cronExpression;
         this.isActive = isActive != null ? isActive : "Y";
     }
 
-    public void update(String cronExpression, String isActive, String jobDescription) {
+    public void update(String cronExpression, String isActive, String jobDescription, String jobNameEn) {
         this.cronExpression = cronExpression;
         this.isActive = isActive;
         this.jobDescription = jobDescription;
+        this.jobNameEn = jobNameEn;
     }
 
     public void recordExecution(String result, String message) {

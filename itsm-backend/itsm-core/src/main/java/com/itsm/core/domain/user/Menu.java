@@ -32,6 +32,9 @@ public class Menu extends BaseEntity {
     @Column(name = "menu_nm", nullable = false, length = 100)
     private String menuNm;
 
+    @Column(name = "menu_nm_en", length = 100)
+    private String menuNmEn;
+
     @Column(name = "menu_url", length = 200)
     private String menuUrl;
 
@@ -48,10 +51,11 @@ public class Menu extends BaseEntity {
     private String status;
 
     @Builder
-    public Menu(Menu parent, String menuNm, String menuUrl, String icon,
+    public Menu(Menu parent, String menuNm, String menuNmEn, String menuUrl, String icon,
                 int sortOrder, String isVisible, String status) {
         this.parent = parent;
         this.menuNm = menuNm;
+        this.menuNmEn = menuNmEn;
         this.menuUrl = menuUrl;
         this.icon = icon;
         this.sortOrder = sortOrder;

@@ -10,6 +10,7 @@
         <thead>
           <tr>
             <th>{{ t('admin.menuName') }}</th>
+            <th>{{ t('admin.menuNameEn') }}</th>
             <th>{{ t('admin.path') }}</th>
             <th>{{ t('admin.icon') }}</th>
             <th>{{ t('admin.sortOrder') }}</th>
@@ -19,10 +20,10 @@
         </thead>
         <tbody>
           <tr v-if="loading">
-            <td colspan="6" class="text-center">{{ t('common.loading') }}</td>
+            <td colspan="7" class="text-center">{{ t('common.loading') }}</td>
           </tr>
           <tr v-else-if="flatMenus.length === 0">
-            <td colspan="6" class="text-center">{{ t('admin.noMenus') }}</td>
+            <td colspan="7" class="text-center">{{ t('admin.noMenus') }}</td>
           </tr>
           <tr v-for="menu in flatMenus" :key="menu.id">
             <td>
@@ -30,6 +31,7 @@
                 {{ menu.depth > 0 ? 'ㄴ ' : '' }}{{ menu.name }}
               </span>
             </td>
+            <td>{{ menu.nameEn || '-' }}</td>
             <td>{{ menu.path || '-' }}</td>
             <td>{{ menu.icon || '-' }}</td>
             <td>{{ menu.sortOrder }}</td>
@@ -57,6 +59,10 @@
           <div class="form-group">
             <label class="form-label">{{ t('admin.menuName') }}</label>
             <input v-model="form.name" type="text" class="form-input" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">{{ t('admin.menuNameEn') }}</label>
+            <input v-model="form.nameEn" type="text" class="form-input" />
           </div>
           <div class="form-group">
             <label class="form-label">{{ t('admin.path') }}</label>
@@ -113,6 +119,7 @@ const saving = ref(false)
 const saveError = ref('')
 const form = reactive({
   name: '',
+  nameEn: '',
   path: '',
   icon: '',
   sortOrder: 0,
@@ -151,17 +158,25 @@ async function loadMenus() {
     const result = data.data || data
     if (Array.isArray(result)) {
       const flat = []
-      function flatten(list) {
+      function flatten(list, parentId) {
         for (const item of list) {
           const { children, ...rest } = item
-          flat.push(rest)
+          flat.push({
+            id: rest.menuId,
+            name: rest.menuNm,
+            nameEn: rest.menuNmEn || '',
+            path: rest.menuUrl,
+            icon: rest.icon,
+            sortOrder: rest.sortOrder,
+            active: rest.isVisible !== 'N',
+            parentId: parentId || null
+          })
           if (children && children.length > 0) {
-            children.forEach(c => { c.parentId = item.id })
-            flatten(children)
+            flatten(children, rest.menuId)
           }
         }
       }
-      flatten(result)
+      flatten(result, null)
       menus.value = flat
     } else {
       const list = result.content || result.items || result || []
@@ -181,6 +196,7 @@ function openDialog(menu = null) {
   if (menu) {
     Object.assign(form, {
       name: menu.name || '',
+      nameEn: menu.nameEn || '',
       path: menu.path || '',
       icon: menu.icon || '',
       sortOrder: menu.sortOrder || 0,
@@ -189,6 +205,7 @@ function openDialog(menu = null) {
   } else {
     Object.assign(form, {
       name: '',
+      nameEn: '',
       path: '',
       icon: '',
       sortOrder: 0,

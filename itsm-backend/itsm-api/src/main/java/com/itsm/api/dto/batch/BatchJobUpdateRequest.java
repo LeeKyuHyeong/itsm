@@ -10,4 +10,5 @@ public class BatchJobUpdateRequest {
     @NotBlank(message = "활성 여부는 필수입니다.")
     private String isActive;
     private String jobDescription;
+    private String jobNameEn;
 }

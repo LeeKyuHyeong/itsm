@@ -401,6 +401,7 @@ export default {
     boardAdd: 'Add Board',
     boardEdit: 'Edit Board',
     boardName: 'Board Name',
+    boardNameEn: 'Board Name (EN)',
     boardType: 'Type Code',
     sortOrder: 'Sort Order',
     allowExt: 'Allowed Extensions',
@@ -458,6 +459,7 @@ export default {
     codeGroupList: 'Code Group List',
     groupCode: 'Group Code',
     groupName: 'Group Name',
+    groupNameEn: 'Group Name (EN)',
     useYn: 'Status',
     noCodeGroups: 'No code groups registered.',
     inUse: 'In Use',
@@ -465,6 +467,7 @@ export default {
     codeDetailList: 'Code Detail List',
     codeValue: 'Code Value',
     codeName: 'Code Name',
+    codeNameEn: 'Code Name (EN)',
     selectCodeGroup: 'Please select a code group.',
     noCodes: 'No codes registered.',
     codeGroupEdit: 'Edit Code Group',
@@ -473,6 +476,7 @@ export default {
     codeEdit: 'Edit Code',
     codeAdd: 'Add Code',
     menuName: 'Menu Name',
+    menuNameEn: 'Menu Name (EN)',
     path: 'Path',
     icon: 'Icon',
     noMenus: 'No menus registered.',
@@ -501,6 +505,7 @@ export default {
     targetRoleCode: 'Target Role Code',
     batchManage: 'Batch Management',
     batchJobName: 'Job Name',
+    batchJobNameEn: 'Job Name (EN)',
     batchDescription: 'Description',
     cronExpression: 'CRON Expression',
     lastExecutedAt: 'Last Executed',
@@ -572,6 +577,20 @@ export default {
     orgManage: 'Organization Management',
     assetList: 'Asset List',
     batchManage: 'Batch Jobs'
+  },
+
+  role: {
+    ROLE_SUPER_ADMIN: 'Super Admin',
+    ROLE_ITSM_ADMIN: 'ITSM Admin',
+    ROLE_PM: 'PM',
+    ROLE_DEVELOPER: 'Developer',
+    ROLE_SECURITY: 'Security',
+    ROLE_DBA: 'DBA',
+    ROLE_NETWORK: 'Network',
+    ROLE_SERVER: 'Server',
+    ROLE_CUSTOMER: 'Customer',
+    ROLE_EXTERNAL: 'External',
+    ROLE_AUDITOR: 'Auditor'
   },
 
   notification: {

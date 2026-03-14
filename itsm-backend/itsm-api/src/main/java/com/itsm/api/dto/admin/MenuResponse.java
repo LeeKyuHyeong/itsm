@@ -16,6 +16,7 @@ public class MenuResponse {
 
     private Long menuId;
     private String menuNm;
+    private String menuNmEn;
     private String menuUrl;
     private String icon;
     private int sortOrder;

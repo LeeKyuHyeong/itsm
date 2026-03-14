@@ -35,6 +35,7 @@ public class BoardService {
     public BoardConfigResponse createConfig(BoardConfigRequest req, Long currentUserId) {
         BoardConfig config = BoardConfig.builder()
                 .boardNm(req.getBoardNm())
+                .boardNmEn(req.getBoardNmEn())
                 .boardTypeCd(req.getBoardTypeCd())
                 .allowExt(req.getAllowExt())
                 .maxFileSize(req.getMaxFileSize())
@@ -51,7 +52,7 @@ public class BoardService {
 
     public BoardConfigResponse updateConfig(Long boardId, BoardConfigRequest req, Long currentUserId) {
         BoardConfig config = findConfigById(boardId);
-        config.update(req.getBoardNm(), req.getBoardTypeCd(), req.getAllowExt(),
+        config.update(req.getBoardNm(), req.getBoardNmEn(), req.getBoardTypeCd(), req.getAllowExt(),
                 req.getMaxFileSize(), req.getAllowComment(), req.getRolePermission(),
                 req.getIsActive(), req.getSortOrder());
         config.setUpdatedBy(currentUserId);
@@ -158,6 +159,7 @@ public class BoardService {
         return BoardConfigResponse.builder()
                 .boardId(config.getBoardId())
                 .boardNm(config.getBoardNm())
+                .boardNmEn(config.getBoardNmEn())
                 .boardTypeCd(config.getBoardTypeCd())
                 .allowExt(config.getAllowExt())
                 .maxFileSize(config.getMaxFileSize())

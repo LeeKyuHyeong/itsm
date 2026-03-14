@@ -74,7 +74,7 @@ class BoardControllerTest {
     @DisplayName("POST /api/v1/admin/boards - 게시판 설정 생성")
     void createConfig_returns200() throws Exception {
         BoardConfigRequest req = new BoardConfigRequest(
-                "자유게시판", "FREE", "jpg,png", 5, "Y", "{}", "Y", 2);
+                "자유게시판", "Free Board", "FREE", "jpg,png", 5, "Y", "{}", "Y", 2);
         BoardConfigResponse response = BoardConfigResponse.builder()
                 .boardId(2L).boardNm("자유게시판").boardTypeCd("FREE")
                 .allowComment("Y").isActive("Y").sortOrder(2)
@@ -93,7 +93,7 @@ class BoardControllerTest {
     @DisplayName("PUT /api/v1/admin/boards/{boardId} - 게시판 설정 수정")
     void updateConfig_returns200() throws Exception {
         BoardConfigRequest req = new BoardConfigRequest(
-                "수정된 공지", "NOTICE", "pdf", 20, "Y", "{}", "Y", 1);
+                "수정된 공지", "Updated Notice", "NOTICE", "pdf", 20, "Y", "{}", "Y", 1);
         BoardConfigResponse response = BoardConfigResponse.builder()
                 .boardId(1L).boardNm("수정된 공지").boardTypeCd("NOTICE")
                 .allowComment("Y").isActive("Y").sortOrder(1)
