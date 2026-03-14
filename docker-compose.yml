@@ -8,7 +8,7 @@ services:
       MARIADB_DATABASE: ITSM
       TZ: Asia/Seoul
     ports:
-      - "3306:3306"
+      - "3310:3306"
     volumes:
       - itsm-db-data:/var/lib/mysql
     healthcheck:
@@ -30,8 +30,8 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost}
-    ports:
-      - "8080:8080"
+    expose:
+      - "8080"
 
   itsm-batch:
     image: ${DOCKERHUB_USERNAME}/itsm-batch:latest
@@ -52,7 +52,7 @@ services:
     depends_on:
       - itsm-api
     ports:
-      - "80:80"
+      - "8084:80"
 
 volumes:
   itsm-db-data:
