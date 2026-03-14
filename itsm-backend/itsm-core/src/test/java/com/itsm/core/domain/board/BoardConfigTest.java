@@ -64,7 +64,7 @@ class BoardConfigTest {
                 .sortOrder(0)
                 .build();
 
-        config.update("수정된 게시판", "FREE", "jpg,png", 20, "N",
+        config.update("수정된 게시판", "Updated Board", "FREE", "jpg,png", 20, "N",
                 "{\"read\":[\"USER\"]}", "N", 5);
 
         assertThat(config.getBoardNm()).isEqualTo("수정된 게시판");

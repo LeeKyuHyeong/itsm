@@ -1,0 +1,58 @@
+services:
+  db:
+    image: mariadb:11
+    container_name: itsm-db
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_PASSWORD}
+      MARIADB_DATABASE: ITSM
+      TZ: Asia/Seoul
+    ports:
+      - "3306:3306"
+    volumes:
+      - itsm-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  itsm-api:
+    image: ${DOCKERHUB_USERNAME}/itsm-api:latest
+    container_name: itsm-api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db:3306
+      DB_USERNAME: root
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost}
+    ports:
+      - "8080:8080"
+
+  itsm-batch:
+    image: ${DOCKERHUB_USERNAME}/itsm-batch:latest
+    container_name: itsm-batch
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db:3306
+      DB_USERNAME: root
+      DB_PASSWORD: ${DB_PASSWORD}
+
+  itsm-frontend:
+    image: ${DOCKERHUB_USERNAME}/itsm-frontend:latest
+    container_name: itsm-frontend
+    restart: unless-stopped
+    depends_on:
+      - itsm-api
+    ports:
+      - "80:80"
+
+volumes:
+  itsm-db-data:

@@ -28,7 +28,7 @@ class BatchJobTest {
                 .cronExpression("0 0 * * * *")
                 .build();
 
-        job.update("0 30 * * * *", "N", "변경된 설명");
+        job.update("0 30 * * * *", "N", "변경된 설명", "Changed Description");
 
         assertThat(job.getCronExpression()).isEqualTo("0 30 * * * *");
         assertThat(job.getIsActive()).isEqualTo("N");

@@ -1,12 +1,22 @@
 spring:
   datasource:
-    url: jdbc:mariadb://<KIRYONG_SERVER_IP>:3310/ITSM?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-    username: root
-    password: Olympus2426!
+    url: jdbc:mariadb://${DB_HOST:db:3306}/ITSM?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD}
     driver-class-name: org.mariadb.jdbc.Driver
     hikari:
       maximum-pool-size: 20
       minimum-idle: 10
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
+jwt:
+  secret: ${JWT_SECRET}
+
+cors:
+  allowed-origins: ${CORS_ORIGINS:http://localhost:3000}
 
 logging:
   level:

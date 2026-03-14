@@ -1,5 +1,7 @@
 package com.itsm.batch.job.change;
 
+import java.time.DayOfWeek;
+
 import com.itsm.core.domain.change.Change;
 import com.itsm.core.domain.change.ChangeApprover;
 import com.itsm.core.domain.company.Company;
@@ -83,8 +85,13 @@ class ChangeSimulationJobTest {
         // when
         job.execute();
 
-        // then
-        verify(changeRepository, atLeastOnce()).save(any(Change.class));
+        // then — 주말이면 save 호출 안 됨, 주중이면 호출됨
+        DayOfWeek dow = java.time.LocalDate.now().getDayOfWeek();
+        if (dow == DayOfWeek.SATURDAY || dow == DayOfWeek.SUNDAY) {
+            verify(changeRepository, never()).save(any(Change.class));
+        } else {
+            verify(changeRepository, atLeastOnce()).save(any(Change.class));
+        }
     }
 
     @Test
