@@ -118,7 +118,14 @@ async function loadSlaList() {
   try {
     const { data } = await slaApi.getList({ size: 100 })
     const result = data.data || data
-    slaList.value = result.content || result.items || result || []
+    const list = result.content || result.items || result || []
+    slaList.value = list.map(s => ({
+      ...s,
+      id: s.policyId ?? s.id,
+      resolutionTimeHours: s.deadlineHours ?? s.resolutionTimeHours ?? 0,
+      warningThresholdPercent: s.warningPct ?? s.warningThresholdPercent ?? 0,
+      active: s.isActive === 'Y' || s.isActive === true || (s.active !== false && s.isActive !== 'N')
+    }))
   } catch (error) {
     console.error('SLA 목록 로드 실패:', error)
     slaList.value = []
@@ -131,7 +138,12 @@ async function loadCompanies() {
   try {
     const { data } = await companyApi.getList({ size: 100 })
     const result = data.data || data
-    companies.value = result.content || result.items || result || []
+    const list = result.content || result.items || result || []
+    companies.value = list.map(c => ({
+      ...c,
+      id: c.companyId ?? c.id,
+      name: c.companyNm ?? c.name ?? ''
+    }))
   } catch (error) {
     console.error('회사 목록 로드 실패:', error)
   }

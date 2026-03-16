@@ -235,7 +235,12 @@ async function loadGroups() {
   try {
     const { data } = await commonCodeApi.getGroups({ size: 100 })
     const result = data.data || data
-    groups.value = result.content || result.items || result || []
+    const list = result.content || result.items || result || []
+    groups.value = list.map(g => ({
+      ...g,
+      id: g.groupId ?? g.id,
+      active: g.isActive === 'Y' || g.isActive === true || (g.active !== false && g.isActive !== 'N')
+    }))
   } catch (error) {
     console.error('코드그룹 목록 로드 실패:', error)
     groups.value = []
@@ -254,7 +259,12 @@ async function loadDetails() {
   loadingDetails.value = true
   try {
     const { data } = await commonCodeApi.getDetails(selectedGroupId.value)
-    details.value = data.data || data || []
+    const list = data.data || data || []
+    details.value = (Array.isArray(list) ? list : []).map(d => ({
+      ...d,
+      id: d.detailId ?? d.id,
+      active: d.isActive === 'Y' || d.isActive === true || (d.active !== false && d.isActive !== 'N')
+    }))
   } catch (error) {
     console.error('코드상세 목록 로드 실패:', error)
     details.value = []

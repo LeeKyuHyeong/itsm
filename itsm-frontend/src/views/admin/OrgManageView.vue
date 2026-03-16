@@ -234,7 +234,14 @@ async function loadCompanies() {
   try {
     const { data } = await companyApi.getList({ size: 100 })
     const result = data.data || data
-    companies.value = result.content || result.items || result || []
+    const list = result.content || result.items || result || []
+    companies.value = list.map(c => ({
+      ...c,
+      id: c.companyId ?? c.id,
+      name: c.companyNm ?? c.name ?? '',
+      representative: c.ceoNm ?? c.representative ?? '',
+      phone: c.tel ?? c.phone ?? ''
+    }))
   } catch (error) {
     console.error('회사 목록 로드 실패:', error)
     companies.value = []
@@ -253,7 +260,15 @@ async function loadDepartments() {
   loadingDepts.value = true
   try {
     const { data } = await companyApi.getDepartments(selectedCompanyId.value)
-    departments.value = data.data || data || []
+    const list = data.data || data || []
+    departments.value = (Array.isArray(list) ? list : []).map(d => ({
+      ...d,
+      id: d.deptId ?? d.id,
+      name: d.deptNm ?? d.name ?? '',
+      code: d.deptCd ?? d.code ?? '',
+      parentId: d.parentDeptId ?? d.parentId ?? null,
+      parentName: d.parentDeptNm ?? d.parentName ?? ''
+    }))
   } catch (error) {
     console.error('부서 목록 로드 실패:', error)
     departments.value = []

@@ -121,7 +121,14 @@ async function loadPolicies() {
   try {
     const { data } = await notificationPolicyApi.getList({ size: 100 })
     const result = data.data || data
-    policies.value = result.content || result.items || result || []
+    const list = result.content || result.items || result || []
+    policies.value = list.map(p => ({
+      ...p,
+      id: p.policyId ?? p.id,
+      typeCd: p.notiTypeCd ?? p.typeCd ?? '',
+      conditionExpr: p.triggerCondition ?? p.conditionExpr ?? '',
+      active: p.isActive === 'Y' || p.isActive === true || (p.active !== false && p.isActive !== 'N')
+    }))
   } catch (error) {
     console.error('알림 정책 목록 로드 실패:', error)
     policies.value = []

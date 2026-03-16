@@ -335,7 +335,14 @@ async function loadUsers() {
 
     const { data } = await userApi.getList(params)
     const result = data.data || data
-    users.value = result.content || result.items || result || []
+    const list = result.content || result.items || result || []
+    users.value = list.map(u => ({
+      ...u,
+      id: u.userId ?? u.id,
+      name: u.userNm ?? u.name ?? '',
+      departmentName: u.deptName ?? u.departmentName ?? '',
+      phone: u.tel ?? u.phone ?? ''
+    }))
     pagination.total = result.totalElements || result.total || 0
   } catch (error) {
     console.error('사용자 목록 로드 실패:', error)
@@ -349,7 +356,12 @@ async function loadCompanies() {
   try {
     const { data } = await companyApi.getList({ size: 100 })
     const result = data.data || data
-    companies.value = result.content || result.items || result || []
+    const list = result.content || result.items || result || []
+    companies.value = list.map(c => ({
+      ...c,
+      id: c.companyId ?? c.id,
+      name: c.companyNm ?? c.name ?? ''
+    }))
   } catch (error) {
     console.error('회사 목록 로드 실패:', error)
   }
@@ -360,7 +372,12 @@ async function loadDepartments() {
   if (!userForm.companyId) return
   try {
     const { data } = await companyApi.getDepartments(userForm.companyId)
-    departments.value = data.data || data || []
+    const list = data.data || data || []
+    departments.value = (Array.isArray(list) ? list : []).map(d => ({
+      ...d,
+      id: d.deptId ?? d.id,
+      name: d.deptNm ?? d.name ?? ''
+    }))
   } catch (error) {
     console.error('부서 목록 로드 실패:', error)
   }
