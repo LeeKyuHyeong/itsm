@@ -43,7 +43,7 @@
       </button>
 
       <div class="user-info">
-        <span class="user-name">{{ user?.name || t('common.noData') }}</span>
+        <span class="user-name">{{ user?.userNm || t('common.noData') }}</span>
         <span v-if="primaryRole" class="role-badge">{{ primaryRole }}</span>
       </div>
 

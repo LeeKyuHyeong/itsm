@@ -49,7 +49,7 @@ INSERT INTO tb_user (user_id, login_id, password, user_nm, employee_no, dept_id,
 -- ============================================================
 -- 4. 사용자-역할 매핑
 -- ============================================================
-INSERT INTO tb_user_role (user_id, role_id, created_at, created_by) VALUES
+INSERT INTO tb_user_role (user_id, role_id, granted_at, granted_by) VALUES
 (2,  3,  NOW(), 1),   -- 김철수: PM
 (3,  4,  NOW(), 1),   -- 이영희: 개발자
 (4,  5,  NOW(), 1),   -- 박보안: 보안담당
