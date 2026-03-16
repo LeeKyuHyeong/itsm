@@ -437,6 +437,7 @@ export default {
     role: '역할',
     manage: '관리',
     searchByNameOrId: '이름 또는 아이디로 검색',
+    searchByNameIdEmail: '이름, 아이디 또는 이메일로 검색',
     userEdit: '사용자 수정',
     userAdd: '사용자 추가',
     password: '비밀번호',

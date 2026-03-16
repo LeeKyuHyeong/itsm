@@ -23,8 +23,11 @@ public class UserController {
     @GetMapping
     public ApiResponse<Page<UserListResponse>> getUsers(
             @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) Long deptId,
+            @RequestParam(required = false) String roleCd,
             Pageable pageable) {
-        return ApiResponse.success(userService.getUsers(keyword, pageable));
+        return ApiResponse.success(userService.getUsers(keyword, status, deptId, roleCd, pageable));
     }
 
     @PostMapping

@@ -108,17 +108,85 @@ class UserServiceTest {
         // given
         Pageable pageable = PageRequest.of(0, 10);
         Page<User> userPage = new PageImpl<>(List.of(activeUser), pageable, 1);
-        given(userRepository.search("test", pageable)).willReturn(userPage);
+        given(userRepository.searchWithFilters("test", null, null, null, pageable)).willReturn(userPage);
         given(userRoleRepository.findByUserIdWithRole(1L)).willReturn(List.of(userRole));
 
         // when
-        Page<UserListResponse> result = userService.getUsers("test", pageable);
+        Page<UserListResponse> result = userService.getUsers("test", null, null, null, pageable);
 
         // then
         assertThat(result.getContent()).hasSize(1);
         assertThat(result.getContent().get(0).getUserNm()).isEqualTo("테스트사용자");
         assertThat(result.getContent().get(0).getRoles()).containsExactly("ADMIN");
-        verify(userRepository).search("test", pageable);
+        verify(userRepository).searchWithFilters("test", null, null, null, pageable);
+    }
+
+    @Test
+    @DisplayName("상태 필터로 사용자 목록을 조회한다")
+    void getUsers_withStatusFilter_searchesUsers() {
+        // given
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<User> userPage = new PageImpl<>(List.of(activeUser), pageable, 1);
+        given(userRepository.searchWithFilters(null, "ACTIVE", null, null, pageable)).willReturn(userPage);
+        given(userRoleRepository.findByUserIdWithRole(1L)).willReturn(List.of(userRole));
+
+        // when
+        Page<UserListResponse> result = userService.getUsers(null, "ACTIVE", null, null, pageable);
+
+        // then
+        assertThat(result.getContent()).hasSize(1);
+        verify(userRepository).searchWithFilters(null, "ACTIVE", null, null, pageable);
+    }
+
+    @Test
+    @DisplayName("부서 필터로 사용자 목록을 조회한다")
+    void getUsers_withDeptFilter_searchesUsers() {
+        // given
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<User> userPage = new PageImpl<>(List.of(activeUser), pageable, 1);
+        given(userRepository.searchWithFilters(null, null, 1L, null, pageable)).willReturn(userPage);
+        given(userRoleRepository.findByUserIdWithRole(1L)).willReturn(List.of(userRole));
+
+        // when
+        Page<UserListResponse> result = userService.getUsers(null, null, 1L, null, pageable);
+
+        // then
+        assertThat(result.getContent()).hasSize(1);
+        verify(userRepository).searchWithFilters(null, null, 1L, null, pageable);
+    }
+
+    @Test
+    @DisplayName("역할 필터로 사용자 목록을 조회한다")
+    void getUsers_withRoleFilter_searchesUsers() {
+        // given
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<User> userPage = new PageImpl<>(List.of(activeUser), pageable, 1);
+        given(userRepository.searchWithFilters(null, null, null, "ADMIN", pageable)).willReturn(userPage);
+        given(userRoleRepository.findByUserIdWithRole(1L)).willReturn(List.of(userRole));
+
+        // when
+        Page<UserListResponse> result = userService.getUsers(null, null, null, "ADMIN", pageable);
+
+        // then
+        assertThat(result.getContent()).hasSize(1);
+        verify(userRepository).searchWithFilters(null, null, null, "ADMIN", pageable);
+    }
+
+    @Test
+    @DisplayName("모든 필터로 사용자 목록을 조회한다")
+    void getUsers_withAllFilters_searchesUsers() {
+        // given
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<User> userPage = new PageImpl<>(List.of(activeUser), pageable, 1);
+        given(userRepository.searchWithFilters("test", "ACTIVE", 1L, "ADMIN", pageable)).willReturn(userPage);
+        given(userRoleRepository.findByUserIdWithRole(1L)).willReturn(List.of(userRole));
+
+        // when
+        Page<UserListResponse> result = userService.getUsers("test", "ACTIVE", 1L, "ADMIN", pageable);
+
+        // then
+        assertThat(result.getContent()).hasSize(1);
+        verify(userRepository).searchWithFilters("test", "ACTIVE", 1L, "ADMIN", pageable);
     }
 
     @Test

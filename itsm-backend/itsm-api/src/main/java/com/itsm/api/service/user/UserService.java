@@ -37,14 +37,12 @@ public class UserService {
     );
 
     @Transactional(readOnly = true)
-    public Page<UserListResponse> getUsers(String keyword, Pageable pageable) {
-        Page<User> users;
-        if (StringUtils.hasText(keyword)) {
-            users = userRepository.search(keyword, pageable);
-        } else {
-            users = userRepository.findAllActive(pageable);
-        }
+    public Page<UserListResponse> getUsers(String keyword, String status, Long deptId, String roleCd, Pageable pageable) {
+        String kw = StringUtils.hasText(keyword) ? keyword : null;
+        String st = StringUtils.hasText(status) ? status : null;
+        String rc = StringUtils.hasText(roleCd) ? roleCd : null;
 
+        Page<User> users = userRepository.searchWithFilters(kw, st, deptId, rc, pageable);
         return users.map(this::toUserListResponse);
     }
 

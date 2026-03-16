@@ -24,4 +24,18 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT u FROM User u WHERE u.department.deptId = :deptId AND u.status <> 'DELETED'")
     Page<User> findByDepartment(@Param("deptId") Long deptId, Pageable pageable);
+
+    @Query("SELECT DISTINCT u FROM User u " +
+            "LEFT JOIN UserRole ur ON ur.userId = u.userId " +
+            "LEFT JOIN Role r ON r.roleId = ur.roleId " +
+            "WHERE u.status <> 'DELETED' " +
+            "AND (:keyword IS NULL OR u.userNm LIKE %:keyword% OR u.loginId LIKE %:keyword% OR u.email LIKE %:keyword%) " +
+            "AND (:status IS NULL OR u.status = :status) " +
+            "AND (:deptId IS NULL OR u.department.deptId = :deptId) " +
+            "AND (:roleCd IS NULL OR r.roleCd = :roleCd)")
+    Page<User> searchWithFilters(@Param("keyword") String keyword,
+                                  @Param("status") String status,
+                                  @Param("deptId") Long deptId,
+                                  @Param("roleCd") String roleCd,
+                                  Pageable pageable);
 }

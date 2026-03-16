@@ -73,7 +73,7 @@ class UserControllerTest {
 
         Page<UserListResponse> page = new PageImpl<>(
                 List.of(userListResponse), PageRequest.of(0, 10), 1);
-        given(userService.getUsers(isNull(), any())).willReturn(page);
+        given(userService.getUsers(isNull(), isNull(), isNull(), isNull(), any())).willReturn(page);
 
         // when & then
         mockMvc.perform(get("/api/v1/users")
@@ -84,6 +84,73 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.data.content[0].userId").value(1))
                 .andExpect(jsonPath("$.data.content[0].loginId").value("testuser"))
                 .andExpect(jsonPath("$.data.content[0].userNm").value("테스트사용자"));
+    }
+
+    @Test
+    @DisplayName("GET /api/v1/users - 상태 필터로 사용자 목록을 조회한다")
+    void getUsers_withStatusFilter_returns200() throws Exception {
+        // given
+        Page<UserListResponse> page = new PageImpl<>(Collections.emptyList(), PageRequest.of(0, 10), 0);
+        given(userService.getUsers(isNull(), eq("ACTIVE"), isNull(), isNull(), any())).willReturn(page);
+
+        // when & then
+        mockMvc.perform(get("/api/v1/users")
+                        .param("status", "ACTIVE")
+                        .param("page", "0")
+                        .param("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true));
+    }
+
+    @Test
+    @DisplayName("GET /api/v1/users - 부서 필터로 사용자 목록을 조회한다")
+    void getUsers_withDeptFilter_returns200() throws Exception {
+        // given
+        Page<UserListResponse> page = new PageImpl<>(Collections.emptyList(), PageRequest.of(0, 10), 0);
+        given(userService.getUsers(isNull(), isNull(), eq(1L), isNull(), any())).willReturn(page);
+
+        // when & then
+        mockMvc.perform(get("/api/v1/users")
+                        .param("deptId", "1")
+                        .param("page", "0")
+                        .param("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true));
+    }
+
+    @Test
+    @DisplayName("GET /api/v1/users - 역할 필터로 사용자 목록을 조회한다")
+    void getUsers_withRoleFilter_returns200() throws Exception {
+        // given
+        Page<UserListResponse> page = new PageImpl<>(Collections.emptyList(), PageRequest.of(0, 10), 0);
+        given(userService.getUsers(isNull(), isNull(), isNull(), eq("ROLE_ADMIN"), any())).willReturn(page);
+
+        // when & then
+        mockMvc.perform(get("/api/v1/users")
+                        .param("roleCd", "ROLE_ADMIN")
+                        .param("page", "0")
+                        .param("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true));
+    }
+
+    @Test
+    @DisplayName("GET /api/v1/users - 모든 필터 조합으로 사용자 목록을 조회한다")
+    void getUsers_withAllFilters_returns200() throws Exception {
+        // given
+        Page<UserListResponse> page = new PageImpl<>(Collections.emptyList(), PageRequest.of(0, 10), 0);
+        given(userService.getUsers(eq("홍길동"), eq("ACTIVE"), eq(1L), eq("ROLE_ADMIN"), any())).willReturn(page);
+
+        // when & then
+        mockMvc.perform(get("/api/v1/users")
+                        .param("keyword", "홍길동")
+                        .param("status", "ACTIVE")
+                        .param("deptId", "1")
+                        .param("roleCd", "ROLE_ADMIN")
+                        .param("page", "0")
+                        .param("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true));
     }
 
     @Test

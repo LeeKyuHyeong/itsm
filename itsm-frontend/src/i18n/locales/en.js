@@ -426,6 +426,7 @@ export default {
     role: 'Role',
     manage: 'Actions',
     searchByNameOrId: 'Search by name or ID',
+    searchByNameIdEmail: 'Search by name, ID or email',
     userEdit: 'Edit User',
     userAdd: 'Add User',
     password: 'Password',

@@ -20,12 +20,30 @@
           <option value="DELETED">{{ t('status.DELETED') }}</option>
         </select>
       </div>
+      <div class="filter-group">
+        <label class="filter-label">{{ t('admin.department') }}</label>
+        <select v-model="filters.deptId" class="filter-select" @change="loadUsers">
+          <option value="">{{ t('common.all') }}</option>
+          <option v-for="d in allDepartments" :key="d.deptId" :value="d.deptId">
+            {{ d.deptNm }}
+          </option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">{{ t('admin.role') }}</label>
+        <select v-model="filters.roleCd" class="filter-select" @change="loadUsers">
+          <option value="">{{ t('common.all') }}</option>
+          <option v-for="(label, code) in allRoles" :key="code" :value="code">
+            {{ label }}
+          </option>
+        </select>
+      </div>
       <div class="filter-group search-group">
         <input
           v-model="filters.keyword"
           type="text"
           class="filter-input"
-          :placeholder="t('admin.searchByNameOrId')"
+          :placeholder="t('admin.searchByNameIdEmail')"
           @keyup.enter="loadUsers"
         />
         <button class="btn btn-default" @click="loadUsers">{{ t('common.search') }}</button>
@@ -255,7 +273,18 @@ const departments = ref([])
 
 const filters = reactive({
   status: '',
+  deptId: '',
+  roleCd: '',
   keyword: ''
+})
+
+const allDepartments = ref([])
+const allRoles = computed(() => {
+  const result = {}
+  for (const roleCode of Object.values(ROLES)) {
+    result[roleCode] = roleLabel(roleCode)
+  }
+  return result
 })
 
 const pagination = reactive({
@@ -321,16 +350,19 @@ const availableRoles = computed(() => {
 onMounted(() => {
   loadUsers()
   loadCompanies()
+  loadAllDepartments()
 })
 
 async function loadUsers() {
   loading.value = true
   try {
     const params = {
-      page: pagination.page,
+      page: pagination.page - 1,
       size: pagination.size
     }
     if (filters.status) params.status = filters.status
+    if (filters.deptId) params.deptId = filters.deptId
+    if (filters.roleCd) params.roleCd = filters.roleCd
     if (filters.keyword) params.keyword = filters.keyword
 
     const { data } = await userApi.getList(params)
@@ -364,6 +396,28 @@ async function loadCompanies() {
     }))
   } catch (error) {
     console.error('회사 목록 로드 실패:', error)
+  }
+}
+
+async function loadAllDepartments() {
+  try {
+    const { data } = await companyApi.getList({ size: 100 })
+    const result = data.data || data
+    const companyList = result.content || result.items || result || []
+    const deptPromises = companyList.map(c => {
+      const companyId = c.companyId ?? c.id
+      return companyApi.getDepartments(companyId).then(res => {
+        const depts = res.data.data || res.data || []
+        return (Array.isArray(depts) ? depts : []).map(d => ({
+          deptId: d.deptId ?? d.id,
+          deptNm: d.deptNm ?? d.name ?? ''
+        }))
+      }).catch(() => [])
+    })
+    const deptArrays = await Promise.all(deptPromises)
+    allDepartments.value = deptArrays.flat()
+  } catch (error) {
+    console.error('부서 전체 목록 로드 실패:', error)
   }
 }
 
