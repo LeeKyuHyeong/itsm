@@ -43,6 +43,9 @@ public class BatchJob extends BaseEntity {
     @Column(name = "last_result_message", columnDefinition = "TEXT")
     private String lastResultMessage;
 
+    @Column(name = "trigger_now", nullable = false, columnDefinition = "char(1)")
+    private String triggerNow;
+
     @Builder
     public BatchJob(String jobName, String jobNameEn, String jobDescription, String cronExpression, String isActive) {
         this.jobName = jobName;
@@ -50,6 +53,7 @@ public class BatchJob extends BaseEntity {
         this.jobDescription = jobDescription;
         this.cronExpression = cronExpression;
         this.isActive = isActive != null ? isActive : "Y";
+        this.triggerNow = "N";
     }
 
     public void update(String cronExpression, String isActive, String jobDescription, String jobNameEn) {
@@ -67,5 +71,17 @@ public class BatchJob extends BaseEntity {
 
     public boolean isEnabled() {
         return "Y".equals(this.isActive);
+    }
+
+    public void requestTrigger() {
+        this.triggerNow = "Y";
+    }
+
+    public void clearTrigger() {
+        this.triggerNow = "N";
+    }
+
+    public boolean isTriggered() {
+        return "Y".equals(this.triggerNow);
     }
 }

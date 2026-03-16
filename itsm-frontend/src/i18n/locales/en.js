@@ -322,7 +322,12 @@ export default {
     subOaTablet: 'Tablet',
     subOaPeripheral: 'Peripheral',
     subOaProjector: 'Projector',
-    assetList: 'Asset List'
+    assetList: 'Asset List',
+    oaList: 'OA Asset List',
+    oaDetail: 'OA Asset Detail',
+    oaCreate: 'Create OA Asset',
+    oaEdit: 'Edit OA Asset',
+    searchOaPlaceholder: 'Search asset name, serial no., IP address'
   },
 
   inspection: {
@@ -512,7 +517,12 @@ export default {
     lastResult: 'Last Result',
     noBatchJobs: 'No batch jobs registered.',
     batchEdit: 'Edit Batch Job',
-    cronHint: 'e.g., 0 0 7 * * * (every day at 7 AM)'
+    cronHint: 'e.g., 0 0 7 * * * (every day at 7 AM)',
+    executeNow: 'Run Now',
+    executing: 'Running...',
+    confirmExecute: 'Are you sure you want to run {name} now?',
+    executeRequested: 'Execution request has been submitted. Results will be reflected shortly.',
+    executeFailed: 'Failed to submit execution request.'
   },
 
   auth: {

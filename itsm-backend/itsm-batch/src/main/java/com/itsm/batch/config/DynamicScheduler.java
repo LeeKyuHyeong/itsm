@@ -41,6 +41,17 @@ public class DynamicScheduler {
         refreshSchedules();
     }
 
+    @Scheduled(fixedDelay = 5000)
+    public void checkTriggeredJobs() {
+        List<BatchJob> triggeredJobs = batchJobRepository.findByTriggerNow("Y");
+        for (BatchJob job : triggeredJobs) {
+            log.info("[DynamicScheduler] 수동 실행 요청 감지: {}", job.getJobName());
+            job.clearTrigger();
+            batchJobRepository.save(job);
+            executeJobImmediately(job);
+        }
+    }
+
     @Scheduled(fixedDelay = 60000)
     public void refreshSchedules() {
         List<BatchJob> allJobs = batchJobRepository.findAll();
@@ -97,6 +108,24 @@ public class DynamicScheduler {
             log.info("[DynamicScheduler] 배치 등록: {} [{}]", jobName, batchJob.getCronExpression());
         } catch (Exception e) {
             log.error("[DynamicScheduler] 배치 등록 실패: {}", jobName, e);
+        }
+    }
+
+    private void executeJobImmediately(BatchJob batchJob) {
+        String jobName = batchJob.getJobName();
+        try {
+            Object bean = applicationContext.getBean(
+                    Character.toLowerCase(jobName.charAt(0)) + jobName.substring(1));
+            Method executeMethod = bean.getClass().getMethod("execute");
+
+            log.info("[DynamicScheduler] 수동 배치 실행: {}", jobName);
+            executeMethod.invoke(bean);
+            recordResult(jobName, "SUCCESS", null);
+            log.info("[DynamicScheduler] 수동 배치 완료: {}", jobName);
+        } catch (Exception e) {
+            log.error("[DynamicScheduler] 수동 배치 실패: {}", jobName, e);
+            String msg = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
+            recordResult(jobName, "FAILURE", msg);
         }
     }
 

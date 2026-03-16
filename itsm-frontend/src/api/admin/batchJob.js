@@ -9,5 +9,8 @@ export const batchJobApi = {
   },
   update(id, data) {
     return api.patch(`/admin/batch-jobs/${id}`, data)
+  },
+  execute(id) {
+    return api.post(`/admin/batch-jobs/${id}/execute`)
   }
 }

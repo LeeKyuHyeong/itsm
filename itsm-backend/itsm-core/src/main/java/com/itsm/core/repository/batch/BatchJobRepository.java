@@ -9,4 +9,5 @@ public interface BatchJobRepository extends JpaRepository<BatchJob, Long> {
     Optional<BatchJob> findByJobName(String jobName);
     List<BatchJob> findByIsActive(String isActive);
     List<BatchJob> findAllByOrderByJobNameAsc();
+    List<BatchJob> findByTriggerNow(String triggerNow);
 }

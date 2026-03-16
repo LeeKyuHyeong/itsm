@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("test")
@@ -82,5 +83,25 @@ class BatchJobServiceTest {
 
         assertThat(result.getCronExpression()).isEqualTo("0 30 * * * *");
         assertThat(result.getIsActive()).isEqualTo("N");
+    }
+
+    @Test
+    @DisplayName("배치 작업을 즉시 실행 요청하면 triggerNow가 Y로 변경된다")
+    void executeNow_setsTriggerNow() {
+        given(batchJobRepository.findById(1L)).willReturn(Optional.of(batchJob));
+
+        batchJobService.executeNow(1L, 1L);
+
+        assertThat(batchJob.isTriggered()).isTrue();
+        verify(batchJobRepository).save(batchJob);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 배치 작업 즉시 실행 시 예외가 발생한다")
+    void executeNow_notFound_throwsException() {
+        given(batchJobRepository.findById(999L)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> batchJobService.executeNow(999L, 1L))
+                .isInstanceOf(BusinessException.class);
     }
 }

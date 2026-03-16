@@ -329,7 +329,12 @@ export default {
     subOaTablet: '태블릿',
     subOaPeripheral: '주변기기',
     subOaProjector: '프로젝터',
-    assetList: '자산 목록'
+    assetList: '자산 목록',
+    oaList: 'OA 자산 목록',
+    oaDetail: 'OA 자산 상세',
+    oaCreate: 'OA 자산 등록',
+    oaEdit: 'OA 자산 수정',
+    searchOaPlaceholder: '자산명, 시리얼번호, IP주소 검색'
   },
 
   // 정기점검
@@ -523,7 +528,12 @@ export default {
     lastResult: '실행 결과',
     noBatchJobs: '등록된 배치 작업이 없습니다.',
     batchEdit: '배치 작업 수정',
-    cronHint: '예: 0 0 7 * * * (매일 오전 7시)'
+    cronHint: '예: 0 0 7 * * * (매일 오전 7시)',
+    executeNow: '즉시 실행',
+    executing: '실행중...',
+    confirmExecute: '{name} 배치를 즉시 실행하시겠습니까?',
+    executeRequested: '실행 요청이 등록되었습니다. 잠시 후 결과가 반영됩니다.',
+    executeFailed: '실행 요청에 실패했습니다.'
   },
 
   // 인증

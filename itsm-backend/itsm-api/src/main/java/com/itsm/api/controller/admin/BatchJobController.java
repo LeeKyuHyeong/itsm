@@ -35,4 +35,13 @@ public class BatchJobController {
         Long currentUserId = (Long) authentication.getPrincipal();
         return ApiResponse.success(batchJobService.updateJob(batchJobId, req, currentUserId));
     }
+
+    @PostMapping("/{batchJobId}/execute")
+    public ApiResponse<Void> executeNow(
+            @PathVariable Long batchJobId,
+            Authentication authentication) {
+        Long currentUserId = (Long) authentication.getPrincipal();
+        batchJobService.executeNow(batchJobId, currentUserId);
+        return ApiResponse.success(null);
+    }
 }

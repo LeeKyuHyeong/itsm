@@ -37,9 +37,11 @@ public class BatchJobService {
         return toResponse(job);
     }
 
-    public void executeNow(Long batchJobId) {
-        findById(batchJobId); // verify exists
-        // Actual execution happens in batch module - this just validates
+    public void executeNow(Long batchJobId, Long currentUserId) {
+        BatchJob job = findById(batchJobId);
+        job.requestTrigger();
+        job.setUpdatedBy(currentUserId);
+        batchJobRepository.save(job);
     }
 
     private BatchJob findById(Long batchJobId) {

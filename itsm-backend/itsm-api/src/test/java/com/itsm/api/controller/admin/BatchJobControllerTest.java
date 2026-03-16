@@ -23,6 +23,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -95,5 +96,17 @@ class BatchJobControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.cronExpression").value("0 30 * * * *"))
                 .andExpect(jsonPath("$.data.isActive").value("N"));
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/admin/batch-jobs/{id}/execute - 배치 작업 즉시 실행 요청 시 200을 반환한다")
+    void executeNow_returns200() throws Exception {
+        willDoNothing().given(batchJobService).executeNow(eq(1L), eq(1L));
+
+        mockMvc.perform(post("/api/v1/admin/batch-jobs/1/execute")
+                        .principal(new UsernamePasswordAuthenticationToken(
+                                1L, null, List.of(new SimpleGrantedAuthority("ROLE_ADMIN")))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true));
     }
 }

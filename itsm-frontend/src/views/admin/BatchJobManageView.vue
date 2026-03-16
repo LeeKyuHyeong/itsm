@@ -45,7 +45,16 @@
               <span v-else>-</span>
             </td>
             <td>
-              <button class="btn btn-sm btn-default" @click="openEditModal(job)">{{ t('common.edit') }}</button>
+              <div class="action-buttons">
+                <button class="btn btn-sm btn-default" @click="openEditModal(job)">{{ t('common.edit') }}</button>
+                <button
+                  class="btn btn-sm btn-primary"
+                  :disabled="executingJobId === job.batchJobId"
+                  @click="executeJob(job)"
+                >
+                  {{ executingJobId === job.batchJobId ? t('admin.executing') : t('admin.executeNow') }}
+                </button>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -111,6 +120,8 @@ const saveError = ref('')
 const showModal = ref(false)
 const editingJob = ref(null)
 
+const executingJobId = ref(null)
+
 const form = reactive({
   cronExpression: '',
   isActive: 'Y',
@@ -154,6 +165,20 @@ function openEditModal(job) {
 function closeModal() {
   showModal.value = false
   editingJob.value = null
+}
+
+async function executeJob(job) {
+  if (!confirm(t('admin.confirmExecute', { name: job.jobName }))) return
+  executingJobId.value = job.batchJobId
+  try {
+    await batchJobApi.execute(job.batchJobId)
+    alert(t('admin.executeRequested'))
+    loadJobs()
+  } catch (e) {
+    alert(e.response?.data?.message || t('admin.executeFailed'))
+  } finally {
+    executingJobId.value = null
+  }
 }
 
 async function save() {
@@ -268,6 +293,11 @@ async function save() {
   border-radius: 12px;
   font-size: var(--font-size-xs);
   font-weight: 600;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 4px;
 }
 
 .result-success {

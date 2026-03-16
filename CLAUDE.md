@@ -17,6 +17,11 @@
 - JPA Entity에서 `char(1)` 컬럼(`is_active`, `is_visible`, `allow_comment` 등 Y/N 값)은 반드시 `@Column(columnDefinition = "char(1)")` 어노테이션을 명시해야 한다. 누락 시 Hibernate가 `varchar(255)`로 매핑하여 런타임 오류가 발생한다.
 - Entity를 **새로 추가하거나 수정할 때** 반드시 해당 Entity의 모든 `char(1)` 필드에 `columnDefinition`이 정확히 선언되어 있는지 검수한다.
 
+## DB 변경 알림 규칙
+- DB 스키마 변경(테이블/컬럼 추가·수정·삭제)이 발생하면 **반드시 사용자에게 변경 내용을 알린다.**
+- 운영 DB 반영용 ALTER/INSERT SQL을 함께 제공한다.
+- `ddl-auto: update`로 자동 생성되는 컬럼이라도 변경 사실은 반드시 고지한다.
+
 ## 다국어 & 테마 규칙
 - 이 프로젝트는 **다크/라이트 테마** 및 **한국어(ko)/영어(en) 다국어**를 모두 지원한다.
 - 프론트엔드 UI 작업 시 두 테마 모두에서 정상 표시되는지 확인한다. CSS 변수(`var(--color-*)`)를 사용하고, 하드코딩된 색상값을 쓰지 않는다.
