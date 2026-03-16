@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
 import java.lang.reflect.Method;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -46,8 +47,7 @@ public class DynamicScheduler {
         List<BatchJob> triggeredJobs = batchJobRepository.findByTriggerNow("Y");
         for (BatchJob job : triggeredJobs) {
             log.info("[DynamicScheduler] 수동 실행 요청 감지: {}", job.getJobName());
-            job.clearTrigger();
-            batchJobRepository.save(job);
+            batchJobRepository.clearTrigger(job.getBatchJobId());
             executeJobImmediately(job);
         }
     }
@@ -139,10 +139,7 @@ public class DynamicScheduler {
 
     private void recordResult(String jobName, String result, String message) {
         try {
-            batchJobRepository.findByJobName(jobName).ifPresent(job -> {
-                job.recordExecution(result, message);
-                batchJobRepository.save(job);
-            });
+            batchJobRepository.updateExecutionResult(jobName, LocalDateTime.now(), result, message);
         } catch (Exception e) {
             log.error("[DynamicScheduler] 실행 결과 기록 실패: {}", jobName, e);
         }
