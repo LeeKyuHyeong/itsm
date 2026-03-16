@@ -309,6 +309,52 @@ CREATE TABLE IF NOT EXISTS tb_asset_sw_history (
     CONSTRAINT fk_asset_sw_history_created_by FOREIGN KEY (created_by) REFERENCES tb_user (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SW 자산 변경 이력';
 
+CREATE TABLE IF NOT EXISTS tb_asset_oa (
+    asset_oa_id     BIGINT          NOT NULL AUTO_INCREMENT  COMMENT 'OA자산ID',
+    asset_nm        VARCHAR(100)    NOT NULL                 COMMENT '자산명',
+    asset_type_cd   VARCHAR(50)     NOT NULL                 COMMENT 'OA유형코드 (공통코드 - 프린터/복합기/데스크톱 등)',
+    manufacturer    VARCHAR(100)    NULL                     COMMENT '제조사',
+    model_nm        VARCHAR(100)    NULL                     COMMENT '모델명',
+    serial_no       VARCHAR(100)    NULL                     COMMENT '시리얼번호',
+    ip_address      VARCHAR(50)     NULL                     COMMENT 'IP주소',
+    mac_address     VARCHAR(50)     NULL                     COMMENT 'MAC주소',
+    location        VARCHAR(200)    NULL                     COMMENT '설치위치',
+    introduced_at   DATE            NULL                     COMMENT '도입일',
+    warranty_end_at DATE            NULL                     COMMENT '유지보수 만료일',
+    company_id      BIGINT          NOT NULL                 COMMENT '소속 고객사ID',
+    manager_id      BIGINT          NULL                     COMMENT '담당자ID',
+    status          VARCHAR(20)     NOT NULL DEFAULT 'ACTIVE' COMMENT 'ACTIVE/INACTIVE/DISPOSED',
+    description     TEXT            NULL                     COMMENT '비고',
+    created_at      DATETIME        NOT NULL                 COMMENT '등록일시',
+    created_by      BIGINT          NULL                     COMMENT '등록자',
+    updated_at      DATETIME        NULL                     COMMENT '수정일시',
+    updated_by      BIGINT          NULL                     COMMENT '수정자',
+    PRIMARY KEY (asset_oa_id),
+    UNIQUE KEY uk_asset_oa_serial_no (serial_no),
+    INDEX idx_asset_oa_company_id (company_id),
+    INDEX idx_asset_oa_status (status),
+    INDEX idx_asset_oa_asset_type_cd (asset_type_cd),
+    CONSTRAINT fk_asset_oa_company FOREIGN KEY (company_id) REFERENCES tb_company (company_id),
+    CONSTRAINT fk_asset_oa_manager FOREIGN KEY (manager_id) REFERENCES tb_user (user_id),
+    CONSTRAINT fk_asset_oa_created_by FOREIGN KEY (created_by) REFERENCES tb_user (user_id),
+    CONSTRAINT fk_asset_oa_updated_by FOREIGN KEY (updated_by) REFERENCES tb_user (user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='OA 자산';
+
+CREATE TABLE IF NOT EXISTS tb_asset_oa_history (
+    history_id      BIGINT          NOT NULL AUTO_INCREMENT  COMMENT '이력ID',
+    asset_oa_id     BIGINT          NOT NULL                 COMMENT 'OA자산ID',
+    changed_field   VARCHAR(100)    NOT NULL                 COMMENT '변경된 항목명',
+    before_value    TEXT            NULL                     COMMENT '변경 전 값',
+    after_value     TEXT            NULL                     COMMENT '변경 후 값',
+    batch_job_id    VARCHAR(50)     NULL                     COMMENT '일괄변경 시 배치작업ID',
+    created_at      DATETIME        NOT NULL                 COMMENT '이력 생성일시',
+    created_by      BIGINT          NULL                     COMMENT '변경자ID',
+    PRIMARY KEY (history_id),
+    INDEX idx_asset_oa_history_oa_id (asset_oa_id),
+    CONSTRAINT fk_asset_oa_history_oa FOREIGN KEY (asset_oa_id) REFERENCES tb_asset_oa (asset_oa_id),
+    CONSTRAINT fk_asset_oa_history_created_by FOREIGN KEY (created_by) REFERENCES tb_user (user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='OA 자산 변경 이력';
+
 -- ============================================================
 -- 3. 장애관리 영역
 -- ============================================================

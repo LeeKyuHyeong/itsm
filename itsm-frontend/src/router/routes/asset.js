@@ -28,5 +28,17 @@ export default [
     name: 'AssetSwDetail',
     component: () => import('@/views/asset/AssetSwDetailView.vue'),
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/assets/oa',
+    name: 'AssetOaList',
+    component: () => import('@/views/asset/AssetOaListView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/assets/oa/:id',
+    name: 'AssetOaDetail',
+    component: () => import('@/views/asset/AssetOaDetailView.vue'),
+    meta: { requiresAuth: true }
   }
 ]

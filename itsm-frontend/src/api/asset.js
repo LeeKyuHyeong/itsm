@@ -51,6 +51,27 @@ export const assetSwApi = {
   }
 }
 
+export const assetOaApi = {
+  getList(params) {
+    return api.get('/assets/oa', { params })
+  },
+  getDetail(id) {
+    return api.get(`/assets/oa/${id}`)
+  },
+  create(data) {
+    return api.post('/assets/oa', data)
+  },
+  update(id, data) {
+    return api.patch(`/assets/oa/${id}`, data)
+  },
+  changeStatus(id, status) {
+    return api.patch(`/assets/oa/${id}/status`, { status })
+  },
+  getHistory(id) {
+    return api.get(`/assets/oa/${id}/history`)
+  }
+}
+
 export const assetStatApi = {
   getStats() {
     return api.get('/assets/stats')

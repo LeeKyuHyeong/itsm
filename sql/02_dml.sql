@@ -76,7 +76,8 @@ INSERT INTO tb_menu (menu_id, parent_menu_id, menu_nm, menu_nm_en, menu_url, ico
 -- 2레벨 메뉴: 자산관리 (CMDB)
 INSERT INTO tb_menu (menu_id, parent_menu_id, menu_nm, menu_nm_en, menu_url, icon, sort_order, is_visible, status, created_at, created_by) VALUES
 (18, 5, 'HW 자산 목록',   'HW Asset List',        '/assets/hw',          NULL, 1, 'Y', 'ACTIVE', NOW(), 1),
-(19, 5, 'SW 자산 목록',   'SW Asset List',        '/assets/sw',          NULL, 2, 'Y', 'ACTIVE', NOW(), 1);
+(19, 5, 'SW 자산 목록',   'SW Asset List',        '/assets/sw',          NULL, 2, 'Y', 'ACTIVE', NOW(), 1),
+(20, 5, 'OA 자산 목록',   'OA Asset List',        '/assets/oa',          NULL, 3, 'Y', 'ACTIVE', NOW(), 1);
 
 -- 2레벨 메뉴: 정기점검관리
 INSERT INTO tb_menu (menu_id, parent_menu_id, menu_nm, menu_nm_en, menu_url, icon, sort_order, is_visible, status, created_at, created_by) VALUES
@@ -229,6 +230,22 @@ INSERT INTO tb_common_code_detail (group_id, code_val, code_nm, code_nm_en, sort
 (6, 'SECURITY',  '보안 소프트웨어', 'Security Software',  4, 'Y', NOW(), 1),
 (6, 'OFFICE',    '오피스/업무용',   'Office/Business',    5, 'Y', NOW(), 1),
 (6, 'OTHER',     '기타',            'Other',              6, 'Y', NOW(), 1);
+
+-- OA 자산유형
+INSERT INTO tb_common_code (group_id, group_nm, group_nm_en, group_cd, description, is_active, created_at, created_by)
+VALUES (12, 'OA 자산유형', 'OA Asset Type', 'ASSET_OA_TYPE', 'OA 자산 유형 분류', 'Y', NOW(), 1);
+
+INSERT INTO tb_common_code_detail (group_id, code_val, code_nm, code_nm_en, sort_order, is_active, created_at, created_by) VALUES
+(12, 'DESKTOP',   '데스크톱',       'Desktop',            1, 'Y', NOW(), 1),
+(12, 'LAPTOP',    '노트북',         'Laptop',             2, 'Y', NOW(), 1),
+(12, 'MONITOR',   '모니터',         'Monitor',            3, 'Y', NOW(), 1),
+(12, 'PRINTER',   '프린터',         'Printer',            4, 'Y', NOW(), 1),
+(12, 'MFP',       '복합기',         'MFP',                5, 'Y', NOW(), 1),
+(12, 'PHONE',     '전화/VoIP',      'Phone/VoIP',         6, 'Y', NOW(), 1),
+(12, 'TABLET',    '태블릿',         'Tablet',             7, 'Y', NOW(), 1),
+(12, 'PROJECTOR', '프로젝터',       'Projector',          8, 'Y', NOW(), 1),
+(12, 'PERIPHERAL','주변기기',       'Peripheral',         9, 'Y', NOW(), 1),
+(12, 'OTHER',     '기타',           'Other',             10, 'Y', NOW(), 1);
 
 -- 점검유형
 INSERT INTO tb_common_code (group_id, group_nm, group_nm_en, group_cd, description, is_active, created_at, created_by)

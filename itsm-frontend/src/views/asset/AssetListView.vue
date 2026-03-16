@@ -312,8 +312,7 @@ const commonCodeStore = useCommonCodeStore()
 
 const tabs = [
   { key: 'INFRA_HW', label: 'asset.categoryInfraHw' },
-  { key: 'INFRA_SW', label: 'asset.categoryInfraSw' },
-  { key: 'OA', label: 'asset.categoryOa' }
+  { key: 'INFRA_SW', label: 'asset.categoryInfraSw' }
 ]
 
 const activeTab = ref('INFRA_HW')
