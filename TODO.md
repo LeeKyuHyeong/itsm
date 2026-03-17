@@ -110,9 +110,9 @@
 
 ### 4단계: SQL/스키마 정합성 (HIGH/MEDIUM)
 
-- [ ] DDL에 `asset_category`, `asset_sub_category` 컬럼 추가 (tb_asset_hw, tb_asset_sw — Entity와 불일치)
+- [x] DDL에 `asset_category`, `asset_sub_category` 컬럼 추가 (tb_asset_hw, tb_asset_sw — Entity와 불일치)
 - [x] application-prod.yml: `ddl-auto: update` → `validate`로 변경 (운영 안전)
-- [ ] FK 컬럼 인덱스 추가 (manager_id, created_by 등 — 조회 성능)
+- [x] FK 컬럼 인덱스 추가 (manager_id, created_by — tb_asset_hw, tb_asset_sw)
 - [x] docker-compose.yml: JWT_SECRET 기본값 누락 → 필수 환경변수 검증 추가
 
 ### 5단계: 프론트엔드 품질 (MEDIUM)
