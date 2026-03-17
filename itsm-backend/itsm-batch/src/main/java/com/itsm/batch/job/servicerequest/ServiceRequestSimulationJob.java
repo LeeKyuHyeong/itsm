@@ -11,6 +11,7 @@ import com.itsm.core.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -52,6 +53,7 @@ public class ServiceRequestSimulationJob {
             {"처리는 되었으나 시간이 다소 소요되었습니다.", "추가 안내가 있었으면 좋겠습니다."},
     };
 
+    @Transactional
     public void execute() {
         log.info("[ServiceRequestSimulationJob] 시작");
 
@@ -101,6 +103,7 @@ public class ServiceRequestSimulationJob {
                     .company(company)
                     .build();
 
+            sr.setCreatedBy(SYSTEM_USER_ID);
             serviceRequestRepository.save(sr);
             log.info("[ServiceRequestSimulationJob] 신규 SR 생성: {}", sr.getTitle());
         }

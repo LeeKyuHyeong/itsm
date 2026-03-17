@@ -14,6 +14,7 @@ import com.itsm.core.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -169,6 +170,7 @@ public class IncidentSimulationJob {
             "장애 종료. 사후 분석 보고서 작성 예정."
     };
 
+    @Transactional
     public void execute() {
         log.info("[IncidentSimulationJob] 시작");
 
@@ -251,6 +253,7 @@ public class IncidentSimulationJob {
                 incident.setSlaDeadline(occurredAt.plusHours(slaHours));
             }
 
+            incident.setCreatedBy(1L);
             Incident saved = incidentRepository.save(incident);
 
             // 접수 댓글 추가

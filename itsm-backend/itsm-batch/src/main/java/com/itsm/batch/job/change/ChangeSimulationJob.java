@@ -11,6 +11,7 @@ import com.itsm.core.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -24,6 +25,7 @@ import java.util.Random;
 @Slf4j
 public class ChangeSimulationJob {
 
+    private static final Long SYSTEM_USER_ID = 1L;
     private static final int WEEKLY_MIN = 2;
     private static final int WEEKLY_MAX = 4;
     private static final double REJECTION_RATE = 0.12;
@@ -52,6 +54,7 @@ public class ChangeSimulationJob {
             "스냅샷 기반 원복, 복원 소요시간: 약 1시간",
     };
 
+    @Transactional
     public void execute() {
         log.info("[ChangeSimulationJob] 시작");
 
@@ -106,6 +109,7 @@ public class ChangeSimulationJob {
                 .rollbackPlan(ROLLBACK_PLANS[random.nextInt(ROLLBACK_PLANS.length)])
                 .company(company)
                 .build();
+        change.setCreatedBy(SYSTEM_USER_ID);
 
         changeRepository.save(change);
         log.info("[ChangeSimulationJob] 신규 변경 생성: {}", change.getTitle());

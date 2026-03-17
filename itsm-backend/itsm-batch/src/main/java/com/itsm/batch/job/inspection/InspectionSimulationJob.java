@@ -15,6 +15,7 @@ import com.itsm.core.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -84,6 +85,7 @@ public class InspectionSimulationJob {
             "비정상 (메모리 96%)", "경고 (패킷 손실 5%)", "비정상 (인증서 만료 임박)"
     };
 
+    @Transactional
     public void execute() {
         log.info("[InspectionSimulationJob] 시작");
 
@@ -138,6 +140,7 @@ public class InspectionSimulationJob {
                     .description(title + " - 자동 생성된 정기 점검입니다.")
                     .build();
 
+            inspection.setCreatedBy(1L);
             inspectionRepository.save(inspection);
             log.info("[InspectionSimulationJob] 점검 생성: {} (예정일: {})", title, scheduledDate);
         }
@@ -192,6 +195,7 @@ public class InspectionSimulationJob {
                     .itemNm(itemNames[i])
                     .sortOrder(i + 1)
                     .isRequired("Y")
+                    .createdBy(1L)
                     .build();
             inspectionItemRepository.save(item);
         }
@@ -221,6 +225,7 @@ public class InspectionSimulationJob {
                     .isNormal(isNormal)
                     .remark(isAbnormal ? "점검 결과 이상 발견 - 조치 필요" : null)
                     .build();
+            result.setCreatedBy(1L);
             inspectionResultRepository.save(result);
         }
     }
@@ -264,6 +269,7 @@ public class InspectionSimulationJob {
                     .occurredAt(LocalDateTime.now())
                     .company(inspection.getCompany())
                     .build();
+            incident.setCreatedBy(1L);
 
             incidentRepository.save(incident);
             log.info("[InspectionSimulationJob] 점검 #{} 비정상 → 장애 생성: {}",
