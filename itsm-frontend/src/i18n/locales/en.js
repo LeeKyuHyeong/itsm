@@ -607,7 +607,14 @@ export default {
   notification: {
     title: 'Notifications',
     markAllRead: 'Mark all as read',
-    noNotification: 'No notifications.'
+    noNotification: 'No notifications.',
+    markAllReadBtn: 'Mark all read',
+    readFail: 'Failed to mark as read',
+    markAllReadFail: 'Failed to mark all as read',
+    justNow: 'Just now',
+    minutesAgo: '{n}m ago',
+    hoursAgo: '{n}h ago',
+    daysAgo: '{n}d ago'
   },
 
   message: {

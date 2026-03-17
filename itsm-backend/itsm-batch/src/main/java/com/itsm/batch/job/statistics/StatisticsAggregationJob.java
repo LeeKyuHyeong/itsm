@@ -15,6 +15,7 @@ import com.itsm.core.repository.statistics.DailyStatisticsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -40,6 +41,7 @@ public class StatisticsAggregationJob {
     private final LoginHistoryRepository loginHistoryRepository;
     private final SimMenuAccessLogRepository menuAccessLogRepository;
 
+    @Transactional
     public void execute() {
         LocalDate yesterday = LocalDate.now().minusDays(1);
         log.info("통계 집계 시작: {}", yesterday);

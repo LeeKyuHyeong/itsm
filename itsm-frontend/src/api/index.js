@@ -40,7 +40,8 @@ api.interceptors.response.use(
         }
       } catch (refreshError) {
         localStorage.removeItem('accessToken')
-        window.location.href = '/login'
+        const { default: router } = await import('@/router/index.js')
+        router.push('/login')
         return Promise.reject(refreshError)
       }
     }

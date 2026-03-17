@@ -101,7 +101,7 @@ const user = computed(() => authStore.user)
 
 const primaryRole = computed(() => {
   const roles = user.value?.roles
-  if (!roles || roles.length === 0) return ''
+  if (!Array.isArray(roles) || roles.length === 0) return ''
   const roleKey = `role.${roles[0]}`
   return te(roleKey) ? t(roleKey) : roles[0]
 })

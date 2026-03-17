@@ -78,6 +78,67 @@
 
 ---
 
+## Phase 17: 소스 위험도 분석 및 품질 개선
+
+> 2026-03-17 전체 소스 정적 분석 결과. 위험도 순으로 정리.
+
+### 1단계: 보안 (CRITICAL/HIGH) — 즉시 조치
+
+- [x] AuthController: Refresh Token 쿠키 `setSecure(false)` → 환경별 분기 (prod: true, local: false)
+- [x] AuthController: 쿠키에 `SameSite=Strict` 속성 추가 (CSRF 방지)
+- [x] LoginView.vue: 기본 자격증명 `admin/admin123!@#` 하드코딩 제거
+- [x] application.yml: JWT Secret 하드코딩 제거 → 환경변수 전용으로 변경
+- [x] application-prod.yml: HTTPS/SSL 설정 추가 또는 리버스 프록시 의존 명시
+- [x] `.env.example` 파일 생성 (DB_PASSWORD, JWT_SECRET, CORS_ORIGINS 등 문서화)
+
+### 2단계: 배치 안정화 (CRITICAL/HIGH)
+
+- [x] AssetAutoRegisterJob: `@Transactional` 추가
+- [x] AssetExpiryJob: `@Transactional` 추가
+- [x] ChangeSimulationJob: ChangeApprover 생성 시 `createdBy` 미설정 수정 (N/A: 엔티티에 createdBy 필드 없음)
+- [x] StatisticsAggregationJob: `@Transactional` 추가
+- [x] 8개 알림 Job에 `@Transactional` 추가 (RepeatIncidentJob, UnassignedIncidentJob, SlaOverdueJob, SlaWarningJob, LongPendingSrJob, InspectionAlertJob, MissedInspectionJob, TrafficSimulationJob)
+- [x] DynamicScheduler: `checkTriggeredJobs()`/`refreshSchedules()` 간 Map 동시 수정 레이스 컨디션 해결 (ReentrantLock)
+
+### 3단계: 입력 검증 강화 (HIGH/MEDIUM)
+
+- [ ] 다수 Controller: `Map<String,Object>` 기반 요청 → DTO + `@Valid` 전환 (ServiceRequestController, IncidentController, ChangeController 등)
+- [ ] Map.get() 후 null 체크 없이 캐스팅하는 코드 수정 (NPE 방지)
+- [ ] DELETE 작업에 소유자/권한 검증 추가 (댓글 삭제, 배정 해제 등)
+- [ ] authentication.getPrincipal() null 체크 추가
+- [ ] UserService: 중복 체크 TOCTOU → DB unique 제약조건 + 예외 핸들링으로 보완
+
+### 4단계: SQL/스키마 정합성 (HIGH/MEDIUM)
+
+- [ ] DDL에 `asset_category`, `asset_sub_category` 컬럼 추가 (tb_asset_hw, tb_asset_sw — Entity와 불일치)
+- [x] application-prod.yml: `ddl-auto: update` → `validate`로 변경 (운영 안전)
+- [ ] FK 컬럼 인덱스 추가 (manager_id, created_by 등 — 조회 성능)
+- [x] docker-compose.yml: JWT_SECRET 기본값 누락 → 필수 환경변수 검증 추가
+
+### 5단계: 프론트엔드 품질 (MEDIUM)
+
+- [x] NotificationDropdown.vue: 한국어 하드코딩 → i18n 키 전환 ("알림", "전체 읽음", "분 전" 등)
+- [x] guards.js: fetchMe() 중복 호출 방지 (세션 복원 진행 중 플래그)
+- [x] api/index.js: 토큰 갱신 실패 시 `window.location.href` → `router.push('/login')` + 상태 정리
+- [x] AppSidebar.vue: `v-html` SVG 렌더링 → 컴포넌트 방식 전환 (XSS 예방)
+- [ ] 다수 Store: API 응답 구조 처리 통일 (`data.data` vs `data.data || data`)
+- [x] AppHeader.vue: `roles[0]` 접근 시 빈 배열 체크 추가
+
+### 6단계: 성능 최적화 (MEDIUM/LOW)
+
+- [ ] N+1 쿼리 개선: Incident, ServiceRequest, Change 등 목록 조회에 `JOIN FETCH` 추가
+- [ ] ChangeApprover, Comment 등 연관 엔티티 조회 시 EntityGraph 적용 검토
+
+### 기타 (LOW)
+
+- [x] .gitignore: `scrren.png` 오타 수정
+- [ ] SYSTEM_USER_ID = 1L 하드코딩 → 설정값 또는 시스템 사용자 조회로 변경
+- [x] ChangePasswordView.vue: setTimeout 내 router.push → 컴포넌트 언마운트 시 정리
+- [x] Frontend Dockerfile: HEALTHCHECK 추가
+- [ ] application-local.yml: DB 비밀번호 하드코딩 → 환경변수 전환 검토
+
+---
+
 ## 설계 원칙 (개발 시 항상 참고)
 
 1. **서비스 중단 최소화** — 동적 폼, DB 기반 설정, 메뉴 동적 관리

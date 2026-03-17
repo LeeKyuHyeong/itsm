@@ -5,6 +5,7 @@ import com.itsm.core.repository.incident.IncidentAssetRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,6 +20,7 @@ public class RepeatIncidentJob {
     private final IncidentAssetRepository incidentAssetRepository;
     private final NotificationService notificationService;
 
+    @Transactional
     public void execute() {
         log.info("[RepeatIncidentJob] 시작");
         LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusDays(30);

@@ -80,7 +80,7 @@
 </template>
 
 <script setup>
-import { ref, computed, reactive } from 'vue'
+import { ref, computed, reactive, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { authApi } from '@/api/auth.js'
@@ -99,6 +99,14 @@ const form = reactive({
 const loading = ref(false)
 const errorMessage = ref('')
 const successMessage = ref('')
+let redirectTimer = null
+
+onBeforeUnmount(() => {
+  if (redirectTimer) {
+    clearTimeout(redirectTimer)
+    redirectTimer = null
+  }
+})
 
 const hasMinLength = computed(() => form.newPassword.length >= 8)
 const hasUppercase = computed(() => /[A-Z]/.test(form.newPassword))
@@ -135,7 +143,7 @@ async function handleChangePassword() {
     // 사용자 정보 갱신
     await authStore.fetchMe()
 
-    setTimeout(() => {
+    redirectTimer = setTimeout(() => {
       router.push('/dashboard')
     }, 1500)
   } catch (error) {

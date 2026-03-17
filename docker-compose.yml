@@ -28,7 +28,7 @@ services:
       DB_HOST: db:3306
       DB_USERNAME: root
       DB_PASSWORD: ${DB_PASSWORD}
-      JWT_SECRET: ${JWT_SECRET}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost}
     expose:
       - "8080"

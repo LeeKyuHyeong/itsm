@@ -1,16 +1,21 @@
 import { useAuthStore } from '../stores/auth.js'
 
+let sessionRestoring = false
+
 export function setupGuards(router) {
   router.beforeEach(async (to, from, next) => {
     const authStore = useAuthStore()
     const requiresAuth = to.meta.requiresAuth !== false
 
     // 토큰이 있지만 user 상태가 없으면 세션 복원 시도 (새로고침 대응)
-    if (!authStore.isAuthenticated && localStorage.getItem('accessToken')) {
+    if (!authStore.isAuthenticated && localStorage.getItem('accessToken') && !sessionRestoring) {
+      sessionRestoring = true
       try {
         await authStore.fetchMe()
       } catch (e) {
         authStore.clearAuth()
+      } finally {
+        sessionRestoring = false
       }
     }
 

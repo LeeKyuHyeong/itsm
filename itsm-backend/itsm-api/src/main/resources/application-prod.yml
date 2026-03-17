@@ -10,13 +10,16 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
 
 jwt:
   secret: ${JWT_SECRET}
 
 cors:
   allowed-origins: ${CORS_ORIGINS:http://localhost:3000}
+
+cookie:
+  secure: true
 
 logging:
   level:

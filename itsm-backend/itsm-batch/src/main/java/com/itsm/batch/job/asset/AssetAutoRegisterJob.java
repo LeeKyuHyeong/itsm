@@ -11,6 +11,7 @@ import com.itsm.core.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -234,6 +235,7 @@ public class AssetAutoRegisterJob {
             Map.entry("BenQ", "BNQ"), Map.entry("Sony", "SNY")
     );
 
+    @Transactional
     public void execute() {
         log.info("[AssetAutoRegisterJob] 시작");
 

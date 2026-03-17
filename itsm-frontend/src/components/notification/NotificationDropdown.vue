@@ -12,19 +12,19 @@
 
     <div v-if="isOpen" class="dropdown-panel">
       <div class="dropdown-header">
-        <h3 class="dropdown-title">알림</h3>
+        <h3 class="dropdown-title">{{ t('notification.title') }}</h3>
         <button
           v-if="notificationStore.unreadCount > 0"
           class="mark-all-btn"
           @click="handleMarkAllAsRead"
         >
-          전체 읽음
+          {{ t('notification.markAllReadBtn') }}
         </button>
       </div>
 
       <div class="dropdown-body">
         <div v-if="notificationStore.notifications.length === 0" class="empty-message">
-          알림이 없습니다.
+          {{ t('notification.noNotification') }}
         </div>
         <div
           v-for="noti in notificationStore.notifications"
@@ -44,9 +44,11 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useNotificationStore } from '@/stores/notification.js'
 import { notificationApi } from '@/api/notification.js'
 
+const { t } = useI18n()
 const router = useRouter()
 const notificationStore = useNotificationStore()
 
@@ -105,13 +107,13 @@ function formatTimeAgo(dateStr) {
   const date = new Date(dateStr)
   const diffMs = now - date
   const diffMin = Math.floor(diffMs / 60000)
-  if (diffMin < 1) return '방금 전'
-  if (diffMin < 60) return `${diffMin}분 전`
+  if (diffMin < 1) return t('notification.justNow')
+  if (diffMin < 60) return t('notification.minutesAgo', { n: diffMin })
   const diffHour = Math.floor(diffMin / 60)
-  if (diffHour < 24) return `${diffHour}시간 전`
+  if (diffHour < 24) return t('notification.hoursAgo', { n: diffHour })
   const diffDay = Math.floor(diffHour / 24)
-  if (diffDay < 30) return `${diffDay}일 전`
-  return date.toLocaleDateString('ko-KR')
+  if (diffDay < 30) return t('notification.daysAgo', { n: diffDay })
+  return date.toLocaleDateString()
 }
 </script>
 

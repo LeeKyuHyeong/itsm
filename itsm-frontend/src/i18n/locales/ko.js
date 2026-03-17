@@ -622,7 +622,14 @@ export default {
   notification: {
     title: '알림',
     markAllRead: '모두 읽음',
-    noNotification: '알림이 없습니다.'
+    noNotification: '알림이 없습니다.',
+    markAllReadBtn: '전체 읽음',
+    readFail: '알림 읽음 처리 실패',
+    markAllReadFail: '전체 읽음 처리 실패',
+    justNow: '방금 전',
+    minutesAgo: '{n}분 전',
+    hoursAgo: '{n}시간 전',
+    daysAgo: '{n}일 전'
   },
 
   // 메시지

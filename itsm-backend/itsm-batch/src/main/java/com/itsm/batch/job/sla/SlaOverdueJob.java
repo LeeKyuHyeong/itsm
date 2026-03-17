@@ -6,6 +6,7 @@ import com.itsm.core.repository.incident.IncidentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,6 +19,7 @@ public class SlaOverdueJob {
     private final IncidentRepository incidentRepository;
     private final NotificationService notificationService;
 
+    @Transactional
     public void execute() {
         log.info("[SlaOverdueJob] 시작");
         LocalDateTime now = LocalDateTime.now();

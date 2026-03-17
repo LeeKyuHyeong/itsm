@@ -6,6 +6,7 @@ import com.itsm.core.repository.servicerequest.ServiceRequestRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,6 +21,7 @@ public class LongPendingSrJob {
     private final ServiceRequestRepository serviceRequestRepository;
     private final NotificationService notificationService;
 
+    @Transactional
     public void execute() {
         log.info("[LongPendingSrJob] 시작");
         LocalDateTime twoDaysAgo = LocalDateTime.now().minusDays(2);

@@ -58,8 +58,8 @@ const { t } = useI18n()
 const router = useRouter()
 const authStore = useAuthStore()
 
-const loginId = ref('admin')
-const password = ref('admin123!@#')
+const loginId = ref('')
+const password = ref('')
 const loading = ref(false)
 const errorMessage = ref('')
 

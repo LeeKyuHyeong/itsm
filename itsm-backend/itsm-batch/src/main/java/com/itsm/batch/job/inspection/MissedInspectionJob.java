@@ -6,6 +6,7 @@ import com.itsm.core.repository.inspection.InspectionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -20,6 +21,7 @@ public class MissedInspectionJob {
     private final InspectionRepository inspectionRepository;
     private final NotificationService notificationService;
 
+    @Transactional
     public void execute() {
         log.info("[MissedInspectionJob] 시작");
         LocalDate today = LocalDate.now();

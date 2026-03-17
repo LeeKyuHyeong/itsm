@@ -10,6 +10,7 @@ import com.itsm.core.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -69,6 +70,7 @@ public class TrafficSimulationJob {
             {"APPROVAL_REQUEST", "서비스요청 승인", "서비스 요청에 대한 검토가 필요합니다."},
     };
 
+    @Transactional
     public void execute() {
         List<User> allUsers = userRepository.findAll();
         List<User> activeUsers = allUsers.stream()

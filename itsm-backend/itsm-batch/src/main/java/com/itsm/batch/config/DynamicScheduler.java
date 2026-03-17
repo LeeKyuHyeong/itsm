@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Component
 @Slf4j
@@ -27,6 +28,7 @@ public class DynamicScheduler {
 
     private final Map<String, ScheduledFuture<?>> scheduledTasks = new ConcurrentHashMap<>();
     private final Map<String, String> registeredCrons = new ConcurrentHashMap<>();
+    private final ReentrantLock scheduleLock = new ReentrantLock();
 
     public DynamicScheduler(BatchJobRepository batchJobRepository,
                             ApplicationContext applicationContext,
@@ -48,38 +50,45 @@ public class DynamicScheduler {
         for (BatchJob job : triggeredJobs) {
             log.info("[DynamicScheduler] 수동 실행 요청 감지: {}", job.getJobName());
             batchJobRepository.clearTrigger(job.getBatchJobId());
-            executeJobImmediately(job);
+            scheduleLock.lock();
+            try {
+                executeJobImmediately(job);
+            } finally {
+                scheduleLock.unlock();
+            }
         }
     }
 
     @Scheduled(fixedDelay = 60000)
     public void refreshSchedules() {
-        List<BatchJob> allJobs = batchJobRepository.findAll();
+        scheduleLock.lock();
+        try {
+            List<BatchJob> allJobs = batchJobRepository.findAll();
 
-        for (BatchJob job : allJobs) {
-            String jobName = job.getJobName();
+            for (BatchJob job : allJobs) {
+                String jobName = job.getJobName();
 
-            if (job.isEnabled()) {
-                String currentCron = registeredCrons.get(jobName);
-                if (currentCron == null || !currentCron.equals(job.getCronExpression())) {
-                    // Cancel existing if cron changed
-                    cancelTask(jobName);
-                    scheduleTask(job);
-                }
-            } else {
-                // Job disabled - cancel if running
-                if (scheduledTasks.containsKey(jobName)) {
-                    cancelTask(jobName);
-                    log.info("[DynamicScheduler] 비활성 배치 해제: {}", jobName);
+                if (job.isEnabled()) {
+                    String currentCron = registeredCrons.get(jobName);
+                    if (currentCron == null || !currentCron.equals(job.getCronExpression())) {
+                        cancelTask(jobName);
+                        scheduleTask(job);
+                    }
+                } else {
+                    if (scheduledTasks.containsKey(jobName)) {
+                        cancelTask(jobName);
+                        log.info("[DynamicScheduler] 비활성 배치 해제: {}", jobName);
+                    }
                 }
             }
-        }
 
-        // Cancel tasks for jobs that no longer exist in DB
-        scheduledTasks.keySet().stream()
-                .filter(name -> allJobs.stream().noneMatch(j -> j.getJobName().equals(name)))
-                .toList()
-                .forEach(this::cancelTask);
+            scheduledTasks.keySet().stream()
+                    .filter(name -> allJobs.stream().noneMatch(j -> j.getJobName().equals(name)))
+                    .toList()
+                    .forEach(this::cancelTask);
+        } finally {
+            scheduleLock.unlock();
+        }
     }
 
     private void scheduleTask(BatchJob batchJob) {

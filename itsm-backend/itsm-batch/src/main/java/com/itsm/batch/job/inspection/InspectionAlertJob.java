@@ -6,6 +6,7 @@ import com.itsm.core.repository.inspection.InspectionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -21,6 +22,7 @@ public class InspectionAlertJob {
     private final InspectionRepository inspectionRepository;
     private final NotificationService notificationService;
 
+    @Transactional
     public void execute() {
         log.info("[InspectionAlertJob] 시작");
         LocalDate today = LocalDate.now();
