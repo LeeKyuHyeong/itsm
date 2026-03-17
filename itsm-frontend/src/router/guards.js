@@ -1,9 +1,18 @@
 import { useAuthStore } from '../stores/auth.js'
 
 export function setupGuards(router) {
-  router.beforeEach((to, from, next) => {
+  router.beforeEach(async (to, from, next) => {
     const authStore = useAuthStore()
     const requiresAuth = to.meta.requiresAuth !== false
+
+    // 토큰이 있지만 user 상태가 없으면 세션 복원 시도 (새로고침 대응)
+    if (!authStore.isAuthenticated && localStorage.getItem('accessToken')) {
+      try {
+        await authStore.fetchMe()
+      } catch (e) {
+        authStore.clearAuth()
+      }
+    }
 
     // 인증이 필요하지 않은 페이지 (로그인 등)
     if (!requiresAuth) {
