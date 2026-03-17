@@ -18,7 +18,13 @@ public interface ServiceRequestRepository extends JpaRepository<ServiceRequest, 
     List<ServiceRequest> findByStatusCdAndUpdatedAtBefore(@Param("statusCd") String statusCd,
                                                           @Param("before") LocalDateTime before);
 
-    @Query("SELECT sr FROM ServiceRequest sr WHERE " +
+    @Query(value = "SELECT sr FROM ServiceRequest sr LEFT JOIN FETCH sr.company WHERE " +
+            "(:keyword IS NULL OR sr.title LIKE %:keyword% OR sr.content LIKE %:keyword%) " +
+            "AND (:companyId IS NULL OR sr.company.companyId = :companyId) " +
+            "AND (:statusCd IS NULL OR sr.statusCd = :statusCd) " +
+            "AND (:priorityCd IS NULL OR sr.priorityCd = :priorityCd) " +
+            "AND (:requestTypeCd IS NULL OR sr.requestTypeCd = :requestTypeCd)",
+            countQuery = "SELECT COUNT(sr) FROM ServiceRequest sr WHERE " +
             "(:keyword IS NULL OR sr.title LIKE %:keyword% OR sr.content LIKE %:keyword%) " +
             "AND (:companyId IS NULL OR sr.company.companyId = :companyId) " +
             "AND (:statusCd IS NULL OR sr.statusCd = :statusCd) " +

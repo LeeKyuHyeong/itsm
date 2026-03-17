@@ -17,7 +17,13 @@ public interface IncidentRepository extends JpaRepository<Incident, Long> {
     @Query("SELECT i FROM Incident i WHERE i.statusCd IN :statusCds AND i.mainManager IS NULL")
     List<Incident> findByStatusCdInAndMainManagerIsNull(@Param("statusCds") List<String> statusCds);
 
-    @Query("SELECT i FROM Incident i WHERE " +
+    @Query(value = "SELECT i FROM Incident i LEFT JOIN FETCH i.company LEFT JOIN FETCH i.mainManager WHERE " +
+            "(:keyword IS NULL OR i.title LIKE %:keyword% OR i.content LIKE %:keyword%) " +
+            "AND (:companyId IS NULL OR i.company.companyId = :companyId) " +
+            "AND (:statusCd IS NULL OR i.statusCd = :statusCd) " +
+            "AND (:priorityCd IS NULL OR i.priorityCd = :priorityCd) " +
+            "AND (:incidentTypeCd IS NULL OR i.incidentTypeCd = :incidentTypeCd)",
+            countQuery = "SELECT COUNT(i) FROM Incident i WHERE " +
             "(:keyword IS NULL OR i.title LIKE %:keyword% OR i.content LIKE %:keyword%) " +
             "AND (:companyId IS NULL OR i.company.companyId = :companyId) " +
             "AND (:statusCd IS NULL OR i.statusCd = :statusCd) " +

@@ -126,8 +126,8 @@
 
 ### 6단계: 성능 최적화 (MEDIUM/LOW)
 
-- [ ] N+1 쿼리 개선: Incident, ServiceRequest, Change 등 목록 조회에 `JOIN FETCH` 추가
-- [ ] ChangeApprover, Comment 등 연관 엔티티 조회 시 EntityGraph 적용 검토
+- [x] N+1 쿼리 개선: Incident, ServiceRequest, Change 목록 조회에 `JOIN FETCH` + countQuery 분리
+- [x] ChangeApprover, IncidentAssignee, ServiceRequestAssignee 조회 시 `@EntityGraph(user)` 적용
 
 ### 기타 (LOW)
 

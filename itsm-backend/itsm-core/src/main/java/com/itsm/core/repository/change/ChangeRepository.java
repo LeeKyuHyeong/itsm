@@ -14,7 +14,13 @@ public interface ChangeRepository extends JpaRepository<Change, Long> {
 
     List<Change> findByStatusCd(String statusCd);
 
-    @Query("SELECT c FROM Change c WHERE " +
+    @Query(value = "SELECT c FROM Change c LEFT JOIN FETCH c.company WHERE " +
+            "(:keyword IS NULL OR c.title LIKE %:keyword% OR c.content LIKE %:keyword%) " +
+            "AND (:companyId IS NULL OR c.company.companyId = :companyId) " +
+            "AND (:statusCd IS NULL OR c.statusCd = :statusCd) " +
+            "AND (:priorityCd IS NULL OR c.priorityCd = :priorityCd) " +
+            "AND (:changeTypeCd IS NULL OR c.changeTypeCd = :changeTypeCd)",
+            countQuery = "SELECT COUNT(c) FROM Change c WHERE " +
             "(:keyword IS NULL OR c.title LIKE %:keyword% OR c.content LIKE %:keyword%) " +
             "AND (:companyId IS NULL OR c.company.companyId = :companyId) " +
             "AND (:statusCd IS NULL OR c.statusCd = :statusCd) " +
