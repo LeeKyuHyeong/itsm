@@ -40,7 +40,7 @@ export const useCommonCodeStore = defineStore('commonCode', () => {
     if (codeMap.value[groupCd]) return  // already cached
     try {
       const { data } = await api.get(`/common-codes/${groupCd}`)
-      const details = data.data || data || []
+      const details = data.data || []
       codeMap.value[groupCd] = details.map(d => ({
         code: d.codeVal,
         name: d.codeNm,

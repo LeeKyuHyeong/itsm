@@ -16,7 +16,7 @@ export const useNotificationStore = defineStore('notification', () => {
   async function fetchNotifications() {
     try {
       const { data } = await notificationApi.getList({ size: 20 })
-      const result = data.data || data
+      const result = data.data || {}
       notifications.value = result.content || result.items || result || []
     } catch (e) {
       console.error('알림 목록 로드 실패:', e)
@@ -26,7 +26,7 @@ export const useNotificationStore = defineStore('notification', () => {
   async function fetchUnreadCount() {
     try {
       const { data } = await notificationApi.getList({ size: 100, unreadOnly: true })
-      const result = data.data || data
+      const result = data.data || {}
       const list = result.content || result.items || result || []
       // Merge unread into existing notifications
       list.forEach(n => {

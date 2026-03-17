@@ -121,7 +121,7 @@
 - [x] guards.js: fetchMe() 중복 호출 방지 (세션 복원 진행 중 플래그)
 - [x] api/index.js: 토큰 갱신 실패 시 `window.location.href` → `router.push('/login')` + 상태 정리
 - [x] AppSidebar.vue: `v-html` SVG 렌더링 → 컴포넌트 방식 전환 (XSS 예방)
-- [ ] 다수 Store: API 응답 구조 처리 통일 (`data.data` vs `data.data || data`)
+- [x] 다수 Store: API 응답 구조 처리 통일 (`data.data` vs `data.data || data`)
 - [x] AppHeader.vue: `roles[0]` 접근 시 빈 배열 체크 추가
 
 ### 6단계: 성능 최적화 (MEDIUM/LOW)
