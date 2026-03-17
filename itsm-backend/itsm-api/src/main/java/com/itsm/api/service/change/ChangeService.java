@@ -233,9 +233,12 @@ public class ChangeService {
         return toCommentResponse(comment);
     }
 
-    public void deleteComment(Long changeId, Long commentId) {
+    public void deleteComment(Long changeId, Long commentId, Long currentUserId) {
         ChangeComment comment = changeCommentRepository.findById(commentId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND, "댓글을 찾을 수 없습니다."));
+        if (!currentUserId.equals(comment.getCreatedBy())) {
+            throw new BusinessException(ErrorCode.ACCESS_DENIED, "본인이 작성한 댓글만 삭제할 수 있습니다.");
+        }
         changeCommentRepository.delete(comment);
     }
 

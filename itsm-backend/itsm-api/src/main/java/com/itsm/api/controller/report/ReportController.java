@@ -1,5 +1,6 @@
 package com.itsm.api.controller.report;
 
+import com.itsm.api.dto.common.ReportContentRequest;
 import com.itsm.api.dto.report.*;
 import com.itsm.api.service.report.ReportService;
 import com.itsm.core.dto.ApiResponse;
@@ -9,9 +10,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -84,10 +82,10 @@ public class ReportController {
     @PatchMapping("/api/v1/reports/{reportId}")
     public ApiResponse<ReportResponse> updateReport(
             @PathVariable Long reportId,
-            @RequestBody Map<String, String> body,
+            @Valid @RequestBody ReportContentRequest req,
             Authentication authentication) {
         Long currentUserId = getCurrentUserId(authentication);
-        return ApiResponse.success(reportService.updateReport(reportId, body.get("reportContent"), currentUserId));
+        return ApiResponse.success(reportService.updateReport(reportId, req.getReportContent(), currentUserId));
     }
 
     @DeleteMapping("/api/v1/reports/{reportId}")

@@ -1,6 +1,7 @@
 package com.itsm.api.controller.asset;
 
 import com.itsm.api.dto.asset.*;
+import com.itsm.api.dto.common.StatusChangeRequest;
 import com.itsm.api.service.asset.AssetHwService;
 import com.itsm.core.dto.ApiResponse;
 import jakarta.validation.Valid;
@@ -11,7 +12,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/assets/hw")
@@ -58,10 +58,10 @@ public class AssetHwController {
     @PatchMapping("/{assetHwId}/status")
     public ApiResponse<Void> changeStatus(
             @PathVariable Long assetHwId,
-            @RequestBody Map<String, String> body,
+            @Valid @RequestBody StatusChangeRequest req,
             Authentication authentication) {
         Long currentUserId = getCurrentUserId(authentication);
-        assetHwService.changeStatus(assetHwId, body.get("status"), currentUserId);
+        assetHwService.changeStatus(assetHwId, req.getStatus(), currentUserId);
         return ApiResponse.success();
     }
 

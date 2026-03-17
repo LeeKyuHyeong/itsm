@@ -1,8 +1,11 @@
 package com.itsm.api.controller.board;
 
 import com.itsm.api.dto.board.*;
+import com.itsm.api.dto.common.ContentRequest;
 import com.itsm.api.service.board.BoardService;
 import com.itsm.core.dto.ApiResponse;
+import com.itsm.core.exception.BusinessException;
+import com.itsm.core.exception.ErrorCode;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -11,7 +14,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -105,10 +107,10 @@ public class BoardController {
     public ApiResponse<BoardCommentResponse> createComment(
             @PathVariable Long boardId,
             @PathVariable Long postId,
-            @RequestBody Map<String, String> body,
+            @Valid @RequestBody ContentRequest req,
             Authentication authentication) {
         Long currentUserId = getCurrentUserId(authentication);
-        return ApiResponse.success(boardService.createComment(boardId, postId, body.get("content"), currentUserId));
+        return ApiResponse.success(boardService.createComment(boardId, postId, req.getContent(), currentUserId));
     }
 
     @PutMapping("/api/v1/boards/{boardId}/posts/{postId}/comments/{commentId}")
@@ -116,10 +118,10 @@ public class BoardController {
             @PathVariable Long boardId,
             @PathVariable Long postId,
             @PathVariable Long commentId,
-            @RequestBody Map<String, String> body,
+            @Valid @RequestBody ContentRequest req,
             Authentication authentication) {
         Long currentUserId = getCurrentUserId(authentication);
-        return ApiResponse.success(boardService.updateComment(boardId, postId, commentId, body.get("content"), currentUserId));
+        return ApiResponse.success(boardService.updateComment(boardId, postId, commentId, req.getContent(), currentUserId));
     }
 
     @DeleteMapping("/api/v1/boards/{boardId}/posts/{postId}/comments/{commentId}")
@@ -132,6 +134,9 @@ public class BoardController {
     }
 
     private Long getCurrentUserId(Authentication authentication) {
+        if (authentication == null || authentication.getPrincipal() == null) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED, "인증 정보가 없습니다.");
+        }
         return (Long) authentication.getPrincipal();
     }
 }

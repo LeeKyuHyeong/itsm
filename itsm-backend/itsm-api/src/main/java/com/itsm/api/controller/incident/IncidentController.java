@@ -1,8 +1,13 @@
 package com.itsm.api.controller.incident;
 
+import com.itsm.api.dto.common.ContentRequest;
+import com.itsm.api.dto.common.StatusChangeRequest;
+import com.itsm.api.dto.common.UserIdRequest;
 import com.itsm.api.dto.incident.*;
 import com.itsm.api.service.incident.IncidentService;
 import com.itsm.core.dto.ApiResponse;
+import com.itsm.core.exception.BusinessException;
+import com.itsm.core.exception.ErrorCode;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -11,7 +16,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/incidents")
@@ -56,26 +60,28 @@ public class IncidentController {
     @PatchMapping("/{incidentId}/status")
     public ApiResponse<Void> changeStatus(
             @PathVariable Long incidentId,
-            @RequestBody Map<String, String> body,
+            @Valid @RequestBody StatusChangeRequest req,
             Authentication authentication) {
         Long currentUserId = getCurrentUserId(authentication);
-        incidentService.changeStatus(incidentId, body.get("status"), currentUserId);
+        incidentService.changeStatus(incidentId, req.getStatus(), currentUserId);
         return ApiResponse.success();
     }
 
     @PostMapping("/{incidentId}/assignees")
     public ApiResponse<IncidentAssigneeResponse> assignUser(
             @PathVariable Long incidentId,
-            @RequestBody Map<String, Long> body,
+            @Valid @RequestBody UserIdRequest req,
             Authentication authentication) {
         Long currentUserId = getCurrentUserId(authentication);
-        return ApiResponse.success(incidentService.assignUser(incidentId, body.get("userId"), currentUserId));
+        return ApiResponse.success(incidentService.assignUser(incidentId, req.getUserId(), currentUserId));
     }
 
     @DeleteMapping("/{incidentId}/assignees/{userId}")
     public ApiResponse<Void> removeAssignee(
             @PathVariable Long incidentId,
-            @PathVariable Long userId) {
+            @PathVariable Long userId,
+            Authentication authentication) {
+        getCurrentUserId(authentication);
         incidentService.removeAssignee(incidentId, userId);
         return ApiResponse.success();
     }
@@ -93,27 +99,29 @@ public class IncidentController {
     @PostMapping("/{incidentId}/comments")
     public ApiResponse<IncidentCommentResponse> addComment(
             @PathVariable Long incidentId,
-            @RequestBody Map<String, String> body,
+            @Valid @RequestBody ContentRequest req,
             Authentication authentication) {
         Long currentUserId = getCurrentUserId(authentication);
-        return ApiResponse.success(incidentService.addComment(incidentId, body.get("content"), currentUserId));
+        return ApiResponse.success(incidentService.addComment(incidentId, req.getContent(), currentUserId));
     }
 
     @PatchMapping("/{incidentId}/comments/{commentId}")
     public ApiResponse<IncidentCommentResponse> updateComment(
             @PathVariable Long incidentId,
             @PathVariable Long commentId,
-            @RequestBody Map<String, String> body,
+            @Valid @RequestBody ContentRequest req,
             Authentication authentication) {
         Long currentUserId = getCurrentUserId(authentication);
-        return ApiResponse.success(incidentService.updateComment(incidentId, commentId, body.get("content"), currentUserId));
+        return ApiResponse.success(incidentService.updateComment(incidentId, commentId, req.getContent(), currentUserId));
     }
 
     @DeleteMapping("/{incidentId}/comments/{commentId}")
     public ApiResponse<Void> deleteComment(
             @PathVariable Long incidentId,
-            @PathVariable Long commentId) {
-        incidentService.deleteComment(incidentId, commentId);
+            @PathVariable Long commentId,
+            Authentication authentication) {
+        Long currentUserId = getCurrentUserId(authentication);
+        incidentService.deleteComment(incidentId, commentId, currentUserId);
         return ApiResponse.success();
     }
 
@@ -171,14 +179,17 @@ public class IncidentController {
     @PatchMapping("/{incidentId}/main-manager")
     public ApiResponse<Void> assignMainManager(
             @PathVariable Long incidentId,
-            @RequestBody Map<String, Long> body,
+            @Valid @RequestBody UserIdRequest req,
             Authentication authentication) {
         Long currentUserId = getCurrentUserId(authentication);
-        incidentService.assignMainManager(incidentId, body.get("managerId"), currentUserId);
+        incidentService.assignMainManager(incidentId, req.getUserId(), currentUserId);
         return ApiResponse.success();
     }
 
     private Long getCurrentUserId(Authentication authentication) {
+        if (authentication == null || authentication.getPrincipal() == null) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED, "인증 정보가 없습니다.");
+        }
         return (Long) authentication.getPrincipal();
     }
 }

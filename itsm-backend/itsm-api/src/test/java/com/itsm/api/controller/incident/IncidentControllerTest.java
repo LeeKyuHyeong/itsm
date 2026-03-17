@@ -159,7 +159,8 @@ class IncidentControllerTest {
     @Test
     @DisplayName("DELETE /api/v1/incidents/{id}/assignees/{userId} - 담당자 해제 시 200을 반환한다")
     void removeAssignee_returns200() throws Exception {
-        mockMvc.perform(delete("/api/v1/incidents/1/assignees/10"))
+        mockMvc.perform(delete("/api/v1/incidents/1/assignees/10")
+                        .principal(createAuthentication(1L)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true));
 

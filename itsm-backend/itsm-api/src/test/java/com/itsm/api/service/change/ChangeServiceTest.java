@@ -270,7 +270,7 @@ class ChangeServiceTest {
         ReflectionTestUtils.setField(comment, "commentId", 1L);
         given(changeCommentRepository.findById(1L)).willReturn(Optional.of(comment));
 
-        changeService.deleteComment(1L, 1L);
+        changeService.deleteComment(1L, 1L, 10L);
 
         verify(changeCommentRepository).delete(comment);
     }

@@ -236,7 +236,7 @@ class IncidentServiceTest {
         ReflectionTestUtils.setField(comment, "commentId", 1L);
         given(incidentCommentRepository.findById(1L)).willReturn(Optional.of(comment));
 
-        incidentService.deleteComment(1L, 1L);
+        incidentService.deleteComment(1L, 1L, 10L);
 
         verify(incidentCommentRepository).delete(comment);
     }

@@ -1,8 +1,13 @@
 package com.itsm.api.controller.servicerequest;
 
+import com.itsm.api.dto.common.ContentRequest;
+import com.itsm.api.dto.common.StatusChangeRequest;
+import com.itsm.api.dto.common.UserIdRequest;
 import com.itsm.api.dto.servicerequest.*;
 import com.itsm.api.service.servicerequest.ServiceRequestService;
 import com.itsm.core.dto.ApiResponse;
+import com.itsm.core.exception.BusinessException;
+import com.itsm.core.exception.ErrorCode;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -11,7 +16,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/service-requests")
@@ -56,26 +60,28 @@ public class ServiceRequestController {
     @PatchMapping("/{requestId}/status")
     public ApiResponse<Void> changeStatus(
             @PathVariable Long requestId,
-            @RequestBody Map<String, String> body,
+            @Valid @RequestBody StatusChangeRequest req,
             Authentication authentication) {
         Long currentUserId = getCurrentUserId(authentication);
-        serviceRequestService.changeStatus(requestId, body.get("status"), currentUserId);
+        serviceRequestService.changeStatus(requestId, req.getStatus(), currentUserId);
         return ApiResponse.success();
     }
 
     @PostMapping("/{requestId}/assignees")
     public ApiResponse<SrAssigneeResponse> assignUser(
             @PathVariable Long requestId,
-            @RequestBody Map<String, Long> body,
+            @Valid @RequestBody UserIdRequest req,
             Authentication authentication) {
         Long currentUserId = getCurrentUserId(authentication);
-        return ApiResponse.success(serviceRequestService.assignUser(requestId, body.get("userId"), currentUserId));
+        return ApiResponse.success(serviceRequestService.assignUser(requestId, req.getUserId(), currentUserId));
     }
 
     @DeleteMapping("/{requestId}/assignees/{userId}")
     public ApiResponse<Void> removeAssignee(
             @PathVariable Long requestId,
-            @PathVariable Long userId) {
+            @PathVariable Long userId,
+            Authentication authentication) {
+        getCurrentUserId(authentication);
         serviceRequestService.removeAssignee(requestId, userId);
         return ApiResponse.success();
     }
@@ -88,11 +94,9 @@ public class ServiceRequestController {
     @PostMapping("/{requestId}/processes")
     public ApiResponse<SrProcessResponse> addProcess(
             @PathVariable Long requestId,
-            @RequestBody Map<String, Object> body,
+            @Valid @RequestBody SrProcessRequest req,
             Authentication authentication) {
-        Long userId = ((Number) body.get("userId")).longValue();
-        String processContent = (String) body.get("processContent");
-        return ApiResponse.success(serviceRequestService.addProcess(requestId, userId, processContent));
+        return ApiResponse.success(serviceRequestService.addProcess(requestId, req.getUserId(), req.getProcessContent()));
     }
 
     @PatchMapping("/{requestId}/processes/{processId}/complete")
@@ -114,11 +118,9 @@ public class ServiceRequestController {
     @PostMapping("/{requestId}/satisfaction")
     public ApiResponse<Void> submitSatisfaction(
             @PathVariable Long requestId,
-            @RequestBody Map<String, Object> body,
+            @Valid @RequestBody SrSatisfactionRequest req,
             Authentication authentication) {
-        int score = ((Number) body.get("score")).intValue();
-        String comment = (String) body.get("comment");
-        serviceRequestService.submitSatisfaction(requestId, score, comment);
+        serviceRequestService.submitSatisfaction(requestId, req.getScore(), req.getComment());
         return ApiResponse.success();
     }
 
@@ -128,6 +130,9 @@ public class ServiceRequestController {
     }
 
     private Long getCurrentUserId(Authentication authentication) {
+        if (authentication == null || authentication.getPrincipal() == null) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED, "인증 정보가 없습니다.");
+        }
         return (Long) authentication.getPrincipal();
     }
 }

@@ -9,7 +9,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -42,8 +41,8 @@ public class CommonCodeController {
     @PatchMapping("/api/v1/admin/common-codes/{groupId}/status")
     public ApiResponse<Void> changeGroupStatus(
             @PathVariable Long groupId,
-            @RequestBody Map<String, String> request) {
-        commonCodeService.changeGroupStatus(groupId, request.get("isActive"));
+            @Valid @RequestBody IsActiveChangeRequest request) {
+        commonCodeService.changeGroupStatus(groupId, request.getIsActive());
         return ApiResponse.success(null);
     }
 
@@ -75,8 +74,8 @@ public class CommonCodeController {
     public ApiResponse<Void> changeDetailStatus(
             @PathVariable Long groupId,
             @PathVariable Long detailId,
-            @RequestBody Map<String, String> request) {
-        commonCodeService.changeDetailStatus(detailId, request.get("isActive"));
+            @Valid @RequestBody IsActiveChangeRequest request) {
+        commonCodeService.changeDetailStatus(detailId, request.getIsActive());
         return ApiResponse.success(null);
     }
 

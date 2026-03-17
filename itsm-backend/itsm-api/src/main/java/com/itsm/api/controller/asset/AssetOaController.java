@@ -1,6 +1,7 @@
 package com.itsm.api.controller.asset;
 
 import com.itsm.api.dto.asset.*;
+import com.itsm.api.dto.common.StatusChangeRequest;
 import com.itsm.api.service.asset.AssetOaService;
 import com.itsm.core.dto.ApiResponse;
 import jakarta.validation.Valid;
@@ -11,7 +12,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/assets/oa")
@@ -55,10 +55,10 @@ public class AssetOaController {
     @PatchMapping("/{assetOaId}/status")
     public ApiResponse<Void> changeStatus(
             @PathVariable Long assetOaId,
-            @RequestBody Map<String, String> body,
+            @Valid @RequestBody StatusChangeRequest req,
             Authentication authentication) {
         Long currentUserId = getCurrentUserId(authentication);
-        assetOaService.changeStatus(assetOaId, body.get("status"), currentUserId);
+        assetOaService.changeStatus(assetOaId, req.getStatus(), currentUserId);
         return ApiResponse.success();
     }
 

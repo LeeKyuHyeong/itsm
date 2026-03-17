@@ -10,6 +10,7 @@ import com.itsm.core.repository.user.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -86,7 +87,13 @@ public class UserService {
                 .build();
 
         user.setCreatedBy(currentUserId);
-        User savedUser = userRepository.save(user);
+        User savedUser;
+        try {
+            savedUser = userRepository.save(user);
+            userRepository.flush();
+        } catch (DataIntegrityViolationException e) {
+            throw new BusinessException(ErrorCode.DUPLICATE_VALUE, "이미 존재하는 로그인 ID입니다.");
+        }
 
         List<UserRole> userRoles = userRoleRepository.findByUserIdWithRole(savedUser.getUserId());
         return toUserDetailResponse(savedUser, userRoles);

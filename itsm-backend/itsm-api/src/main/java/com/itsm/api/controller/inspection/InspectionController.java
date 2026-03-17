@@ -1,8 +1,11 @@
 package com.itsm.api.controller.inspection;
 
+import com.itsm.api.dto.common.StatusChangeRequest;
 import com.itsm.api.dto.inspection.*;
 import com.itsm.api.service.inspection.InspectionService;
 import com.itsm.core.dto.ApiResponse;
+import com.itsm.core.exception.BusinessException;
+import com.itsm.core.exception.ErrorCode;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -11,7 +14,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/inspections")
@@ -55,10 +57,10 @@ public class InspectionController {
     @PatchMapping("/{inspectionId}/status")
     public ApiResponse<Void> changeStatus(
             @PathVariable Long inspectionId,
-            @RequestBody Map<String, String> body,
+            @Valid @RequestBody StatusChangeRequest req,
             Authentication authentication) {
         Long currentUserId = getCurrentUserId(authentication);
-        inspectionService.changeStatus(inspectionId, body.get("status"), currentUserId);
+        inspectionService.changeStatus(inspectionId, req.getStatus(), currentUserId);
         return ApiResponse.success();
     }
 
@@ -104,6 +106,9 @@ public class InspectionController {
     }
 
     private Long getCurrentUserId(Authentication authentication) {
+        if (authentication == null || authentication.getPrincipal() == null) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED, "인증 정보가 없습니다.");
+        }
         return (Long) authentication.getPrincipal();
     }
 }

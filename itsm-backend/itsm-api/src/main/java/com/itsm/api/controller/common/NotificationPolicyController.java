@@ -1,5 +1,6 @@
 package com.itsm.api.controller.common;
 
+import com.itsm.api.dto.common.IsActiveChangeRequest;
 import com.itsm.api.dto.common.NotificationPolicyCreateRequest;
 import com.itsm.api.dto.common.NotificationPolicyResponse;
 import com.itsm.api.dto.common.NotificationPolicyUpdateRequest;
@@ -12,7 +13,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/admin/notification-policies")
@@ -50,8 +50,8 @@ public class NotificationPolicyController {
     @PatchMapping("/{policyId}/status")
     public ApiResponse<Void> changePolicyStatus(
             @PathVariable Long policyId,
-            @RequestBody Map<String, String> body) {
-        notificationPolicyService.changePolicyStatus(policyId, body.get("isActive"));
+            @Valid @RequestBody IsActiveChangeRequest req) {
+        notificationPolicyService.changePolicyStatus(policyId, req.getIsActive());
         return ApiResponse.success();
     }
 

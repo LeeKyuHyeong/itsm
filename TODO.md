@@ -102,11 +102,11 @@
 
 ### 3단계: 입력 검증 강화 (HIGH/MEDIUM)
 
-- [ ] 다수 Controller: `Map<String,Object>` 기반 요청 → DTO + `@Valid` 전환 (ServiceRequestController, IncidentController, ChangeController 등)
-- [ ] Map.get() 후 null 체크 없이 캐스팅하는 코드 수정 (NPE 방지)
-- [ ] DELETE 작업에 소유자/권한 검증 추가 (댓글 삭제, 배정 해제 등)
-- [ ] authentication.getPrincipal() null 체크 추가
-- [ ] UserService: 중복 체크 TOCTOU → DB unique 제약조건 + 예외 핸들링으로 보완
+- [x] 다수 Controller: `Map<String,Object>` 기반 요청 → DTO + `@Valid` 전환 (ServiceRequestController, IncidentController, ChangeController, InspectionController, BoardController, ReportController, CommonCodeController, SlaPolicyController, NotificationPolicyController, AssetHw/Sw/OaController)
+- [x] Map.get() 후 null 체크 없이 캐스팅하는 코드 수정 (NPE 방지) — DTO + @Valid로 해결
+- [x] DELETE 작업에 소유자/권한 검증 추가 (댓글 삭제 시 작성자 검증, 배정 해제 시 인증 검증)
+- [x] authentication.getPrincipal() null 체크 추가
+- [x] UserService: 중복 체크 TOCTOU → DB unique 제약조건 + 예외 핸들링으로 보완
 
 ### 4단계: SQL/스키마 정합성 (HIGH/MEDIUM)
 

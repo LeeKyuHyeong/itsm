@@ -1,5 +1,6 @@
 package com.itsm.api.controller.common;
 
+import com.itsm.api.dto.common.IsActiveChangeRequest;
 import com.itsm.api.dto.common.SlaPolicyCreateRequest;
 import com.itsm.api.dto.common.SlaPolicyResponse;
 import com.itsm.api.dto.common.SlaPolicyUpdateRequest;
@@ -11,7 +12,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/admin/sla-policies")
@@ -49,8 +49,8 @@ public class SlaPolicyController {
     @PatchMapping("/{policyId}/status")
     public ApiResponse<Void> changePolicyStatus(
             @PathVariable Long policyId,
-            @RequestBody Map<String, String> body) {
-        slaPolicyService.changePolicyStatus(policyId, body.get("isActive"));
+            @Valid @RequestBody IsActiveChangeRequest req) {
+        slaPolicyService.changePolicyStatus(policyId, req.getIsActive());
         return ApiResponse.success();
     }
 
