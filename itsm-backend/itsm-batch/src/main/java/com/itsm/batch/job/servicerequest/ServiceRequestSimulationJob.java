@@ -10,6 +10,7 @@ import com.itsm.core.repository.servicerequest.ServiceRequestRepository;
 import com.itsm.core.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +26,9 @@ public class ServiceRequestSimulationJob {
 
     private static final int DAILY_MIN = 3;
     private static final int DAILY_MAX = 8;
-    private static final Long SYSTEM_USER_ID = 1L;
+
+    @Value("${itsm.system-user-id:1}")
+    private Long systemUserId;
 
     private final ServiceRequestRepository serviceRequestRepository;
     private final ServiceRequestAssigneeRepository serviceRequestAssigneeRepository;
@@ -103,7 +106,7 @@ public class ServiceRequestSimulationJob {
                     .company(company)
                     .build();
 
-            sr.setCreatedBy(SYSTEM_USER_ID);
+            sr.setCreatedBy(systemUserId);
             serviceRequestRepository.save(sr);
             log.info("[ServiceRequestSimulationJob] 신규 SR 생성: {}", sr.getTitle());
         }
@@ -122,7 +125,7 @@ public class ServiceRequestSimulationJob {
             ServiceRequestAssignee sra = ServiceRequestAssignee.builder()
                     .requestId(sr.getRequestId())
                     .userId(assignee.getUserId())
-                    .grantedBy(SYSTEM_USER_ID)
+                    .grantedBy(systemUserId)
                     .build();
 
             serviceRequestAssigneeRepository.save(sra);

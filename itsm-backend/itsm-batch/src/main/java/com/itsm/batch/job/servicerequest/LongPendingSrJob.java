@@ -5,6 +5,7 @@ import com.itsm.core.domain.servicerequest.ServiceRequest;
 import com.itsm.core.repository.servicerequest.ServiceRequestRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,7 +17,8 @@ import java.util.List;
 @Slf4j
 public class LongPendingSrJob {
 
-    private static final Long ADMIN_USER_ID = 1L;
+    @Value("${itsm.system-user-id:1}")
+    private Long systemUserId;
 
     private final ServiceRequestRepository serviceRequestRepository;
     private final NotificationService notificationService;
@@ -31,7 +33,7 @@ public class LongPendingSrJob {
 
         for (ServiceRequest sr : requests) {
             notificationService.sendNotification(
-                    ADMIN_USER_ID,
+                    systemUserId,
                     "LONG_PENDING_SR",
                     String.format("[장기 미처리 SR] SR #%d 완료대기 2일 초과", sr.getRequestId()),
                     String.format("서비스요청 '%s'이(가) 완료대기 상태로 2일 이상 경과하였습니다.",

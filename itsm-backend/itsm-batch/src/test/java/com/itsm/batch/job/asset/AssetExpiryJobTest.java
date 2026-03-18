@@ -3,12 +3,14 @@ package com.itsm.batch.job.asset;
 import com.itsm.batch.service.NotificationService;
 import com.itsm.core.domain.asset.AssetHw;
 import com.itsm.core.repository.asset.AssetHwRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -28,6 +30,11 @@ class AssetExpiryJobTest {
 
     @InjectMocks
     private AssetExpiryJob assetExpiryJob;
+
+    @BeforeEach
+    void setUp() {
+        ReflectionTestUtils.setField(assetExpiryJob, "systemUserId", 1L);
+    }
 
     @Test
     @DisplayName("보증 만료 임박 자산에 대해 알림을 발송한다")

@@ -5,6 +5,7 @@ import com.itsm.core.domain.asset.AssetHw;
 import com.itsm.core.repository.asset.AssetHwRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,7 +17,8 @@ import java.util.List;
 @Slf4j
 public class AssetExpiryJob {
 
-    private static final Long ADMIN_USER_ID = 1L;
+    @Value("${itsm.system-user-id:1}")
+    private Long systemUserId;
 
     private final AssetHwRepository assetHwRepository;
     private final NotificationService notificationService;
@@ -36,7 +38,7 @@ public class AssetExpiryJob {
             String urgency = daysUntilExpiry <= 7 ? "긴급" : "알림";
 
             notificationService.sendNotification(
-                    ADMIN_USER_ID,
+                    systemUserId,
                     "ASSET_EXPIRY",
                     String.format("[자산 만료 %s] %s - 보증 만료 %d일 전",
                             urgency, asset.getAssetNm(), daysUntilExpiry),

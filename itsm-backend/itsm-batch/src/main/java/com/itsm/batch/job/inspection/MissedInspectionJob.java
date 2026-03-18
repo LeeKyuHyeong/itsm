@@ -5,6 +5,7 @@ import com.itsm.core.domain.inspection.Inspection;
 import com.itsm.core.repository.inspection.InspectionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,7 +17,8 @@ import java.util.List;
 @Slf4j
 public class MissedInspectionJob {
 
-    private static final Long ADMIN_USER_ID = 1L;
+    @Value("${itsm.system-user-id:1}")
+    private Long systemUserId;
 
     private final InspectionRepository inspectionRepository;
     private final NotificationService notificationService;
@@ -32,7 +34,7 @@ public class MissedInspectionJob {
         int count = 0;
         for (Inspection inspection : missedInspections) {
             Long targetUserId = inspection.getManagerId() != null
-                    ? inspection.getManagerId() : ADMIN_USER_ID;
+                    ? inspection.getManagerId() : systemUserId;
 
             notificationService.sendNotification(
                     targetUserId,

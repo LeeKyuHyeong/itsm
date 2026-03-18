@@ -18,3 +18,7 @@ spring:
       enabled: false
     jdbc:
       initialize-schema: always
+
+# ITSM
+itsm:
+  system-user-id: ${SYSTEM_USER_ID:1}

@@ -3,12 +3,14 @@ package com.itsm.batch.job.inspection;
 import com.itsm.batch.service.NotificationService;
 import com.itsm.core.domain.inspection.Inspection;
 import com.itsm.core.repository.inspection.InspectionRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -28,6 +30,11 @@ class InspectionAlertJobTest {
 
     @InjectMocks
     private InspectionAlertJob inspectionAlertJob;
+
+    @BeforeEach
+    void setUp() {
+        ReflectionTestUtils.setField(inspectionAlertJob, "systemUserId", 1L);
+    }
 
     @Test
     @DisplayName("점검 예정일이 7일 이내인 점검에 대해 알림을 발송한다")

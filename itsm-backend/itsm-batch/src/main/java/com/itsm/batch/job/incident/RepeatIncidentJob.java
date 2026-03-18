@@ -4,6 +4,7 @@ import com.itsm.batch.service.NotificationService;
 import com.itsm.core.repository.incident.IncidentAssetRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,7 +16,8 @@ import java.util.List;
 @Slf4j
 public class RepeatIncidentJob {
 
-    private static final Long ADMIN_USER_ID = 1L;
+    @Value("${itsm.system-user-id:1}")
+    private Long systemUserId;
 
     private final IncidentAssetRepository incidentAssetRepository;
     private final NotificationService notificationService;
@@ -34,7 +36,7 @@ public class RepeatIncidentJob {
             Long incidentCount = (Long) row[2];
 
             notificationService.sendNotification(
-                    ADMIN_USER_ID,
+                    systemUserId,
                     "REPEAT_INCIDENT",
                     String.format("[반복 장애] %s 자산 #%d - 30일간 %d건 발생",
                             assetType, assetId, incidentCount),

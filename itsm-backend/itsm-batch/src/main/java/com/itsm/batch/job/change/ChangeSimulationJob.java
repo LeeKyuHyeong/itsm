@@ -10,6 +10,7 @@ import com.itsm.core.repository.company.CompanyRepository;
 import com.itsm.core.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +26,8 @@ import java.util.Random;
 @Slf4j
 public class ChangeSimulationJob {
 
-    private static final Long SYSTEM_USER_ID = 1L;
+    @Value("${itsm.system-user-id:1}")
+    private Long systemUserId;
     private static final int WEEKLY_MIN = 2;
     private static final int WEEKLY_MAX = 4;
     private static final double REJECTION_RATE = 0.12;
@@ -109,7 +111,7 @@ public class ChangeSimulationJob {
                 .rollbackPlan(ROLLBACK_PLANS[random.nextInt(ROLLBACK_PLANS.length)])
                 .company(company)
                 .build();
-        change.setCreatedBy(SYSTEM_USER_ID);
+        change.setCreatedBy(systemUserId);
 
         changeRepository.save(change);
         log.info("[ChangeSimulationJob] 신규 변경 생성: {}", change.getTitle());

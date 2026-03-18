@@ -132,10 +132,10 @@
 ### 기타 (LOW)
 
 - [x] .gitignore: `scrren.png` 오타 수정
-- [ ] SYSTEM_USER_ID = 1L 하드코딩 → 설정값 또는 시스템 사용자 조회로 변경
+- [x] SYSTEM_USER_ID = 1L 하드코딩 → `itsm.system-user-id` 설정값으로 변경 (7개 배치 Job)
 - [x] ChangePasswordView.vue: setTimeout 내 router.push → 컴포넌트 언마운트 시 정리
 - [x] Frontend Dockerfile: HEALTHCHECK 추가
-- [ ] application-local.yml: DB 비밀번호 하드코딩 → 환경변수 전환 검토
+- [x] application-local.yml: DB 비밀번호 하드코딩 → 환경변수(기본값 유지) 전환
 
 ---
 

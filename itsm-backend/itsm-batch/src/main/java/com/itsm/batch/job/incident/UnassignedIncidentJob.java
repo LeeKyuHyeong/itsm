@@ -5,6 +5,7 @@ import com.itsm.core.domain.incident.Incident;
 import com.itsm.core.repository.incident.IncidentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,7 +16,8 @@ import java.util.List;
 @Slf4j
 public class UnassignedIncidentJob {
 
-    private static final Long ADMIN_USER_ID = 1L;
+    @Value("${itsm.system-user-id:1}")
+    private Long systemUserId;
 
     private final IncidentRepository incidentRepository;
     private final NotificationService notificationService;
@@ -29,7 +31,7 @@ public class UnassignedIncidentJob {
 
         for (Incident incident : incidents) {
             notificationService.sendNotification(
-                    ADMIN_USER_ID,
+                    systemUserId,
                     "UNASSIGNED_INCIDENT",
                     String.format("[미배정 장애] 장애 #%d 담당자 미배정", incident.getIncidentId()),
                     String.format("장애 '%s'에 담당자가 배정되지 않았습니다.", incident.getTitle()),

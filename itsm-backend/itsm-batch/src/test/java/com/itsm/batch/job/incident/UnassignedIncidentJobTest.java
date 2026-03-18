@@ -3,12 +3,14 @@ package com.itsm.batch.job.incident;
 import com.itsm.batch.service.NotificationService;
 import com.itsm.core.domain.incident.Incident;
 import com.itsm.core.repository.incident.IncidentRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -27,6 +29,11 @@ class UnassignedIncidentJobTest {
 
     @InjectMocks
     private UnassignedIncidentJob unassignedIncidentJob;
+
+    @BeforeEach
+    void setUp() {
+        ReflectionTestUtils.setField(unassignedIncidentJob, "systemUserId", 1L);
+    }
 
     @Test
     @DisplayName("미배정 장애가 있으면 관리자에게 알림을 발송한다")
