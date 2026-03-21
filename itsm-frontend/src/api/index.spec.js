@@ -15,32 +15,14 @@ describe('Axios instance (api/index.js)', () => {
     expect(hasContentType).toBe(true)
   })
 
-  it('has request interceptor that attaches Authorization header when token exists', async () => {
-    const storage = {}
-    vi.spyOn(Storage.prototype, 'getItem').mockImplementation((key) => storage[key] || null)
-    storage['accessToken'] = 'test-jwt-token'
-
-    // Simulate interceptor by creating a mock config
-    const interceptors = api.interceptors.request.handlers
-    expect(interceptors.length).toBeGreaterThan(0)
-
-    const config = { headers: {} }
-    const fulfilled = interceptors[0].fulfilled
-    const result = fulfilled(config)
-    expect(result.headers.Authorization).toBe('Bearer test-jwt-token')
-
-    vi.restoreAllMocks()
+  it('has withCredentials enabled for cookie-based auth', () => {
+    expect(api.defaults.withCredentials).toBe(true)
   })
 
-  it('does not attach Authorization header when no token', () => {
-    vi.spyOn(Storage.prototype, 'getItem').mockReturnValue(null)
-
-    const config = { headers: {} }
-    const fulfilled = api.interceptors.request.handlers[0].fulfilled
-    const result = fulfilled(config)
-    expect(result.headers.Authorization).toBeUndefined()
-
-    vi.restoreAllMocks()
+  it('does not have request interceptor for Authorization header (cookie-based auth)', () => {
+    const requestInterceptors = api.interceptors.request.handlers
+    const activeInterceptors = requestInterceptors.filter(h => h !== null)
+    expect(activeInterceptors.length).toBe(0)
   })
 
   it('has response interceptor', () => {

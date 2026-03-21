@@ -2,6 +2,7 @@ package com.itsm.api.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
 
+    private static final String ACCESS_TOKEN_COOKIE = "accessToken";
     private static final Set<String> SKIP_PATHS = Set.of(
             "/api/v1/auth/login",
             "/api/v1/auth/refresh"
@@ -59,10 +61,22 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     }
 
     private String resolveToken(HttpServletRequest request) {
+        // 1. Authorization 헤더 우선
         String bearerToken = request.getHeader("Authorization");
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }
+
+        // 2. httpOnly 쿠키에서 추출
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (ACCESS_TOKEN_COOKIE.equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+
         return null;
     }
 }

@@ -7,8 +7,8 @@ export function setupGuards(router) {
     const authStore = useAuthStore()
     const requiresAuth = to.meta.requiresAuth !== false
 
-    // 토큰이 있지만 user 상태가 없으면 세션 복원 시도 (새로고침 대응)
-    if (!authStore.isAuthenticated && localStorage.getItem('accessToken') && !sessionRestoring) {
+    // user 상태가 없으면 세션 복원 시도 (새로고침 대응 — 쿠키 기반이므로 서버에 직접 확인)
+    if (!authStore.isAuthenticated && !sessionRestoring) {
       sessionRestoring = true
       try {
         await authStore.fetchMe()

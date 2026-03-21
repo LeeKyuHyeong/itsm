@@ -3,7 +3,6 @@ package com.itsm.api.controller.auth;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itsm.api.dto.auth.*;
 import com.itsm.api.exception.GlobalExceptionHandler;
-import com.itsm.api.security.JwtAuthFilter;
 import com.itsm.api.security.JwtTokenProvider;
 import com.itsm.api.service.auth.AuthService;
 import com.itsm.core.exception.BusinessException;
@@ -43,6 +42,9 @@ class AuthControllerTest {
     @Mock
     private AuthService authService;
 
+    @Mock
+    private JwtTokenProvider jwtTokenProvider;
+
     @InjectMocks
     private AuthController authController;
 
@@ -55,8 +57,8 @@ class AuthControllerTest {
     }
 
     @Test
-    @DisplayName("POST /login - 로그인 성공 시 200과 토큰을 반환한다")
-    void login_success_returns200WithTokens() throws Exception {
+    @DisplayName("POST /login - 로그인 성공 시 200과 사용자 정보를 반환하고 accessToken 쿠키를 설정한다")
+    void login_success_returns200WithCookie() throws Exception {
         // given
         LoginRequest request = new LoginRequest("admin", "Password1!");
         LoginResponse response = LoginResponse.builder()
@@ -69,6 +71,7 @@ class AuthControllerTest {
                 .build();
 
         given(authService.login(any(LoginRequest.class), anyString())).willReturn(response);
+        given(jwtTokenProvider.getAccessTokenExpirySeconds()).willReturn(3600L);
 
         // when & then
         mockMvc.perform(post("/api/v1/auth/login")
@@ -76,12 +79,12 @@ class AuthControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.data.accessToken").value("access-token"))
-                .andExpect(jsonPath("$.data.refreshToken").value("refresh-token"))
+                .andExpect(jsonPath("$.data.accessToken").doesNotExist())
                 .andExpect(jsonPath("$.data.userId").value(1))
                 .andExpect(jsonPath("$.data.loginId").value("admin"))
                 .andExpect(jsonPath("$.data.userNm").value("관리자"))
-                .andExpect(jsonPath("$.data.roles[0]").value("ADMIN"));
+                .andExpect(jsonPath("$.data.roles[0]").value("ADMIN"))
+                .andExpect(header().exists("Set-Cookie"));
     }
 
     @Test

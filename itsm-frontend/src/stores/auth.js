@@ -8,17 +8,12 @@ export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = computed(() => user.value !== null)
   const mustChangePassword = computed(() => user.value?.mustChangePassword ?? false)
 
-  function setToken(token) {
-    localStorage.setItem('accessToken', token)
-  }
-
   function setUser(userData) {
     user.value = userData
   }
 
   function clearAuth() {
     user.value = null
-    localStorage.removeItem('accessToken')
   }
 
   function hasRole(role) {
@@ -32,7 +27,6 @@ export const useAuthStore = defineStore('auth', () => {
   async function login(loginId, password) {
     const { data } = await authApi.login({ loginId, password })
     const result = data.data
-    setToken(result.accessToken)
     const meInfo = await authApi.getMe()
     setUser(meInfo.data.data)
     return result
@@ -53,7 +47,6 @@ export const useAuthStore = defineStore('auth', () => {
     user,
     isAuthenticated,
     mustChangePassword,
-    setToken,
     setUser,
     clearAuth,
     hasRole,

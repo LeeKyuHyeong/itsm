@@ -1,6 +1,7 @@
 package com.itsm.api.controller.auth;
 
 import com.itsm.api.dto.auth.*;
+import com.itsm.api.security.JwtTokenProvider;
 import com.itsm.api.service.auth.AuthService;
 import com.itsm.core.dto.ApiResponse;
 import com.itsm.core.exception.BusinessException;
@@ -22,10 +23,12 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Value("${cookie.secure:false}")
     private boolean cookieSecure;
 
+    private static final String ACCESS_TOKEN_COOKIE = "accessToken";
     private static final String REFRESH_TOKEN_COOKIE = "refreshToken";
     private static final int REFRESH_TOKEN_MAX_AGE = 7 * 24 * 60 * 60; // 7 days
 
@@ -36,9 +39,12 @@ public class AuthController {
         String ipAddress = httpRequest.getRemoteAddr();
         LoginResponse loginResponse = authService.login(request, ipAddress);
 
+        addAccessTokenCookie(httpResponse, loginResponse.getAccessToken());
         addRefreshTokenCookie(httpResponse, loginResponse.getRefreshToken());
 
-        return ApiResponse.success(loginResponse);
+        LoginResponse cookieSafeResponse = loginResponse.withoutTokens();
+
+        return ApiResponse.success(cookieSafeResponse);
     }
 
     @PostMapping("/refresh")
@@ -51,9 +57,12 @@ public class AuthController {
 
         LoginResponse loginResponse = authService.refresh(refreshToken);
 
+        addAccessTokenCookie(httpResponse, loginResponse.getAccessToken());
         addRefreshTokenCookie(httpResponse, loginResponse.getRefreshToken());
 
-        return ApiResponse.success(loginResponse);
+        LoginResponse cookieSafeResponse = loginResponse.withoutTokens();
+
+        return ApiResponse.success(cookieSafeResponse);
     }
 
     @PostMapping("/logout")
@@ -65,6 +74,7 @@ public class AuthController {
 
         authService.logout(userId, ipAddress);
 
+        clearAccessTokenCookie(response);
         clearRefreshTokenCookie(response);
 
         return ApiResponse.success();
@@ -83,6 +93,28 @@ public class AuthController {
         Long userId = (Long) authentication.getPrincipal();
         authService.changePassword(userId, request);
         return ApiResponse.success();
+    }
+
+    private void addAccessTokenCookie(HttpServletResponse response, String accessToken) {
+        ResponseCookie cookie = ResponseCookie.from(ACCESS_TOKEN_COOKIE, accessToken)
+                .httpOnly(true)
+                .secure(cookieSecure)
+                .path("/api")
+                .maxAge(jwtTokenProvider.getAccessTokenExpirySeconds())
+                .sameSite("Strict")
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+    }
+
+    private void clearAccessTokenCookie(HttpServletResponse response) {
+        ResponseCookie cookie = ResponseCookie.from(ACCESS_TOKEN_COOKIE, "")
+                .httpOnly(true)
+                .secure(cookieSecure)
+                .path("/api")
+                .maxAge(0)
+                .sameSite("Strict")
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
     private void addRefreshTokenCookie(HttpServletResponse response, String refreshToken) {

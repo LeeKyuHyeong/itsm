@@ -4,20 +4,9 @@ const api = axios.create({
   baseURL: '/api/v1',
   headers: {
     'Content-Type': 'application/json'
-  }
-})
-
-// Request interceptor: JWT 자동 첨부
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('accessToken')
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
-    }
-    return config
   },
-  (error) => Promise.reject(error)
-)
+  withCredentials: true
+})
 
 // Response interceptor: 에러 핸들링
 api.interceptors.response.use(
@@ -29,17 +18,11 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true
       try {
-        const { data } = await axios.post('/api/v1/auth/refresh', null, {
+        await axios.post('/api/v1/auth/refresh', null, {
           withCredentials: true
         })
-        const newToken = data.data?.accessToken
-        if (newToken) {
-          localStorage.setItem('accessToken', newToken)
-          originalRequest.headers.Authorization = `Bearer ${newToken}`
-          return api(originalRequest)
-        }
+        return api(originalRequest)
       } catch (refreshError) {
-        localStorage.removeItem('accessToken')
         const { default: router } = await import('@/router/index.js')
         router.push('/login')
         return Promise.reject(refreshError)

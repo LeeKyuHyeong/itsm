@@ -5,7 +5,6 @@ import { useAuthStore } from './auth.js'
 describe('auth store', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
-    localStorage.clear()
     vi.restoreAllMocks()
   })
 
@@ -13,12 +12,6 @@ describe('auth store', () => {
     const store = useAuthStore()
     expect(store.user).toBeNull()
     expect(store.isAuthenticated).toBe(false)
-  })
-
-  it('setToken stores token in localStorage', () => {
-    const store = useAuthStore()
-    store.setToken('my-token')
-    expect(localStorage.getItem('accessToken')).toBe('my-token')
   })
 
   it('setUser sets user and updates isAuthenticated', () => {
@@ -29,14 +22,12 @@ describe('auth store', () => {
     expect(store.isAuthenticated).toBe(true)
   })
 
-  it('clearAuth removes token and user', () => {
+  it('clearAuth removes user', () => {
     const store = useAuthStore()
-    store.setToken('my-token')
     store.setUser({ id: 1 })
     store.clearAuth()
     expect(store.user).toBeNull()
     expect(store.isAuthenticated).toBe(false)
-    expect(localStorage.getItem('accessToken')).toBeNull()
   })
 
   it('hasRole checks if user has the given role', () => {

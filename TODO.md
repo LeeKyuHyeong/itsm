@@ -44,11 +44,11 @@
 
 > 현재 Access Token을 `localStorage`에 저장. XSS 취약점 발생 시 토큰 탈취 가능. Refresh Token은 이미 httpOnly 쿠키로 안전.
 
-- [ ] Backend: Access Token도 httpOnly 쿠키로 발급하도록 AuthController 수정
-- [ ] Backend: SecurityConfig/JwtAuthFilter에서 쿠키 기반 토큰 추출 로직 추가
-- [ ] Frontend: `localStorage.getItem('accessToken')` 제거 (api/index.js, stores/auth.js, guards.js)
-- [ ] Frontend: Axios interceptor에서 Authorization 헤더 수동 설정 제거 (쿠키 자동 전송)
-- [ ] 테스트: 로그인 → API 호출 → 토큰 갱신 → 로그아웃 전체 플로우 검증
+- [x] Backend: Access Token도 httpOnly 쿠키로 발급하도록 AuthController 수정
+- [x] Backend: SecurityConfig/JwtAuthFilter에서 쿠키 기반 토큰 추출 로직 추가
+- [x] Frontend: `localStorage.getItem('accessToken')` 제거 (api/index.js, stores/auth.js, guards.js)
+- [x] Frontend: Axios interceptor에서 Authorization 헤더 수동 설정 제거 (쿠키 자동 전송)
+- [x] 테스트: 로그인 → API 호출 → 토큰 갱신 → 로그아웃 전체 플로우 검증
 
 ### 3단계: CORS 설정 강화 (HIGH)
 

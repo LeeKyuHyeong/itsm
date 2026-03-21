@@ -41,7 +41,7 @@ describe('navigation guards', () => {
 
   it('redirects authenticated user from login to /dashboard', async () => {
     authStore.setUser({ id: 1, roles: ['DEVELOPER'] })
-    authStore.setToken('token')
+    // accessToken은 httpOnly 쿠키로 관리 (setToken 불필요)
     router.push('/login')
     await router.isReady()
     expect(router.currentRoute.value.path).toBe('/dashboard')
@@ -49,7 +49,7 @@ describe('navigation guards', () => {
 
   it('allows authenticated user to access protected route', async () => {
     authStore.setUser({ id: 1, roles: ['DEVELOPER'] })
-    authStore.setToken('token')
+    // accessToken은 httpOnly 쿠키로 관리 (setToken 불필요)
     router.push('/dashboard')
     await router.isReady()
     expect(router.currentRoute.value.path).toBe('/dashboard')
@@ -57,7 +57,7 @@ describe('navigation guards', () => {
 
   it('redirects to /dashboard when user lacks required role', async () => {
     authStore.setUser({ id: 1, roles: ['DEVELOPER'] })
-    authStore.setToken('token')
+    // accessToken은 httpOnly 쿠키로 관리 (setToken 불필요)
     router.push('/admin/users')
     await router.isReady()
     expect(router.currentRoute.value.path).toBe('/dashboard')
@@ -65,7 +65,7 @@ describe('navigation guards', () => {
 
   it('allows access when user has required role', async () => {
     authStore.setUser({ id: 1, roles: ['ITSM_ADMIN'] })
-    authStore.setToken('token')
+    // accessToken은 httpOnly 쿠키로 관리 (setToken 불필요)
     router.push('/admin/users')
     await router.isReady()
     expect(router.currentRoute.value.path).toBe('/admin/users')

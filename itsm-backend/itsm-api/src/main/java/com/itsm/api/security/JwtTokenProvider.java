@@ -86,4 +86,8 @@ public class JwtTokenProvider {
     public List<String> getRoles(String token) {
         return parseClaims(token).get("roles", List.class);
     }
+
+    public long getAccessTokenExpirySeconds() {
+        return accessTokenExpiry / 1000;
+    }
 }
