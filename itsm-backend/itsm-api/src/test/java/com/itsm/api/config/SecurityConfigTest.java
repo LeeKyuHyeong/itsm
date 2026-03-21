@@ -11,6 +11,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -44,5 +45,53 @@ class SecurityConfigTest {
         assertThat(passwordEncoder).isNotNull();
         String encoded = passwordEncoder.encode("test1234");
         assertThat(passwordEncoder.matches("test1234", encoded)).isTrue();
+    }
+
+    @Test
+    @DisplayName("응답에 X-Frame-Options 헤더가 포함된다")
+    void responseContainsXFrameOptions() throws Exception {
+        mockMvc.perform(get("/v3/api-docs"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("X-Frame-Options", "SAMEORIGIN"));
+    }
+
+    @Test
+    @DisplayName("응답에 X-Content-Type-Options 헤더가 포함된다")
+    void responseContainsXContentTypeOptions() throws Exception {
+        mockMvc.perform(get("/v3/api-docs"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("X-Content-Type-Options", "nosniff"));
+    }
+
+    @Test
+    @DisplayName("응답에 Referrer-Policy 헤더가 포함된다")
+    void responseContainsReferrerPolicy() throws Exception {
+        mockMvc.perform(get("/v3/api-docs"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Referrer-Policy", "strict-origin-when-cross-origin"));
+    }
+
+    @Test
+    @DisplayName("응답에 X-XSS-Protection 헤더가 포함된다")
+    void responseContainsXXssProtection() throws Exception {
+        mockMvc.perform(get("/v3/api-docs"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("X-XSS-Protection", "0"));
+    }
+
+    @Test
+    @DisplayName("응답에 Content-Security-Policy 헤더가 포함된다")
+    void responseContainsContentSecurityPolicy() throws Exception {
+        mockMvc.perform(get("/v3/api-docs"))
+                .andExpect(status().isOk())
+                .andExpect(header().exists("Content-Security-Policy"));
+    }
+
+    @Test
+    @DisplayName("HTTPS 요청 시 Strict-Transport-Security 헤더가 포함된다")
+    void responseContainsHstsHeader() throws Exception {
+        mockMvc.perform(get("/v3/api-docs").secure(true))
+                .andExpect(status().isOk())
+                .andExpect(header().exists("Strict-Transport-Security"));
     }
 }

@@ -11,131 +11,97 @@
 - **Phase 13**: 데모/시뮬레이션 배치 ✅
 - **Phase 14**: 전체 i18n (ko/en) 대응 ✅
 - **Phase 15**: CI/CD + 운영 배포 ✅
+- **Phase 16**: 운영 이슈 & OA 자산 분리 ✅ (운영 DB 반영 미완)
+- **Phase 17**: 소스 위험도 분석 및 품질 개선 ✅
 
 ---
 
-## Phase 15: CI/CD + 운영 배포 (완료)
+## Phase 16 잔여 (운영 환경)
 
-- [x] GitHub Actions CI/CD 파이프라인 구성 (test → build → deploy)
-- [x] Docker Compose 구성 (itsm-api, itsm-batch, itsm-frontend, MariaDB)
-- [x] Backend Dockerfile (itsm-api, itsm-batch 공용)
-- [x] Frontend Dockerfile (multi-stage: node build → nginx)
-- [x] 운영 포트 배정 (프론트엔드: 8084, DB: 3310)
-- [x] 환경변수 기반 운영 설정 (DB_PASSWORD, JWT_SECRET, CORS_ORIGINS)
-- [x] 호스트 nginx 리버스 프록시 설정 (itsm.kiryong.com → localhost:8084)
-- [x] Let's Encrypt SSL 인증서 발급 (certbot)
-- [x] Flyway 제거, DB 스키마는 ddl-auto: update + 수동 관리로 전환
-- [ ] SSL "주의 요함" 경고 확인 필요 (Mixed Content 또는 브라우저 캐시 문제 추정)
-
----
-
-## Phase 16: 운영 이슈 & OA 자산 분리
-
-### 운영 이슈
 - [ ] 운영 로그인 무반응 조사 (CORS / Cookie Secure / 브라우저 Network 탭 확인 필요)
 - [ ] SSL "주의 요함" 경고 확인 필요 (Mixed Content 또는 브라우저 캐시 문제 추정)
-
-### OA 자산 분리 (tb_asset_hw에서 OA를 별도 테이블·메뉴로 분리)
-- [x] Backend: AssetOa Entity + tb_asset_oa 테이블 신규
-- [x] Backend: AssetOaHistory Entity + tb_asset_oa_history 테이블 신규
-- [x] Backend: AssetOaRepository (JPQL 검색)
-- [x] Backend: AssetOaService (CRUD, 이력, 상태변경)
-- [x] Backend: AssetOaController (REST API /api/v1/assets/oa)
-- [x] Backend: AssetOa DTOs (Create/Update/Response)
-- [x] Backend: AssetStatService OA 통계 반영 (별도 테이블 기반)
-- [x] Backend: 전체 테스트 통과 (Entity, Service, Controller, Stat)
-- [x] Frontend: AssetOaListView.vue + AssetOaDetailView.vue
-- [x] Frontend: assetOaApi 추가
-- [x] Frontend: 라우터에 /assets/oa, /assets/oa/:id 경로 추가
-- [x] Frontend: AssetListView 탭에서 OA 제거
-- [x] Frontend: AssetHwListView 카테고리 필터에서 OA 제거
-- [x] DB: DDL에 tb_asset_oa, tb_asset_oa_history 추가
-- [x] DB: DML에 OA 자산 목록 메뉴 (menu_id=20) 추가
-- [x] DB: DML에 ASSET_OA_TYPE 공통코드 (group_id=12) 추가
-- [x] i18n: OA 관련 번역 키 추가 (ko/en)
 - [ ] 운영 DB에 tb_asset_oa, tb_asset_oa_history 테이블 생성 (ddl-auto: update로 자동생성 예상)
 - [ ] 운영 DB에 OA 메뉴, OA 공통코드 시드데이터 INSERT
 
-### 관리자 화면 필드 매핑 버그 수정
-- [x] 공통코드관리: API 필드(groupId/detailId/isActive) → 프론트 필드(id/active) 매핑
-- [x] 조직관리: API 필드(companyId/companyNm/ceoNm/tel/deptId/deptNm) 매핑
-- [x] 계정관리: API 필드(userId/userNm/deptName) 매핑
-- [x] SLA관리: API 필드(policyId/deadlineHours/warningPct/isActive) 매핑
-- [x] 알림정책: API 필드(policyId/notiTypeCd/triggerCondition/isActive) 매핑
-
-### 배치 작업 즉시 실행 기능
-- [x] Backend: BatchJob Entity에 triggerNow 컬럼 추가 (char(1))
-- [x] Backend: BatchJobService.executeNow() 구현
-- [x] Backend: POST /api/v1/admin/batch-jobs/{id}/execute 엔드포인트
-- [x] Backend: DynamicScheduler 5초 간격 triggerNow 감지 및 즉시 실행
-- [x] Backend: 테스트 추가 (Service, Controller)
-- [x] Frontend: 배치 관리 화면에 즉시 실행 버튼 추가
-- [x] i18n: 즉시 실행 관련 번역 키 추가 (ko/en)
-- [x] DB: tb_batch_job에 trigger_now CHAR(1) 컬럼 추가 (ddl-auto로 자동생성)
-
-### 시드 데이터
-- [x] sql/03_seed_data.sql 생성 (회사, 부서, 사용자, HW/SW/OA 자산, 장애, 서비스요청)
-
 ---
 
-## Phase 17: 소스 위험도 분석 및 품질 개선
+## Phase 18: 보안 강화 2차
 
-> 2026-03-17 전체 소스 정적 분석 결과. 위험도 순으로 정리.
+> 2026-03-18 전체 보안 정밀 분석 결과. OWASP Top 10 기준 위험도 순으로 정리.
 
-### 1단계: 보안 (CRITICAL/HIGH) — 즉시 조치
+### 1단계: HTTP 보안 헤더 (CRITICAL) — 현재 전무
 
-- [x] AuthController: Refresh Token 쿠키 `setSecure(false)` → 환경별 분기 (prod: true, local: false)
-- [x] AuthController: 쿠키에 `SameSite=Strict` 속성 추가 (CSRF 방지)
-- [x] LoginView.vue: 기본 자격증명 `admin/admin123!@#` 하드코딩 제거
-- [x] application.yml: JWT Secret 하드코딩 제거 → 환경변수 전용으로 변경
-- [x] application-prod.yml: HTTPS/SSL 설정 추가 또는 리버스 프록시 의존 명시
-- [x] `.env.example` 파일 생성 (DB_PASSWORD, JWT_SECRET, CORS_ORIGINS 등 문서화)
+> 백엔드·프론트엔드 모두 보안 헤더가 설정되어 있지 않음. 클릭재킹, MIME 스니핑, XSS 반사 공격에 노출.
 
-### 2단계: 배치 안정화 (CRITICAL/HIGH)
+- [x] nginx.conf: `Content-Security-Policy` 헤더 추가 (`default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self'`)
+- [x] nginx.conf: `X-Frame-Options: SAMEORIGIN` 헤더 추가 (클릭재킹 방지)
+- [x] nginx.conf: `X-Content-Type-Options: nosniff` 헤더 추가 (MIME 스니핑 방지)
+- [x] nginx.conf: `Strict-Transport-Security` 헤더 추가 (HSTS, HTTPS 강제)
+- [x] nginx.conf: `Referrer-Policy: strict-origin-when-cross-origin` 헤더 추가
+- [x] Spring SecurityConfig: `.headers()` 체인으로 서버 측 보안 헤더도 중복 설정 (프록시 우회 대비)
 
-- [x] AssetAutoRegisterJob: `@Transactional` 추가
-- [x] AssetExpiryJob: `@Transactional` 추가
-- [x] ChangeSimulationJob: ChangeApprover 생성 시 `createdBy` 미설정 수정 (N/A: 엔티티에 createdBy 필드 없음)
-- [x] StatisticsAggregationJob: `@Transactional` 추가
-- [x] 8개 알림 Job에 `@Transactional` 추가 (RepeatIncidentJob, UnassignedIncidentJob, SlaOverdueJob, SlaWarningJob, LongPendingSrJob, InspectionAlertJob, MissedInspectionJob, TrafficSimulationJob)
-- [x] DynamicScheduler: `checkTriggeredJobs()`/`refreshSchedules()` 간 Map 동시 수정 레이스 컨디션 해결 (ReentrantLock)
+### 2단계: Access Token 저장소 전환 (CRITICAL)
 
-### 3단계: 입력 검증 강화 (HIGH/MEDIUM)
+> 현재 Access Token을 `localStorage`에 저장. XSS 취약점 발생 시 토큰 탈취 가능. Refresh Token은 이미 httpOnly 쿠키로 안전.
 
-- [x] 다수 Controller: `Map<String,Object>` 기반 요청 → DTO + `@Valid` 전환 (ServiceRequestController, IncidentController, ChangeController, InspectionController, BoardController, ReportController, CommonCodeController, SlaPolicyController, NotificationPolicyController, AssetHw/Sw/OaController)
-- [x] Map.get() 후 null 체크 없이 캐스팅하는 코드 수정 (NPE 방지) — DTO + @Valid로 해결
-- [x] DELETE 작업에 소유자/권한 검증 추가 (댓글 삭제 시 작성자 검증, 배정 해제 시 인증 검증)
-- [x] authentication.getPrincipal() null 체크 추가
-- [x] UserService: 중복 체크 TOCTOU → DB unique 제약조건 + 예외 핸들링으로 보완
+- [ ] Backend: Access Token도 httpOnly 쿠키로 발급하도록 AuthController 수정
+- [ ] Backend: SecurityConfig/JwtAuthFilter에서 쿠키 기반 토큰 추출 로직 추가
+- [ ] Frontend: `localStorage.getItem('accessToken')` 제거 (api/index.js, stores/auth.js, guards.js)
+- [ ] Frontend: Axios interceptor에서 Authorization 헤더 수동 설정 제거 (쿠키 자동 전송)
+- [ ] 테스트: 로그인 → API 호출 → 토큰 갱신 → 로그아웃 전체 플로우 검증
 
-### 4단계: SQL/스키마 정합성 (HIGH/MEDIUM)
+### 3단계: CORS 설정 강화 (HIGH)
 
-- [x] DDL에 `asset_category`, `asset_sub_category` 컬럼 추가 (tb_asset_hw, tb_asset_sw — Entity와 불일치)
-- [x] application-prod.yml: `ddl-auto: update` → `validate`로 변경 (운영 안전)
-- [x] FK 컬럼 인덱스 추가 (manager_id, created_by — tb_asset_hw, tb_asset_sw)
-- [x] docker-compose.yml: JWT_SECRET 기본값 누락 → 필수 환경변수 검증 추가
+> `allowedHeaders("*")`로 모든 헤더 허용 중. 불필요한 커스텀 헤더를 통한 공격 벡터 차단 필요.
 
-### 5단계: 프론트엔드 품질 (MEDIUM)
+- [ ] SecurityConfig: `allowedHeaders(List.of("*"))` → 명시적 목록으로 변경 (`Authorization, Content-Type, Accept, X-Requested-With`)
+- [ ] WebConfig: `.allowedHeaders("*")` → 동일하게 명시적 목록으로 변경
+- [ ] `exposedHeaders` 설정 추가 (프론트엔드에서 읽어야 할 응답 헤더 명시)
 
-- [x] NotificationDropdown.vue: 한국어 하드코딩 → i18n 키 전환 ("알림", "전체 읽음", "분 전" 등)
-- [x] guards.js: fetchMe() 중복 호출 방지 (세션 복원 진행 중 플래그)
-- [x] api/index.js: 토큰 갱신 실패 시 `window.location.href` → `router.push('/login')` + 상태 정리
-- [x] AppSidebar.vue: `v-html` SVG 렌더링 → 컴포넌트 방식 전환 (XSS 예방)
-- [x] 다수 Store: API 응답 구조 처리 통일 (`data.data` vs `data.data || data`)
-- [x] AppHeader.vue: `roles[0]` 접근 시 빈 배열 체크 추가
+### 4단계: 메서드 레벨 권한 검증 (HIGH)
 
-### 6단계: 성능 최적화 (MEDIUM/LOW)
+> 현재 Interceptor 기반 URL 매칭만 존재. 서비스 메서드에 `@PreAuthorize` 없어 우회 가능성 존재.
 
-- [x] N+1 쿼리 개선: Incident, ServiceRequest, Change 목록 조회에 `JOIN FETCH` + countQuery 분리
-- [x] ChangeApprover, IncidentAssignee, ServiceRequestAssignee 조회 시 `@EntityGraph(user)` 적용
+- [ ] SecurityConfig: `@EnableMethodSecurity` 활성화
+- [ ] 관리자 전용 Service 메서드에 `@PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ITSM_ADMIN')")` 추가 (UserService, CommonCodeService, SlaPolicyService, NotificationPolicyService, BatchJobService)
+- [ ] 데이터 소유자 검증이 필요한 메서드에 커스텀 권한 체크 추가 (본인 데이터만 수정/삭제)
 
-### 기타 (LOW)
+### 5단계: Open Redirect 방지 (MEDIUM)
 
-- [x] .gitignore: `scrren.png` 오타 수정
-- [x] SYSTEM_USER_ID = 1L 하드코딩 → `itsm.system-user-id` 설정값으로 변경 (7개 배치 Job)
-- [x] ChangePasswordView.vue: setTimeout 내 router.push → 컴포넌트 언마운트 시 정리
-- [x] Frontend Dockerfile: HEALTHCHECK 추가
-- [x] application-local.yml: DB 비밀번호 하드코딩 → 환경변수(기본값 유지) 전환
+> NotificationDropdown.vue에서 `noti.refLink`를 검증 없이 `router.push()`. 악의적 링크 주입 시 리다이렉트 가능.
+
+- [ ] NotificationDropdown.vue: `refLink`를 허용된 내부 경로 화이트리스트로 검증 후 이동
+- [ ] Backend: 알림 생성 시 `refLink` 값이 내부 경로(`/incidents/`, `/boards/` 등)인지 서버 측 검증
+
+### 6단계: AuthInterceptor 성능 및 보안 (MEDIUM)
+
+> `menuRepository.findAll()`을 매 요청마다 호출. 성능 이슈 + 메뉴 데이터 변조 시 실시간 반영 위험.
+
+- [ ] AuthInterceptor: 메뉴 목록 캐싱 (Spring `@Cacheable` 또는 인메모리 캐시, TTL 5분)
+- [ ] X-Forwarded-For 헤더 파싱 강화: 신뢰할 수 있는 프록시 IP 검증 로직 추가 (IP 스푸핑 방지)
+
+### 7단계: 프로덕션 로깅 정리 (MEDIUM)
+
+> 프론트엔드에 `console.error()` 79건. 프로덕션에서 내부 정보 노출 가능.
+
+- [ ] Vite 빌드 설정: 프로덕션 빌드 시 `console.log/warn/error` 자동 제거 (`esbuild.drop: ['console']`)
+- [ ] 또는 환경별 로거 유틸 도입 (개발에서만 출력)
+
+### 8단계: 의존성 보안 감사 (LOW)
+
+> Axios 1.7.0 등 일부 패키지 구버전. 보안 패치 누락 가능.
+
+- [ ] `npm audit` 실행 및 취약점 수정
+- [ ] Axios 최신 버전 업데이트
+- [ ] Backend: `./gradlew dependencyCheckAnalyze` (OWASP Dependency-Check 플러그인 추가 고려)
+- [ ] CI/CD에 `npm audit --audit-level=high` 단계 추가 (빌드 시 자동 감사)
+
+### 9단계: 추가 보안 강화 (LOW)
+
+- [ ] BCrypt 라운드 수 10 → 12로 상향 (SecurityConfig passwordEncoder)
+- [ ] 로그인 API에 분산 환경 Rate Limiting 추가 (Redis 기반 또는 Spring Cloud Gateway)
+- [ ] JWT 토큰 블랙리스트 구현 (로그아웃 시 토큰 즉시 무효화, 현재는 만료까지 유효)
+- [ ] 비밀번호 최대 길이 제한 추가 (BCrypt는 72바이트 초과 시 잘림 — 128자 제한 권장)
 
 ---
 
