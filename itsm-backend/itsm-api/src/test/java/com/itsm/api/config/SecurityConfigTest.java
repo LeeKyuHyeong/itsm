@@ -9,8 +9,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.CorsConfiguration;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -24,6 +29,9 @@ class SecurityConfigTest {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private CorsConfigurationSource corsConfigurationSource;
 
     @Test
     @DisplayName("Swagger UI는 인증 없이 접근 가능하다")
@@ -93,5 +101,29 @@ class SecurityConfigTest {
         mockMvc.perform(get("/v3/api-docs").secure(true))
                 .andExpect(status().isOk())
                 .andExpect(header().exists("Strict-Transport-Security"));
+    }
+
+    @Test
+    @DisplayName("CORS allowedHeaders가 와일드카드(*)가 아닌 명시적 목록이다")
+    void corsAllowedHeadersAreExplicit() {
+        org.springframework.mock.web.MockHttpServletRequest request = new org.springframework.mock.web.MockHttpServletRequest();
+        request.setRequestURI("/api/v1/users");
+        request.setServletPath("/api/v1/users");
+        CorsConfiguration config = corsConfigurationSource.getCorsConfiguration(request);
+        assertThat(config).isNotNull();
+        assertThat(config.getAllowedHeaders()).doesNotContain("*");
+        assertThat(config.getAllowedHeaders()).contains("Content-Type", "Accept", "X-Requested-With");
+    }
+
+    @Test
+    @DisplayName("CORS exposedHeaders가 설정되어 있다")
+    void corsExposedHeadersAreConfigured() {
+        org.springframework.mock.web.MockHttpServletRequest request = new org.springframework.mock.web.MockHttpServletRequest();
+        request.setRequestURI("/api/v1/users");
+        request.setServletPath("/api/v1/users");
+        CorsConfiguration config = corsConfigurationSource.getCorsConfiguration(request);
+        assertThat(config).isNotNull();
+        assertThat(config.getExposedHeaders()).isNotNull();
+        assertThat(config.getExposedHeaders()).isNotEmpty();
     }
 }

@@ -54,9 +54,9 @@
 
 > `allowedHeaders("*")`로 모든 헤더 허용 중. 불필요한 커스텀 헤더를 통한 공격 벡터 차단 필요.
 
-- [ ] SecurityConfig: `allowedHeaders(List.of("*"))` → 명시적 목록으로 변경 (`Authorization, Content-Type, Accept, X-Requested-With`)
-- [ ] WebConfig: `.allowedHeaders("*")` → 동일하게 명시적 목록으로 변경
-- [ ] `exposedHeaders` 설정 추가 (프론트엔드에서 읽어야 할 응답 헤더 명시)
+- [x] SecurityConfig: `allowedHeaders(List.of("*"))` → 명시적 목록으로 변경 (`Content-Type, Accept, X-Requested-With`)
+- [x] WebConfig: `.allowedHeaders("*")` → 동일하게 명시적 목록으로 변경
+- [x] `exposedHeaders` 설정 추가 (`Content-Disposition` — 파일 다운로드 시 프론트엔드에서 접근 필요)
 
 ### 4단계: 메서드 레벨 권한 검증 (HIGH)
 
