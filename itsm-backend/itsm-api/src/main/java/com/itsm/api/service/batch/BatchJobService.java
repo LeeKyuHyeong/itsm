@@ -7,6 +7,7 @@ import com.itsm.core.exception.BusinessException;
 import com.itsm.core.exception.ErrorCode;
 import com.itsm.core.repository.batch.BatchJobRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -30,6 +31,7 @@ public class BatchJobService {
         return toResponse(findById(batchJobId));
     }
 
+    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ITSM_ADMIN')")
     public BatchJobResponse updateJob(Long batchJobId, BatchJobUpdateRequest req, Long currentUserId) {
         BatchJob job = findById(batchJobId);
         job.update(req.getCronExpression(), req.getIsActive(), req.getJobDescription(), req.getJobNameEn());
@@ -37,6 +39,7 @@ public class BatchJobService {
         return toResponse(job);
     }
 
+    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ITSM_ADMIN')")
     public void executeNow(Long batchJobId, Long currentUserId) {
         BatchJob job = findById(batchJobId);
         job.requestTrigger();

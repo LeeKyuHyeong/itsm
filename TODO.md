@@ -62,9 +62,9 @@
 
 > 현재 Interceptor 기반 URL 매칭만 존재. 서비스 메서드에 `@PreAuthorize` 없어 우회 가능성 존재.
 
-- [ ] SecurityConfig: `@EnableMethodSecurity` 활성화
-- [ ] 관리자 전용 Service 메서드에 `@PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ITSM_ADMIN')")` 추가 (UserService, CommonCodeService, SlaPolicyService, NotificationPolicyService, BatchJobService)
-- [ ] 데이터 소유자 검증이 필요한 메서드에 커스텀 권한 체크 추가 (본인 데이터만 수정/삭제)
+- [x] SecurityConfig: `@EnableMethodSecurity` 활성화
+- [x] 관리자 전용 Service 메서드에 `@PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ITSM_ADMIN')")` 추가 (UserService, CommonCodeService, SlaPolicyService, NotificationPolicyService, BatchJobService)
+- [x] 데이터 소유자 검증이 필요한 메서드에 커스텀 권한 체크 추가 (본인 데이터만 수정/삭제)
 
 ### 5단계: Open Redirect 방지 (MEDIUM)
 

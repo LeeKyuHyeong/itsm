@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -56,6 +57,7 @@ public class UserService {
         return toUserDetailResponse(user, userRoles);
     }
 
+    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ITSM_ADMIN')")
     public UserDetailResponse createUser(UserCreateRequest req, Long currentUserId) {
         // Check loginId duplicate
         if (userRepository.existsByLoginId(req.getLoginId())) {
@@ -99,6 +101,7 @@ public class UserService {
         return toUserDetailResponse(savedUser, userRoles);
     }
 
+    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ITSM_ADMIN')")
     public UserDetailResponse updateUser(Long userId, UserUpdateRequest req, Long currentUserId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND, "사용자를 찾을 수 없습니다."));
@@ -124,6 +127,7 @@ public class UserService {
         return toUserDetailResponse(user, userRoles);
     }
 
+    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ITSM_ADMIN')")
     public void changeUserStatus(Long userId, UserStatusRequest req, Long currentUserId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND, "사용자를 찾을 수 없습니다."));
@@ -156,6 +160,7 @@ public class UserService {
         return userHistoryRepository.findByUserIdOrderByCreatedAtDesc(userId);
     }
 
+    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ITSM_ADMIN')")
     public void grantRole(Long userId, RoleGrantRequest req, Long currentUserId) {
         // Check user exists
         if (!userRepository.existsById(userId)) {
@@ -177,6 +182,7 @@ public class UserService {
         userRoleRepository.save(userRole);
     }
 
+    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ITSM_ADMIN')")
     public void revokeRole(Long userId, Long roleId, Long currentUserId) {
         userRoleRepository.deleteByUserIdAndRoleId(userId, roleId);
     }

@@ -8,6 +8,7 @@ import com.itsm.core.exception.BusinessException;
 import com.itsm.core.exception.ErrorCode;
 import com.itsm.core.repository.common.NotificationPolicyRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +35,7 @@ public class NotificationPolicyService {
                 .toList();
     }
 
+    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ITSM_ADMIN')")
     public NotificationPolicyResponse createPolicy(NotificationPolicyCreateRequest req, Long currentUserId) {
         NotificationPolicy policy = NotificationPolicy.builder()
                 .notiTypeCd(req.getNotiTypeCd())
@@ -46,6 +48,7 @@ public class NotificationPolicyService {
         return toResponse(saved);
     }
 
+    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ITSM_ADMIN')")
     public NotificationPolicyResponse updatePolicy(Long policyId, NotificationPolicyUpdateRequest req, Long currentUserId) {
         NotificationPolicy policy = notificationPolicyRepository.findById(policyId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND, "알림 정책을 찾을 수 없습니다."));
@@ -54,6 +57,7 @@ public class NotificationPolicyService {
         return toResponse(policy);
     }
 
+    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ITSM_ADMIN')")
     public void changePolicyStatus(Long policyId, String isActive) {
         NotificationPolicy policy = notificationPolicyRepository.findById(policyId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND, "알림 정책을 찾을 수 없습니다."));
