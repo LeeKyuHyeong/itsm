@@ -145,9 +145,60 @@ class NotificationServiceTest {
         });
 
         // when
-        notificationService.sendNotification(1L, "TICKET", "새 티켓", "티켓이 생성되었습니다.", "TICKET", 300L);
+        notificationService.sendNotification(1L, "TICKET", "새 티켓", "티켓이 생성되었습니다.", "INCIDENT", 300L);
 
         // then
         verify(notificationRepository).save(any(Notification.class));
+    }
+
+    @Test
+    @DisplayName("허용되지 않은 refType으로 알림 생성 시 예외가 발생한다")
+    void sendNotification_invalidRefType_throwsException() {
+        // when & then
+        assertThatThrownBy(() ->
+                notificationService.sendNotification(1L, "TICKET", "제목", "내용", "MALICIOUS_TYPE", 1L))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(ErrorCode.INVALID_INPUT_VALUE);
+    }
+
+    @Test
+    @DisplayName("refType이 null인 경우 알림 생성이 정상 처리된다")
+    void sendNotification_nullRefType_succeeds() {
+        // given
+        given(notificationRepository.save(any(Notification.class))).willAnswer(invocation -> {
+            Notification saved = invocation.getArgument(0);
+            ReflectionTestUtils.setField(saved, "notiId", 4L);
+            return saved;
+        });
+
+        // when
+        notificationService.sendNotification(1L, "SYSTEM", "시스템 알림", "내용", null, null);
+
+        // then
+        verify(notificationRepository).save(any(Notification.class));
+    }
+
+    @Test
+    @DisplayName("허용된 모든 refType으로 알림 생성이 정상 처리된다")
+    void sendNotification_allValidRefTypes_succeed() {
+        // given
+        given(notificationRepository.save(any(Notification.class))).willAnswer(invocation -> {
+            Notification saved = invocation.getArgument(0);
+            ReflectionTestUtils.setField(saved, "notiId", 5L);
+            return saved;
+        });
+
+        // when & then - 모든 허용된 refType 검증
+        List<String> validTypes = List.of(
+                "INCIDENT", "SERVICE_REQUEST", "CHANGE",
+                "INSPECTION", "ASSET_HW", "ASSET_SW", "ASSET_OA", "SIMULATION");
+
+        for (String refType : validTypes) {
+            notificationService.sendNotification(1L, "TEST", "제목", "내용", refType, 1L);
+        }
+
+        verify(notificationRepository, org.mockito.Mockito.times(validTypes.size()))
+                .save(any(Notification.class));
     }
 }

@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -65,6 +66,26 @@ class NotificationServiceTest {
 
         Notification saved = captor.getValue();
         assertThat(saved.getUserId()).isEqualTo(2L);
+        assertThat(saved.getRefType()).isNull();
+        assertThat(saved.getRefId()).isNull();
+    }
+
+    @Test
+    @DisplayName("허용되지 않은 refType은 null로 치환되어 저장된다")
+    void sendNotification_invalidRefType_savedWithNullRef() {
+        // given
+        when(notificationRepository.save(any(Notification.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        // when
+        notificationService.sendNotification(1L, "TEST", "제목",
+                "내용", "MALICIOUS_TYPE", 1L);
+
+        // then
+        ArgumentCaptor<Notification> captor = ArgumentCaptor.forClass(Notification.class);
+        verify(notificationRepository).save(captor.capture());
+
+        Notification saved = captor.getValue();
         assertThat(saved.getRefType()).isNull();
         assertThat(saved.getRefId()).isNull();
     }

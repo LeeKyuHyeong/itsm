@@ -47,6 +47,7 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useNotificationStore } from '@/stores/notification.js'
 import { notificationApi } from '@/api/notification.js'
+import { buildSafeRefLink } from '@/utils/notificationLink.js'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -86,8 +87,9 @@ async function handleClickNotification(noti) {
       console.error('알림 읽음 처리 실패:', e)
     }
   }
-  if (noti.refLink) {
-    router.push(noti.refLink)
+  const safeLink = buildSafeRefLink(noti.refType, noti.refId)
+  if (safeLink) {
+    router.push(safeLink)
   }
   isOpen.value = false
 }

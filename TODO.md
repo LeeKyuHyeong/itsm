@@ -70,8 +70,8 @@
 
 > NotificationDropdown.vue에서 `noti.refLink`를 검증 없이 `router.push()`. 악의적 링크 주입 시 리다이렉트 가능.
 
-- [ ] NotificationDropdown.vue: `refLink`를 허용된 내부 경로 화이트리스트로 검증 후 이동
-- [ ] Backend: 알림 생성 시 `refLink` 값이 내부 경로(`/incidents/`, `/boards/` 등)인지 서버 측 검증
+- [x] NotificationDropdown.vue: `refLink`를 허용된 내부 경로 화이트리스트로 검증 후 이동
+- [x] Backend: 알림 생성 시 `refLink` 값이 내부 경로(`/incidents/`, `/boards/` 등)인지 서버 측 검증
 
 ### 6단계: AuthInterceptor 성능 및 보안 (MEDIUM)
 

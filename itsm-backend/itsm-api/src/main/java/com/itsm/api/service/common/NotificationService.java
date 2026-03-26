@@ -10,11 +10,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class NotificationService {
+
+    private static final Set<String> ALLOWED_REF_TYPES = Set.of(
+            "INCIDENT", "SERVICE_REQUEST", "CHANGE",
+            "INSPECTION", "ASSET_HW", "ASSET_SW", "ASSET_OA", "SIMULATION"
+    );
 
     private final NotificationRepository notificationRepository;
 
@@ -58,6 +64,11 @@ public class NotificationService {
 
     public void sendNotification(Long userId, String notiTypeCd, String title,
                                   String content, String refType, Long refId) {
+        if (refType != null && !ALLOWED_REF_TYPES.contains(refType)) {
+            throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE,
+                    "허용되지 않은 참조 유형입니다: " + refType);
+        }
+
         Notification notification = Notification.builder()
                 .userId(userId)
                 .notiTypeCd(notiTypeCd)
