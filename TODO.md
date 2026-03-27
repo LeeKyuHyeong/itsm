@@ -77,8 +77,8 @@
 
 > `menuRepository.findAll()`을 매 요청마다 호출. 성능 이슈 + 메뉴 데이터 변조 시 실시간 반영 위험.
 
-- [ ] AuthInterceptor: 메뉴 목록 캐싱 (Spring `@Cacheable` 또는 인메모리 캐시, TTL 5분)
-- [ ] X-Forwarded-For 헤더 파싱 강화: 신뢰할 수 있는 프록시 IP 검증 로직 추가 (IP 스푸핑 방지)
+- [x] AuthInterceptor: 메뉴 목록 캐싱 (Spring `@Cacheable` + Caffeine 인메모리 캐시, TTL 5분)
+- [x] X-Forwarded-For 헤더 파싱 강화: 신뢰할 수 있는 프록시 IP 검증 로직 추가 (CIDR 지원, IP 스푸핑 방지)
 
 ### 7단계: 프로덕션 로깅 정리 (MEDIUM)
 

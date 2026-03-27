@@ -31,6 +31,10 @@ cors:
   allowed-headers: "*"
   allow-credentials: true
 
+# Security
+security:
+  trusted-proxies: 127.0.0.1,::1
+
 # SpringDoc
 springdoc:
   api-docs:

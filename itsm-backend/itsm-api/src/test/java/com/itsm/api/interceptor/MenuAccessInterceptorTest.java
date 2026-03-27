@@ -1,9 +1,9 @@
 package com.itsm.api.interceptor;
 
+import com.itsm.api.service.MenuCacheService;
 import com.itsm.core.domain.user.Menu;
 import com.itsm.core.domain.user.MenuAccessLog;
 import com.itsm.core.repository.user.MenuAccessLogRepository;
-import com.itsm.core.repository.user.MenuRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +31,7 @@ import static org.mockito.Mockito.*;
 class MenuAccessInterceptorTest {
 
     @Mock
-    private MenuRepository menuRepository;
+    private MenuCacheService menuCacheService;
 
     @Mock
     private MenuAccessLogRepository menuAccessLogRepository;
@@ -49,6 +49,7 @@ class MenuAccessInterceptorTest {
         response = mock(HttpServletResponse.class);
         handler = new Object();
         SecurityContextHolder.clearContext();
+        ReflectionTestUtils.setField(menuAccessInterceptor, "trustedProxies", List.of("127.0.0.1", "::1"));
     }
 
     @Test
@@ -60,13 +61,8 @@ class MenuAccessInterceptorTest {
         given(request.getRemoteAddr()).willReturn("127.0.0.1");
         given(request.getHeader("X-Forwarded-For")).willReturn(null);
 
-        Menu menu = Menu.builder()
-                .menuNm("사용자 관리")
-                .menuUrl("/api/v1/users/**")
-                .sortOrder(1)
-                .build();
-        ReflectionTestUtils.setField(menu, "menuId", 10L);
-        given(menuRepository.findAll()).willReturn(List.of(menu));
+        Menu menu = createMenu(10L, "사용자 관리", "/api/v1/users/**");
+        given(menuCacheService.getAllMenus()).willReturn(List.of(menu));
 
         // when
         menuAccessInterceptor.postHandle(request, response, handler, null);
@@ -88,7 +84,7 @@ class MenuAccessInterceptorTest {
         // given
         setAuthentication(1L, List.of("ROLE_ADMIN"));
         given(request.getRequestURI()).willReturn("/api/v1/some-other-endpoint");
-        given(menuRepository.findAll()).willReturn(List.of());
+        given(menuCacheService.getAllMenus()).willReturn(List.of());
 
         // when
         menuAccessInterceptor.postHandle(request, response, handler, null);
@@ -110,20 +106,16 @@ class MenuAccessInterceptorTest {
     }
 
     @Test
-    @DisplayName("X-Forwarded-For 헤더가 있으면 해당 IP를 사용한다")
-    void shouldUseXForwardedForHeader() {
+    @DisplayName("신뢰할 수 있는 프록시를 통한 X-Forwarded-For에서 클라이언트 IP를 추출한다")
+    void shouldExtractClientIpFromTrustedProxy() {
         // given
         setAuthentication(1L, List.of("ROLE_USER"));
         given(request.getRequestURI()).willReturn("/api/v1/users");
-        given(request.getHeader("X-Forwarded-For")).willReturn("192.168.1.100, 10.0.0.1");
+        given(request.getHeader("X-Forwarded-For")).willReturn("192.168.1.100, 127.0.0.1");
+        given(request.getRemoteAddr()).willReturn("127.0.0.1");
 
-        Menu menu = Menu.builder()
-                .menuNm("사용자 관리")
-                .menuUrl("/api/v1/users/**")
-                .sortOrder(1)
-                .build();
-        ReflectionTestUtils.setField(menu, "menuId", 10L);
-        given(menuRepository.findAll()).willReturn(List.of(menu));
+        Menu menu = createMenu(10L, "사용자 관리", "/api/v1/users/**");
+        given(menuCacheService.getAllMenus()).willReturn(List.of(menu));
 
         // when
         menuAccessInterceptor.postHandle(request, response, handler, null);
@@ -132,6 +124,95 @@ class MenuAccessInterceptorTest {
         ArgumentCaptor<MenuAccessLog> captor = ArgumentCaptor.forClass(MenuAccessLog.class);
         verify(menuAccessLogRepository).save(captor.capture());
         assertThat(captor.getValue().getIpAddress()).isEqualTo("192.168.1.100");
+    }
+
+    @Test
+    @DisplayName("신뢰할 수 없는 프록시의 X-Forwarded-For는 무시하고 remoteAddr을 사용한다")
+    void shouldIgnoreXForwardedForFromUntrustedProxy() {
+        // given
+        setAuthentication(1L, List.of("ROLE_USER"));
+        given(request.getRequestURI()).willReturn("/api/v1/users");
+        given(request.getHeader("X-Forwarded-For")).willReturn("10.0.0.1");
+        given(request.getRemoteAddr()).willReturn("203.0.113.50"); // 신뢰할 수 없는 프록시
+
+        Menu menu = createMenu(10L, "사용자 관리", "/api/v1/users/**");
+        given(menuCacheService.getAllMenus()).willReturn(List.of(menu));
+
+        // when
+        menuAccessInterceptor.postHandle(request, response, handler, null);
+
+        // then
+        ArgumentCaptor<MenuAccessLog> captor = ArgumentCaptor.forClass(MenuAccessLog.class);
+        verify(menuAccessLogRepository).save(captor.capture());
+        assertThat(captor.getValue().getIpAddress()).isEqualTo("203.0.113.50");
+    }
+
+    @Test
+    @DisplayName("X-Forwarded-For가 없으면 remoteAddr을 사용한다")
+    void shouldFallbackToRemoteAddr() {
+        // given
+        setAuthentication(1L, List.of("ROLE_USER"));
+        given(request.getRequestURI()).willReturn("/api/v1/users");
+        given(request.getHeader("X-Forwarded-For")).willReturn(null);
+        given(request.getRemoteAddr()).willReturn("10.0.0.5");
+
+        Menu menu = createMenu(10L, "사용자 관리", "/api/v1/users/**");
+        given(menuCacheService.getAllMenus()).willReturn(List.of(menu));
+
+        // when
+        menuAccessInterceptor.postHandle(request, response, handler, null);
+
+        // then
+        ArgumentCaptor<MenuAccessLog> captor = ArgumentCaptor.forClass(MenuAccessLog.class);
+        verify(menuAccessLogRepository).save(captor.capture());
+        assertThat(captor.getValue().getIpAddress()).isEqualTo("10.0.0.5");
+    }
+
+    @Test
+    @DisplayName("CIDR 범위의 신뢰할 수 있는 프록시도 인식한다")
+    void shouldRecognizeTrustedProxiesInCidrRange() {
+        // given
+        ReflectionTestUtils.setField(menuAccessInterceptor, "trustedProxies", List.of("10.0.0.0/8"));
+        setAuthentication(1L, List.of("ROLE_USER"));
+        given(request.getRequestURI()).willReturn("/api/v1/users");
+        given(request.getHeader("X-Forwarded-For")).willReturn("192.168.1.100");
+        given(request.getRemoteAddr()).willReturn("10.0.0.50"); // 10.0.0.0/8 범위 내
+
+        Menu menu = createMenu(10L, "사용자 관리", "/api/v1/users/**");
+        given(menuCacheService.getAllMenus()).willReturn(List.of(menu));
+
+        // when
+        menuAccessInterceptor.postHandle(request, response, handler, null);
+
+        // then
+        ArgumentCaptor<MenuAccessLog> captor = ArgumentCaptor.forClass(MenuAccessLog.class);
+        verify(menuAccessLogRepository).save(captor.capture());
+        assertThat(captor.getValue().getIpAddress()).isEqualTo("192.168.1.100");
+    }
+
+    @Test
+    @DisplayName("MenuCacheService를 통해 메뉴를 조회한다")
+    void shouldUseMenuCacheService() {
+        // given
+        setAuthentication(1L, List.of("ROLE_USER"));
+        given(request.getRequestURI()).willReturn("/api/v1/some-endpoint");
+        given(menuCacheService.getAllMenus()).willReturn(List.of());
+
+        // when
+        menuAccessInterceptor.postHandle(request, response, handler, null);
+
+        // then
+        verify(menuCacheService).getAllMenus();
+    }
+
+    private Menu createMenu(Long menuId, String menuNm, String menuUrl) {
+        Menu menu = Menu.builder()
+                .menuNm(menuNm)
+                .menuUrl(menuUrl)
+                .sortOrder(1)
+                .build();
+        ReflectionTestUtils.setField(menu, "menuId", menuId);
+        return menu;
     }
 
     private void setAuthentication(Long userId, List<String> roles) {

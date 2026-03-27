@@ -1,11 +1,11 @@
 package com.itsm.api.interceptor;
 
+import com.itsm.api.service.MenuCacheService;
 import com.itsm.core.domain.user.Menu;
 import com.itsm.core.domain.user.RoleMenu;
 import com.itsm.core.domain.user.UserRole;
 import com.itsm.core.exception.BusinessException;
 import com.itsm.core.exception.ErrorCode;
-import com.itsm.core.repository.user.MenuRepository;
 import com.itsm.core.repository.user.RoleMenuRepository;
 import com.itsm.core.repository.user.UserRoleRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,7 +38,7 @@ class AuthInterceptorTest {
     private RoleMenuRepository roleMenuRepository;
 
     @Mock
-    private MenuRepository menuRepository;
+    private MenuCacheService menuCacheService;
 
     @Mock
     private UserRoleRepository userRoleRepository;
@@ -104,7 +104,7 @@ class AuthInterceptorTest {
         // given
         given(request.getRequestURI()).willReturn("/api/v1/some-endpoint");
         setAuthentication(1L, List.of("ROLE_USER"));
-        given(menuRepository.findAll()).willReturn(List.of());
+        given(menuCacheService.getAllMenus()).willReturn(List.of());
 
         // when
         boolean result = authInterceptor.preHandle(request, response, handler);
@@ -126,7 +126,7 @@ class AuthInterceptorTest {
                 .sortOrder(1)
                 .build();
         ReflectionTestUtils.setField(menu, "menuId", 10L);
-        given(menuRepository.findAll()).willReturn(List.of(menu));
+        given(menuCacheService.getAllMenus()).willReturn(List.of(menu));
 
         UserRole userRole = new UserRole(1L, 5L, 1L);
         given(userRoleRepository.findByUserIdWithRole(1L)).willReturn(List.of(userRole));
@@ -154,7 +154,7 @@ class AuthInterceptorTest {
                 .sortOrder(1)
                 .build();
         ReflectionTestUtils.setField(menu, "menuId", 10L);
-        given(menuRepository.findAll()).willReturn(List.of(menu));
+        given(menuCacheService.getAllMenus()).willReturn(List.of(menu));
 
         UserRole userRole = new UserRole(1L, 5L, 1L);
         given(userRoleRepository.findByUserIdWithRole(1L)).willReturn(List.of(userRole));
@@ -182,7 +182,7 @@ class AuthInterceptorTest {
                 .sortOrder(1)
                 .build();
         ReflectionTestUtils.setField(menu, "menuId", 10L);
-        given(menuRepository.findAll()).willReturn(List.of(menu));
+        given(menuCacheService.getAllMenus()).willReturn(List.of(menu));
 
         UserRole userRole = new UserRole(1L, 5L, 1L);
         given(userRoleRepository.findByUserIdWithRole(1L)).willReturn(List.of(userRole));

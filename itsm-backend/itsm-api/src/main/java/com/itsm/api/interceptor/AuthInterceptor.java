@@ -1,11 +1,11 @@
 package com.itsm.api.interceptor;
 
+import com.itsm.api.service.MenuCacheService;
 import com.itsm.core.domain.user.Menu;
 import com.itsm.core.domain.user.RoleMenu;
 import com.itsm.core.domain.user.UserRole;
 import com.itsm.core.exception.BusinessException;
 import com.itsm.core.exception.ErrorCode;
-import com.itsm.core.repository.user.MenuRepository;
 import com.itsm.core.repository.user.RoleMenuRepository;
 import com.itsm.core.repository.user.UserRoleRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,7 +27,7 @@ import java.util.List;
 public class AuthInterceptor implements HandlerInterceptor {
 
     private final RoleMenuRepository roleMenuRepository;
-    private final MenuRepository menuRepository;
+    private final MenuCacheService menuCacheService;
     private final UserRoleRepository userRoleRepository;
 
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
@@ -60,7 +60,7 @@ public class AuthInterceptor implements HandlerInterceptor {
             return true;
         }
 
-        List<Menu> allMenus = menuRepository.findAll();
+        List<Menu> allMenus = menuCacheService.getAllMenus();
         Menu matchedMenu = allMenus.stream()
                 .filter(menu -> menu.getMenuUrl() != null && pathMatcher.match(menu.getMenuUrl(), requestUri))
                 .findFirst()
