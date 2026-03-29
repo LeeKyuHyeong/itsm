@@ -2,8 +2,11 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { fileURLToPath, URL } from 'node:url'
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [vue()],
+  esbuild: {
+    drop: mode === 'production' ? ['console', 'debugger'] : []
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
@@ -23,4 +26,4 @@ export default defineConfig({
     globals: true,
     include: ['src/**/*.{test,spec}.{js,ts}']
   }
-})
+}))

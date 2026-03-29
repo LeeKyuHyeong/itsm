@@ -84,8 +84,8 @@
 
 > 프론트엔드에 `console.error()` 79건. 프로덕션에서 내부 정보 노출 가능.
 
-- [ ] Vite 빌드 설정: 프로덕션 빌드 시 `console.log/warn/error` 자동 제거 (`esbuild.drop: ['console']`)
-- [ ] 또는 환경별 로거 유틸 도입 (개발에서만 출력)
+- [x] Vite 빌드 설정: 프로덕션 빌드 시 `console.log/warn/error` 자동 제거 (`esbuild.drop: ['console']`)
+- [x] ~~또는 환경별 로거 유틸 도입 (개발에서만 출력)~~ → esbuild.drop 방식 채택
 
 ### 8단계: 의존성 보안 감사 (LOW)
 
