@@ -12,10 +12,11 @@ services:
     volumes:
       - itsm-db-data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      test: ["CMD-SHELL", "mariadb -u root -p\"$MARIADB_ROOT_PASSWORD\" -e 'SELECT 1'"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s
 
   itsm-api:
     image: ${DOCKERHUB_USERNAME}/itsm-api:latest
