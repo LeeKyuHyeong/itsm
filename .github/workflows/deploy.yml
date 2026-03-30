@@ -131,7 +131,7 @@ jobs:
             DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
             JWT_SECRET=${{ secrets.JWT_SECRET }}
-            CORS_ORIGINS=https://itsm.kiryong.com
+            CORS_ORIGINS=https://itsm.kyuhyeong.com
             ENVEOF
 
             # 호스트 nginx 설정 (최초 1회만 복사)
@@ -140,8 +140,8 @@ jobs:
               sudo cp deploy/nginx-itsm.conf "$NGINX_CONF"
 
               # SSL 인증서 발급 (certbot)
-              if ! sudo certbot certificates 2>/dev/null | grep -q "itsm.kiryong.com"; then
-                sudo certbot certonly --nginx -d itsm.kiryong.com --non-interactive --agree-tos -m ${{ secrets.SERVER_USER }}@kiryong.com
+              if ! sudo certbot certificates 2>/dev/null | grep -q "itsm.kyuhyeong.com"; then
+                sudo certbot certonly --nginx -d itsm.kyuhyeong.com --non-interactive --agree-tos -m ${{ secrets.SERVER_USER }}@kyuhyeong.com
               fi
 
               sudo nginx -t && sudo systemctl reload nginx
