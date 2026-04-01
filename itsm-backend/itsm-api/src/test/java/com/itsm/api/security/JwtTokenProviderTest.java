@@ -19,9 +19,11 @@ class JwtTokenProviderTest {
     private static final long ACCESS_TOKEN_EXPIRY = 1800000L;
     private static final long REFRESH_TOKEN_EXPIRY = 604800000L;
 
+    private final JwtBlacklist jwtBlacklist = new JwtBlacklist();
+
     @BeforeEach
     void setUp() {
-        jwtTokenProvider = new JwtTokenProvider(SECRET, ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY);
+        jwtTokenProvider = new JwtTokenProvider(SECRET, ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY, jwtBlacklist);
     }
 
     @Test
@@ -63,7 +65,7 @@ class JwtTokenProviderTest {
     @DisplayName("만료된 토큰은 validateToken이 false를 반환한다")
     void validateToken_returnsFalse_forExpiredToken() {
         // given
-        JwtTokenProvider shortExpiryProvider = new JwtTokenProvider(SECRET, -1000L, -1000L);
+        JwtTokenProvider shortExpiryProvider = new JwtTokenProvider(SECRET, -1000L, -1000L, jwtBlacklist);
         String token = shortExpiryProvider.createAccessToken(1L, "admin", List.of("ADMIN"));
 
         // when & then

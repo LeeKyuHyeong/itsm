@@ -30,6 +30,9 @@ public enum ErrorCode {
     // 423 Locked
     ACCOUNT_LOCKED(423, "E423_001", "계정이 잠겼습니다. 30분 후 다시 시도해주세요."),
 
+    // 429 Too Many Requests
+    TOO_MANY_REQUESTS(429, "E429_001", "요청이 너무 많습니다. 잠시 후 다시 시도해주세요."),
+
     // 500 Internal Server Error
     INTERNAL_SERVER_ERROR(500, "E500_001", "서버 내부 오류가 발생했습니다.");
 

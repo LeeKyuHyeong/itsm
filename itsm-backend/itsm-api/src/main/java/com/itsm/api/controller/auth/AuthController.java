@@ -2,6 +2,7 @@ package com.itsm.api.controller.auth;
 
 import com.itsm.api.dto.auth.*;
 import com.itsm.api.security.JwtTokenProvider;
+import com.itsm.api.security.LoginRateLimiter;
 import com.itsm.api.service.auth.AuthService;
 import com.itsm.core.dto.ApiResponse;
 import com.itsm.core.exception.BusinessException;
@@ -24,6 +25,7 @@ public class AuthController {
 
     private final AuthService authService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final LoginRateLimiter loginRateLimiter;
 
     @Value("${cookie.secure:false}")
     private boolean cookieSecure;
@@ -37,6 +39,12 @@ public class AuthController {
                                             HttpServletRequest httpRequest,
                                             HttpServletResponse httpResponse) {
         String ipAddress = httpRequest.getRemoteAddr();
+
+        if (loginRateLimiter.isBlocked(ipAddress)) {
+            throw new BusinessException(ErrorCode.TOO_MANY_REQUESTS, "로그인 시도가 너무 많습니다. 잠시 후 다시 시도해주세요.");
+        }
+        loginRateLimiter.recordAttempt(ipAddress);
+
         LoginResponse loginResponse = authService.login(request, ipAddress);
 
         addAccessTokenCookie(httpResponse, loginResponse.getAccessToken());
@@ -71,6 +79,18 @@ public class AuthController {
                                     HttpServletResponse response) {
         Long userId = (Long) authentication.getPrincipal();
         String ipAddress = request.getRemoteAddr();
+
+        // Blacklist current access token
+        String accessToken = extractAccessTokenFromCookie(request);
+        if (accessToken != null) {
+            jwtTokenProvider.invalidate(accessToken);
+        }
+
+        // Blacklist refresh token
+        String refreshToken = extractRefreshTokenFromCookie(request);
+        if (refreshToken != null) {
+            jwtTokenProvider.invalidate(refreshToken);
+        }
 
         authService.logout(userId, ipAddress);
 
@@ -137,6 +157,18 @@ public class AuthController {
                 .sameSite("Strict")
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+    }
+
+    private String extractAccessTokenFromCookie(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (ACCESS_TOKEN_COOKIE.equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
     }
 
     private String extractRefreshTokenFromCookie(HttpServletRequest request) {

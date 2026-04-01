@@ -1,0 +1,35 @@
+[DEFAULT]
+bantime = 3600
+findtime = 600
+maxretry = 5
+banaction = iptables-multiport
+
+# Nginx 스캐너 차단 (444 응답 반복 시 ban)
+[nginx-scanner]
+enabled = true
+filter = nginx-scanner
+logpath = /var/log/nginx/access.log
+maxretry = 3
+findtime = 60
+bantime = 86400
+port = http,https
+
+# Nginx 404 반복 차단
+[nginx-404]
+enabled = true
+filter = nginx-404
+logpath = /var/log/nginx/access.log
+maxretry = 10
+findtime = 60
+bantime = 3600
+port = http,https
+
+# Nginx 비정상 요청 (400 Bad Request)
+[nginx-badbots]
+enabled = true
+filter = nginx-badbots
+logpath = /var/log/nginx/access.log
+maxretry = 3
+findtime = 60
+bantime = 86400
+port = http,https

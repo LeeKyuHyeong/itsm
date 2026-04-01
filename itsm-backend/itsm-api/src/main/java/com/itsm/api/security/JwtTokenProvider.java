@@ -18,14 +18,17 @@ public class JwtTokenProvider {
     private final SecretKey key;
     private final long accessTokenExpiry;
     private final long refreshTokenExpiry;
+    private final JwtBlacklist jwtBlacklist;
 
     public JwtTokenProvider(
             @Value("${jwt.secret}") String secret,
             @Value("${jwt.access-token-expiry}") long accessTokenExpiry,
-            @Value("${jwt.refresh-token-expiry}") long refreshTokenExpiry) {
+            @Value("${jwt.refresh-token-expiry}") long refreshTokenExpiry,
+            JwtBlacklist jwtBlacklist) {
         this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
         this.accessTokenExpiry = accessTokenExpiry;
         this.refreshTokenExpiry = refreshTokenExpiry;
+        this.jwtBlacklist = jwtBlacklist;
     }
 
     public String createAccessToken(Long userId, String loginId, List<String> roles) {
@@ -66,11 +69,24 @@ public class JwtTokenProvider {
 
     public boolean validateToken(String token) {
         try {
+            if (token != null && jwtBlacklist.isBlacklisted(token)) {
+                log.debug("Blacklisted JWT token");
+                return false;
+            }
             parseClaims(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             log.debug("Invalid JWT token: {}", e.getMessage());
             return false;
+        }
+    }
+
+    public void invalidate(String token) {
+        try {
+            Claims claims = parseClaims(token);
+            jwtBlacklist.blacklist(token, claims);
+        } catch (JwtException | IllegalArgumentException e) {
+            log.debug("Cannot blacklist invalid token: {}", e.getMessage());
         }
     }
 

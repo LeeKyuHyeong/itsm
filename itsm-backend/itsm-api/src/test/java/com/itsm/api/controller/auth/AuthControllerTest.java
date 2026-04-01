@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itsm.api.dto.auth.*;
 import com.itsm.api.exception.GlobalExceptionHandler;
 import com.itsm.api.security.JwtTokenProvider;
+import com.itsm.api.security.LoginRateLimiter;
 import com.itsm.api.service.auth.AuthService;
 import com.itsm.core.exception.BusinessException;
 import com.itsm.core.exception.ErrorCode;
@@ -44,6 +45,9 @@ class AuthControllerTest {
 
     @Mock
     private JwtTokenProvider jwtTokenProvider;
+
+    @Mock
+    private LoginRateLimiter loginRateLimiter;
 
     @InjectMocks
     private AuthController authController;

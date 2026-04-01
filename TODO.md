@@ -98,10 +98,10 @@
 
 ### 9단계: 추가 보안 강화 (LOW)
 
-- [ ] BCrypt 라운드 수 10 → 12로 상향 (SecurityConfig passwordEncoder)
-- [ ] 로그인 API에 분산 환경 Rate Limiting 추가 (Redis 기반 또는 Spring Cloud Gateway)
-- [ ] JWT 토큰 블랙리스트 구현 (로그아웃 시 토큰 즉시 무효화, 현재는 만료까지 유효)
-- [ ] 비밀번호 최대 길이 제한 추가 (BCrypt는 72바이트 초과 시 잘림 — 128자 제한 권장)
+- [x] BCrypt 라운드 수 10 → 12로 상향 (SecurityConfig passwordEncoder)
+- [x] 로그인 API에 Rate Limiting 추가 (Caffeine 인메모리 기반, IP당 1분간 10회 제한)
+- [x] JWT 토큰 블랙리스트 구현 (로그아웃 시 accessToken + refreshToken 즉시 무효화, Caffeine 캐시)
+- [x] 비밀번호 최대 길이 제한 추가 (LoginRequest, ChangePasswordRequest에 @Size(max=128) 적용)
 
 ---
 
