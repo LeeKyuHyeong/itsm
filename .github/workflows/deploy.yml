@@ -39,11 +39,17 @@ jobs:
           cache: 'npm'
           cache-dependency-path: itsm-frontend/package-lock.json
 
+      - name: Frontend Install
+        working-directory: itsm-frontend
+        run: npm ci
+
+      - name: Frontend Security Audit
+        working-directory: itsm-frontend
+        run: npm audit --audit-level=high
+
       - name: Frontend Test
         working-directory: itsm-frontend
-        run: |
-          npm ci
-          npm run test:run
+        run: npm run test:run
 
   # ── 2. Build & Push Docker Images ────────────────
   build:

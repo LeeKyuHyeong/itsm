@@ -91,10 +91,10 @@
 
 > Axios 1.7.0 등 일부 패키지 구버전. 보안 패치 누락 가능.
 
-- [ ] `npm audit` 실행 및 취약점 수정
-- [ ] Axios 최신 버전 업데이트
-- [ ] Backend: `./gradlew dependencyCheckAnalyze` (OWASP Dependency-Check 플러그인 추가 고려)
-- [ ] CI/CD에 `npm audit --audit-level=high` 단계 추가 (빌드 시 자동 감사)
+- [x] `npm audit` 실행 및 취약점 수정
+- [x] Axios 최신 버전 업데이트
+- [x] Backend: `./gradlew dependencyCheckAnalyze` (OWASP Dependency-Check 플러그인 추가 고려)
+- [x] CI/CD에 `npm audit --audit-level=high` 단계 추가 (빌드 시 자동 감사)
 
 ### 9단계: 추가 보안 강화 (LOW)
 
