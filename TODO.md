@@ -13,6 +13,7 @@
 - **Phase 15**: CI/CD + 운영 배포 ✅
 - **Phase 16**: 운영 이슈 & OA 자산 분리 ✅ (운영 DB 반영 미완)
 - **Phase 17**: 소스 위험도 분석 및 품질 개선 ✅
+- **Phase 18**: 보안 강화 2차 (OWASP Top 10 기반 전 항목) ✅
 
 ---
 
@@ -25,83 +26,175 @@
 
 ---
 
-## Phase 18: 보안 강화 2차
+## Phase 19: 인프라 보안 & Docker 강화 (CRITICAL)
 
-> 2026-03-18 전체 보안 정밀 분석 결과. OWASP Top 10 기준 위험도 순으로 정리.
+> 2026-04-03 소스 재분석 결과. 운영 환경 직접 영향 항목 우선.
 
-### 1단계: HTTP 보안 헤더 (CRITICAL) — 현재 전무
+### 1단계: 설정 보안 (CRITICAL)
 
-> 백엔드·프론트엔드 모두 보안 헤더가 설정되어 있지 않음. 클릭재킹, MIME 스니핑, XSS 반사 공격에 노출.
+- [ ] application.yml: JWT 기본 시크릿 제거 — 현재 base64 인코딩된 기본값이 소스에 노출 (`${JWT_SECRET}` 환경변수 필수화)
+- [ ] application.yml: 기본 CORS 설정에서 `localhost:5173` 제거 (개발 프로필로 분리)
+- [ ] application-local.yml: 기본 DB 비밀번호 `1234` 제거 (`${DB_PASSWORD}` 환경변수 필수화)
 
-- [x] nginx.conf: `Content-Security-Policy` 헤더 추가 (`default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self'`)
-- [x] nginx.conf: `X-Frame-Options: SAMEORIGIN` 헤더 추가 (클릭재킹 방지)
-- [x] nginx.conf: `X-Content-Type-Options: nosniff` 헤더 추가 (MIME 스니핑 방지)
-- [x] nginx.conf: `Strict-Transport-Security` 헤더 추가 (HSTS, HTTPS 강제)
-- [x] nginx.conf: `Referrer-Policy: strict-origin-when-cross-origin` 헤더 추가
-- [x] Spring SecurityConfig: `.headers()` 체인으로 서버 측 보안 헤더도 중복 설정 (프록시 우회 대비)
+### 2단계: Docker 이미지 버전 고정 (HIGH)
 
-### 2단계: Access Token 저장소 전환 (CRITICAL)
+- [ ] docker-compose.yml: `mariadb:11` → 특정 버전 고정 (예: `mariadb:11.5.2`)
+- [ ] docker-compose.yml: 커스텀 이미지 `latest` 태그 → Git SHA 또는 시맨틱 버전 태그로 변경
+- [ ] itsm-backend/Dockerfile: `eclipse-temurin:17-jre-alpine` → 특정 버전 고정
+- [ ] CI/CD: 이미지 빌드 시 `${{ github.sha }}` 태그 적용
 
-> 현재 Access Token을 `localStorage`에 저장. XSS 취약점 발생 시 토큰 탈취 가능. Refresh Token은 이미 httpOnly 쿠키로 안전.
+### 3단계: 컨테이너 보안 강화 (HIGH)
 
-- [x] Backend: Access Token도 httpOnly 쿠키로 발급하도록 AuthController 수정
-- [x] Backend: SecurityConfig/JwtAuthFilter에서 쿠키 기반 토큰 추출 로직 추가
-- [x] Frontend: `localStorage.getItem('accessToken')` 제거 (api/index.js, stores/auth.js, guards.js)
-- [x] Frontend: Axios interceptor에서 Authorization 헤더 수동 설정 제거 (쿠키 자동 전송)
-- [x] 테스트: 로그인 → API 호출 → 토큰 갱신 → 로그아웃 전체 플로우 검증
+- [ ] itsm-backend/Dockerfile: `USER` 디렉티브 추가 (non-root 실행)
+- [ ] itsm-backend/Dockerfile: JVM 메모리 제한 설정 (`-Xmx512m -Xms256m`)
+- [ ] docker-compose.yml: 서비스별 리소스 제한 추가 (`deploy.limits: cpus, memory`)
+- [ ] docker-compose.yml: 커스텀 네트워크 정의 (서비스 간 격리)
 
-### 3단계: CORS 설정 강화 (HIGH)
+### 4단계: CI/CD 파이프라인 강화 (MEDIUM)
 
-> `allowedHeaders("*")`로 모든 헤더 허용 중. 불필요한 커스텀 헤더를 통한 공격 벡터 차단 필요.
+- [ ] 배포 후 헬스체크 검증 단계 추가 (`docker compose ps`, `/actuator/health`)
+- [ ] 배포 실패 시 자동 롤백 메커니즘 구현
+- [ ] 배포 전 DB 백업 단계 추가
+- [ ] 컨테이너 이미지 스캐닝 추가 (Trivy)
+- [ ] appleboy/scp-action 버전 업데이트 (v0.1.7 → 최신)
+- [ ] deploy.yml: 하드코딩된 이메일/도메인 → secrets로 분리
 
-- [x] SecurityConfig: `allowedHeaders(List.of("*"))` → 명시적 목록으로 변경 (`Content-Type, Accept, X-Requested-With`)
-- [x] WebConfig: `.allowedHeaders("*")` → 동일하게 명시적 목록으로 변경
-- [x] `exposedHeaders` 설정 추가 (`Content-Disposition` — 파일 다운로드 시 프론트엔드에서 접근 필요)
+### 5단계: Nginx SSL 강화 (MEDIUM)
 
-### 4단계: 메서드 레벨 권한 검증 (HIGH)
+- [ ] nginx-itsm.conf: SSL 암호화 스위트 강화 (ECDHE-ECDSA/RSA-AES-GCM 명시)
+- [ ] nginx-itsm.conf: `ssl_prefer_server_ciphers on` 추가
+- [ ] nginx-itsm.conf: `ssl_session_cache`, `ssl_session_timeout` 추가
+- [ ] nginx.conf: 프로덕션에서 Swagger UI 접근 차단
 
-> 현재 Interceptor 기반 URL 매칭만 존재. 서비스 메서드에 `@PreAuthorize` 없어 우회 가능성 존재.
+---
 
-- [x] SecurityConfig: `@EnableMethodSecurity` 활성화
-- [x] 관리자 전용 Service 메서드에 `@PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ITSM_ADMIN')")` 추가 (UserService, CommonCodeService, SlaPolicyService, NotificationPolicyService, BatchJobService)
-- [x] 데이터 소유자 검증이 필요한 메서드에 커스텀 권한 체크 추가 (본인 데이터만 수정/삭제)
+## Phase 20: 백엔드 성능 최적화 (HIGH)
 
-### 5단계: Open Redirect 방지 (MEDIUM)
+> N+1 쿼리, 누락된 인덱스, 비효율적 연산 개선.
 
-> NotificationDropdown.vue에서 `noti.refLink`를 검증 없이 `router.push()`. 악의적 링크 주입 시 리다이렉트 가능.
+### 1단계: 데이터베이스 인덱스 추가 (HIGH)
 
-- [x] NotificationDropdown.vue: `refLink`를 허용된 내부 경로 화이트리스트로 검증 후 이동
-- [x] Backend: 알림 생성 시 `refLink` 값이 내부 경로(`/incidents/`, `/boards/` 등)인지 서버 측 검증
+- [ ] User 엔티티: `login_id`, `status`, `dept_id` 인덱스 추가 (`@Table(indexes = ...)`)
+- [ ] Incident 엔티티: `status_cd`, `sla_deadline_at`, `created_at` 인덱스 추가
+- [ ] ServiceRequest 엔티티: `status_cd`, `created_at` 인덱스 추가
+- [ ] Asset 엔티티: 검색 대상 컬럼 인덱스 추가
 
-### 6단계: AuthInterceptor 성능 및 보안 (MEDIUM)
+### 2단계: DashboardService 쿼리 최적화 (HIGH)
 
-> `menuRepository.findAll()`을 매 요청마다 호출. 성능 이슈 + 메뉴 데이터 변조 시 실시간 반영 위험.
+- [ ] `findByStatusCd` 다건 호출 → `findByStatusCdIn` 단일 쿼리로 변경
+- [ ] SLA 초과 건수를 Java 스트림 필터 → DB 집계 쿼리(`COUNT WHERE`)로 전환
+- [ ] 대시보드 통계 전용 Repository 메서드 작성 (집계 쿼리)
 
-- [x] AuthInterceptor: 메뉴 목록 캐싱 (Spring `@Cacheable` + Caffeine 인메모리 캐시, TTL 5분)
-- [x] X-Forwarded-For 헤더 파싱 강화: 신뢰할 수 있는 프록시 IP 검증 로직 추가 (CIDR 지원, IP 스푸핑 방지)
+### 3단계: JPA 페치 전략 정리 (MEDIUM)
 
-### 7단계: 프로덕션 로깅 정리 (MEDIUM)
+- [ ] DTO 변환 시 접근하는 연관 엔티티에 대해 JOIN FETCH 일괄 정리
+- [ ] `saveAll()` 배치 저장으로 전환 (IncidentAsset 등 반복 save 제거)
+- [ ] 댓글, 이력 등 하위 목록 API에 페이징 적용 (현재 전체 조회)
 
-> 프론트엔드에 `console.error()` 79건. 프로덕션에서 내부 정보 노출 가능.
+---
 
-- [x] Vite 빌드 설정: 프로덕션 빌드 시 `console.log/warn/error` 자동 제거 (`esbuild.drop: ['console']`)
-- [x] ~~또는 환경별 로거 유틸 도입 (개발에서만 출력)~~ → esbuild.drop 방식 채택
+## Phase 21: 백엔드 코드 품질 개선 (HIGH)
 
-### 8단계: 의존성 보안 감사 (LOW)
+> 중복 코드 제거, 상수 관리, 일관된 에러 처리.
 
-> Axios 1.7.0 등 일부 패키지 구버전. 보안 패치 누락 가능.
+### 1단계: 중복 코드 통합 (HIGH)
 
-- [x] `npm audit` 실행 및 취약점 수정
-- [x] Axios 최신 버전 업데이트
-- [x] Backend: `./gradlew dependencyCheckAnalyze` (OWASP Dependency-Check 플러그인 추가 고려)
-- [x] CI/CD에 `npm audit --audit-level=high` 단계 추가 (빌드 시 자동 감사)
+- [ ] `getCurrentUserId()` — 7개 Controller에 중복 → 공통 유틸 또는 ArgumentResolver로 추출
+- [ ] `extractAccessTokenFromCookie()` — AuthController, JwtAuthFilter 중복 → `CookieUtils` 유틸 추출
+- [ ] CORS origin 파싱 시 `trim()` 누락 수정 (SecurityConfig)
 
-### 9단계: 추가 보안 강화 (LOW)
+### 2단계: 매직 스트링 상수화 (MEDIUM)
 
-- [x] BCrypt 라운드 수 10 → 12로 상향 (SecurityConfig passwordEncoder)
-- [x] 로그인 API에 Rate Limiting 추가 (Caffeine 인메모리 기반, IP당 1분간 10회 제한)
-- [x] JWT 토큰 블랙리스트 구현 (로그아웃 시 accessToken + refreshToken 즉시 무효화, Caffeine 캐시)
-- [x] 비밀번호 최대 길이 제한 추가 (LoginRequest, ChangePasswordRequest에 @Size(max=128) 적용)
+- [ ] 사용자 상태(`ACTIVE`, `LOCKED`, `DELETED`) → 상수 클래스 또는 enum 추출
+- [ ] 인시던트 상태(`RECEIVED`, `IN_PROGRESS`, `COMPLETED` 등) → 상수화
+- [ ] 역할 코드(`SUPER_ADMIN`, `ITSM_ADMIN` 등) → 상수화
+
+### 3단계: 에러 처리 표준화 (MEDIUM)
+
+- [ ] AuditLogAspect: silent catch → 최소 `log.warn` 추가
+- [ ] 인증 null 체크 일관성 확보 (일부 Controller만 검증 중)
+- [ ] 입력 검증 강화: 자산 IP/MAC 주소 `@Pattern` 검증, 텍스트 필드 `@Size(max)` 추가
+
+---
+
+## Phase 22: 프론트엔드 성능 & UX 개선 (HIGH)
+
+> 번들 최적화, 로딩/에러 상태, 접근성 개선.
+
+### 1단계: 라우트 지연 로딩 (HIGH)
+
+- [ ] router/index.js: 모든 뷰 컴포넌트를 `() => import()` 동적 임포트로 전환 (초기 번들 30~40% 감소 예상)
+
+### 2단계: UX 개선 (HIGH)
+
+- [ ] `alert()` / `confirm()` 20건 이상 → `BaseConfirm.vue` 컴포넌트로 교체 (이미 존재하나 미사용)
+- [ ] 모달/폼 제출 시 로딩 상태 표시 (버튼 disabled + 스피너)
+- [ ] API 실패 시 사용자 피드백 표준화 (현재 일부만 alert, 일부는 무반응)
+- [ ] 날짜 포맷 `toLocaleString('ko-KR')` 하드코딩 5건 → i18n locale 기반 유틸 추출
+
+### 3단계: 대형 컴포넌트 분할 (MEDIUM)
+
+- [ ] AccountManageView.vue (958줄) → 모달, 필터바, 페이지네이션 분리
+- [ ] IncidentDetailView.vue (709줄) → 댓글, 담당자, 이력, 보고서 모달 분리
+- [ ] CommonCodeView.vue (631줄) → 그룹/코드 모달 분리
+
+### 4단계: 접근성 (MEDIUM)
+
+- [ ] 모달 ESC 키 닫기, Enter 키 확인 처리
+- [ ] SVG 아이콘에 `aria-label` 추가
+- [ ] 테이블 행 키보드 내비게이션
+
+---
+
+## Phase 23: i18n 완성 (MEDIUM)
+
+> 하드코딩된 한국어 문자열 제거, 번역 누락 보완.
+
+- [ ] `constants/roles.js`: `ROLE_LABEL` 한국어 → i18n 키로 전환
+- [ ] `constants/status.js`: 전체 상태 레이블 (접수, 처리중, 완료 등) → i18n 키로 전환
+- [ ] `i18n/locales/en.js` 번역 누락 보완 (현재 약 100줄, 불완전)
+- [ ] 에러 메시지 다국어 처리
+- [ ] 날짜 포맷 locale 기반 통일 (Phase 22 2단계와 연계)
+
+---
+
+## Phase 24: 테스트 커버리지 확대 (MEDIUM)
+
+> 현재 백엔드 11%, 프론트엔드 10% 미만. 핵심 비즈니스 로직 우선 확보.
+
+### 1단계: 백엔드 서비스 레이어 (HIGH)
+
+- [ ] AuthService 테스트 (로그인, 토큰 갱신, 비밀번호 변경)
+- [ ] IncidentService 테스트 (생성, 상태 변경, SLA 계산)
+- [ ] DashboardService 테스트 (통계 집계)
+- [ ] UserService 테스트 (CRUD, 권한 검증)
+
+### 2단계: 백엔드 통합/보안 테스트 (MEDIUM)
+
+- [ ] MockMvc 기반 Controller 통합 테스트 (주요 엔드포인트)
+- [ ] JWT 만료/갱신 시나리오 테스트
+- [ ] 역할 기반 접근 제어 검증 테스트
+- [ ] Rate Limiting 동작 테스트
+
+### 3단계: 프론트엔드 테스트 (MEDIUM)
+
+- [ ] Store 테스트 확대 (commonCode, notification, menu)
+- [ ] API 에러 시나리오 테스트 (MSW 도입 고려)
+- [ ] 주요 폼 컴포넌트 유효성 검증 테스트
+
+---
+
+## Phase 25: 추가 개선 (LOW)
+
+> 안정화 후 선택적 진행.
+
+- [ ] 비밀번호 만료(90일) 시 강제 변경 인터셉터 구현
+- [ ] 요청 추적용 Request ID 필터 추가 (MDC 기반 Correlation ID)
+- [ ] 프로덕션 Swagger UI 접근 차단 (환경별 분기)
+- [ ] chart.js 사용 여부 확인 후 미사용 시 제거
+- [ ] `.env.example` 파일 추가 (필수 환경변수 목록 문서화)
+- [ ] ESLint + Prettier 프론트엔드 도입
+- [ ] Spring Boot 3.2.5 → 3.3.x 업그레이드
 
 ---
 
