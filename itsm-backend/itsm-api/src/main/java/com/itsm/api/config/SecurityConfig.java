@@ -80,8 +80,8 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
-        configuration.setAllowedMethods(Arrays.asList(allowedMethods.split(",")));
+        configuration.setAllowedOrigins(Arrays.stream(allowedOrigins.split(",")).map(String::trim).toList());
+        configuration.setAllowedMethods(Arrays.stream(allowedMethods.split(",")).map(String::trim).toList());
         configuration.setAllowedHeaders(List.of("Content-Type", "Accept", "X-Requested-With"));
         configuration.setExposedHeaders(List.of("Content-Disposition"));
         configuration.setAllowCredentials(allowCredentials);

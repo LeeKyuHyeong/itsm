@@ -21,8 +21,8 @@
 
 - [ ] 운영 로그인 무반응 조사 (CORS / Cookie Secure / 브라우저 Network 탭 확인 필요)
 - [ ] SSL "주의 요함" 경고 확인 필요 (Mixed Content 또는 브라우저 캐시 문제 추정)
-- [ ] 운영 DB에 tb_asset_oa, tb_asset_oa_history 테이블 생성 (ddl-auto: update로 자동생성 예상)
-- [ ] 운영 DB에 OA 메뉴, OA 공통코드 시드데이터 INSERT
+- [x] 운영 DB에 tb_asset_oa, tb_asset_oa_history 테이블 생성 (ddl-auto: update로 자동생성 예상) → `sql/phase16_prod_migration.sql`
+- [x] 운영 DB에 OA 메뉴, OA 공통코드 시드데이터 INSERT → `sql/phase16_prod_migration.sql`
 
 ---
 
@@ -32,39 +32,43 @@
 
 ### 1단계: 설정 보안 (CRITICAL)
 
-- [ ] application.yml: JWT 기본 시크릿 제거 — 현재 base64 인코딩된 기본값이 소스에 노출 (`${JWT_SECRET}` 환경변수 필수화)
-- [ ] application.yml: 기본 CORS 설정에서 `localhost:5173` 제거 (개발 프로필로 분리)
-- [ ] application-local.yml: 기본 DB 비밀번호 `1234` 제거 (`${DB_PASSWORD}` 환경변수 필수화)
+- [x] application.yml: JWT 기본 시크릿 제거 — 환경변수 필수화, 개발용 시크릿은 application-local.yml로 분리
+- [x] application.yml: 기본 CORS 설정에서 `localhost:5173` 제거 — 환경변수 필수화, 개발용은 application-local.yml로 분리
+- [x] application-local.yml: 기본 DB 비밀번호 `1234` 제거 — `${DB_PASSWORD}` 환경변수 필수화
+- [x] CORS origin 파싱 시 `trim()` 누락 수정 (SecurityConfig, WebConfig)
 
 ### 2단계: Docker 이미지 버전 고정 (HIGH)
 
-- [ ] docker-compose.yml: `mariadb:11` → 특정 버전 고정 (예: `mariadb:11.5.2`)
-- [ ] docker-compose.yml: 커스텀 이미지 `latest` 태그 → Git SHA 또는 시맨틱 버전 태그로 변경
-- [ ] itsm-backend/Dockerfile: `eclipse-temurin:17-jre-alpine` → 특정 버전 고정
-- [ ] CI/CD: 이미지 빌드 시 `${{ github.sha }}` 태그 적용
+- [x] docker-compose.yml: `mariadb:11` → `mariadb:11.7.2` 버전 고정
+- [x] docker-compose.yml: 커스텀 이미지 `latest` → `${IMAGE_TAG:-latest}` (Git SHA 태그)
+- [x] itsm-backend/Dockerfile: `eclipse-temurin:17.0.13_11-jre-alpine` 버전 고정
+- [x] itsm-frontend/Dockerfile: `node:20.18-alpine`, `nginx:1.27-alpine` 버전 고정
+- [x] CI/CD: 이미지 빌드 시 `${{ github.sha }}` 태그 적용 + .env에 IMAGE_TAG 전달
 
 ### 3단계: 컨테이너 보안 강화 (HIGH)
 
-- [ ] itsm-backend/Dockerfile: `USER` 디렉티브 추가 (non-root 실행)
-- [ ] itsm-backend/Dockerfile: JVM 메모리 제한 설정 (`-Xmx512m -Xms256m`)
-- [ ] docker-compose.yml: 서비스별 리소스 제한 추가 (`deploy.limits: cpus, memory`)
-- [ ] docker-compose.yml: 커스텀 네트워크 정의 (서비스 간 격리)
+- [x] itsm-backend/Dockerfile: `USER appuser` 디렉티브 추가 (non-root 실행)
+- [x] itsm-backend/Dockerfile: JVM 메모리 제한 설정 (`-Xmx512m -Xms256m -XX:+UseG1GC`)
+- [x] docker-compose.yml: 서비스별 리소스 제한 추가 (db:1CPU/1G, api:1CPU/768M, batch:0.5CPU/512M, frontend:0.5CPU/256M)
+- [x] docker-compose.yml: 커스텀 네트워크 정의 (backend: db↔api↔batch, frontend: api↔frontend)
 
 ### 4단계: CI/CD 파이프라인 강화 (MEDIUM)
 
-- [ ] 배포 후 헬스체크 검증 단계 추가 (`docker compose ps`, `/actuator/health`)
-- [ ] 배포 실패 시 자동 롤백 메커니즘 구현
-- [ ] 배포 전 DB 백업 단계 추가
-- [ ] 컨테이너 이미지 스캐닝 추가 (Trivy)
-- [ ] appleboy/scp-action 버전 업데이트 (v0.1.7 → 최신)
-- [ ] deploy.yml: 하드코딩된 이메일/도메인 → secrets로 분리
+- [x] 배포 후 헬스체크 검증 단계 추가 (최대 60초 대기, `/actuator/health` 확인)
+- [x] 배포 실패 시 자동 롤백 메커니즘 구현 (이전 IMAGE_TAG로 복원)
+- [x] 배포 전 DB 백업 단계 추가 (mariadb-dump + gzip, 최근 7개 보관)
+- [x] 컨테이너 이미지 스캐닝 추가 (Trivy — CRITICAL/HIGH)
+- [x] appleboy/scp-action 버전 업데이트 (v0.1.7 → v0.1.9)
+- [x] deploy.yml: 하드코딩된 이메일/도메인 → `secrets.DOMAIN`, `secrets.CERTBOT_EMAIL`로 분리
 
 ### 5단계: Nginx SSL 강화 (MEDIUM)
 
-- [ ] nginx-itsm.conf: SSL 암호화 스위트 강화 (ECDHE-ECDSA/RSA-AES-GCM 명시)
-- [ ] nginx-itsm.conf: `ssl_prefer_server_ciphers on` 추가
-- [ ] nginx-itsm.conf: `ssl_session_cache`, `ssl_session_timeout` 추가
-- [ ] nginx.conf: 프로덕션에서 Swagger UI 접근 차단
+- [x] nginx-itsm.conf: SSL 암호화 스위트 강화 (ECDHE-ECDSA/RSA-AES-GCM + CHACHA20 명시)
+- [x] nginx-itsm.conf: `ssl_prefer_server_ciphers on` 추가
+- [x] nginx-itsm.conf: `ssl_session_cache shared:SSL:10m`, `ssl_session_timeout 10m`, `ssl_session_tickets off` 추가
+- [x] nginx-itsm.conf: OCSP Stapling 추가
+- [x] nginx-itsm.conf: HSTS `preload` 플래그 추가
+- [x] nginx-itsm.conf + nginx.conf: 프로덕션에서 Swagger UI 접근 차단 (404 반환)
 
 ---
 

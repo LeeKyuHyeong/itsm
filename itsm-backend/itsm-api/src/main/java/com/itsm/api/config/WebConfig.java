@@ -9,6 +9,8 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.util.Arrays;
+
 @Configuration
 @RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
@@ -28,8 +30,8 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
-                .allowedOrigins(allowedOrigins.split(","))
-                .allowedMethods(allowedMethods.split(","))
+                .allowedOrigins(Arrays.stream(allowedOrigins.split(",")).map(String::trim).toArray(String[]::new))
+                .allowedMethods(Arrays.stream(allowedMethods.split(",")).map(String::trim).toArray(String[]::new))
                 .allowedHeaders("Content-Type", "Accept", "X-Requested-With")
                 .exposedHeaders("Content-Disposition")
                 .allowCredentials(allowCredentials)

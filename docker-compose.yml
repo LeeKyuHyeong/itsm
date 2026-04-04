@@ -1,6 +1,6 @@
 services:
   db:
-    image: mariadb:11
+    image: mariadb:11.7.2
     container_name: itsm-db
     restart: unless-stopped
     environment:
@@ -17,9 +17,16 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
+    networks:
+      - backend
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1024M
 
   itsm-api:
-    image: ${DOCKERHUB_USERNAME}/itsm-api:latest
+    image: ${DOCKERHUB_USERNAME}/itsm-api:${IMAGE_TAG:-latest}
     container_name: itsm-api
     restart: unless-stopped
     depends_on:
@@ -33,9 +40,17 @@ services:
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost}
     expose:
       - "8080"
+    networks:
+      - backend
+      - frontend
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 768M
 
   itsm-batch:
-    image: ${DOCKERHUB_USERNAME}/itsm-batch:latest
+    image: ${DOCKERHUB_USERNAME}/itsm-batch:${IMAGE_TAG:-latest}
     container_name: itsm-batch
     restart: unless-stopped
     depends_on:
@@ -45,9 +60,16 @@ services:
       DB_HOST: db:3306
       DB_USERNAME: root
       DB_PASSWORD: ${DB_PASSWORD}
+    networks:
+      - backend
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
 
   itsm-frontend:
-    image: ${DOCKERHUB_USERNAME}/itsm-frontend:latest
+    image: ${DOCKERHUB_USERNAME}/itsm-frontend:${IMAGE_TAG:-latest}
     container_name: itsm-frontend
     restart: unless-stopped
     depends_on:
@@ -56,6 +78,13 @@ services:
       - "8084:80"
     volumes:
       - nginx-logs:/var/log/nginx
+    networks:
+      - frontend
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
 
   fail2ban:
     image: crazymax/fail2ban:latest
@@ -72,6 +101,17 @@ services:
       - fail2ban-data:/var/lib/fail2ban
     depends_on:
       - itsm-frontend
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 128M
+
+networks:
+  backend:
+    driver: bridge
+  frontend:
+    driver: bridge
 
 volumes:
   itsm-db-data:
