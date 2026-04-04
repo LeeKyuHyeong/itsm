@@ -13,7 +13,10 @@ import java.util.Map;
 import java.util.Set;
 
 @Entity
-@Table(name = "tb_change")
+@Table(name = "tb_change", indexes = {
+        @Index(name = "idx_change_status_cd", columnList = "status_cd"),
+        @Index(name = "idx_change_created_at", columnList = "created_at")
+})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Change extends BaseEntity {

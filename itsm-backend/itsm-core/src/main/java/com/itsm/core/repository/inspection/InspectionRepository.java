@@ -31,4 +31,7 @@ public interface InspectionRepository extends JpaRepository<Inspection, Long> {
 
     @Query("SELECT COUNT(i) FROM Inspection i WHERE i.statusCd = :statusCd")
     long countByStatusCd(@Param("statusCd") String statusCd);
+
+    @Query("SELECT i.statusCd, COUNT(i) FROM Inspection i GROUP BY i.statusCd")
+    List<Object[]> countGroupByStatusCd();
 }

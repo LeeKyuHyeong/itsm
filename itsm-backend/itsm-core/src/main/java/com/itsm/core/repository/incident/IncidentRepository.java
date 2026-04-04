@@ -51,4 +51,22 @@ public interface IncidentRepository extends JpaRepository<Incident, Long> {
 
     @Query("SELECT COUNT(i) FROM Incident i WHERE i.createdAt >= :from AND i.createdAt < :to")
     long countByCreatedAtBetween(@Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
+
+    @Query("SELECT i.statusCd, COUNT(i) FROM Incident i GROUP BY i.statusCd")
+    List<Object[]> countGroupByStatusCd();
+
+    @Query("SELECT i.priorityCd, COUNT(i) FROM Incident i WHERE i.statusCd IN ('RECEIVED', 'IN_PROGRESS') GROUP BY i.priorityCd")
+    List<Object[]> countActivePriorityGrouped();
+
+    @Query(value = "SELECT i FROM Incident i LEFT JOIN FETCH i.company ORDER BY i.createdAt DESC",
+            countQuery = "SELECT COUNT(i) FROM Incident i")
+    Page<Incident> findRecentWithCompany(Pageable pageable);
+
+    @Query("SELECT COUNT(i) FROM Incident i WHERE i.statusCd IN ('RECEIVED', 'IN_PROGRESS') AND i.slaDeadlineAt IS NOT NULL AND i.slaDeadlineAt < :now")
+    long countSlaOverdue(@Param("now") LocalDateTime now);
+
+    @Query("SELECT COUNT(i) FROM Incident i WHERE i.statusCd IN ('RECEIVED', 'IN_PROGRESS') " +
+            "AND i.slaDeadlineAt IS NOT NULL AND i.slaDeadlineAt > :now " +
+            "AND TIMESTAMPDIFF(MINUTE, i.occurredAt, :now) >= TIMESTAMPDIFF(MINUTE, i.occurredAt, i.slaDeadlineAt) * 0.8")
+    long countSlaWarning(@Param("now") LocalDateTime now);
 }

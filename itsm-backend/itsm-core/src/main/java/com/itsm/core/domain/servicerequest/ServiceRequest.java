@@ -13,7 +13,10 @@ import java.util.Map;
 import java.util.Set;
 
 @Entity
-@Table(name = "tb_service_request")
+@Table(name = "tb_service_request", indexes = {
+        @Index(name = "idx_sr_status_cd", columnList = "status_cd"),
+        @Index(name = "idx_sr_created_at", columnList = "created_at")
+})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ServiceRequest extends BaseEntity {

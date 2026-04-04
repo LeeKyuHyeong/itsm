@@ -14,6 +14,8 @@
 - **Phase 16**: 운영 이슈 & OA 자산 분리 ✅ (운영 DB 반영 미완)
 - **Phase 17**: 소스 위험도 분석 및 품질 개선 ✅
 - **Phase 18**: 보안 강화 2차 (OWASP Top 10 기반 전 항목) ✅
+- **Phase 19**: 인프라 보안 & Docker 강화 ✅
+- **Phase 20**: 백엔드 성능 최적화 ✅
 
 ---
 
@@ -58,7 +60,7 @@
 - [x] 배포 실패 시 자동 롤백 메커니즘 구현 (이전 IMAGE_TAG로 복원)
 - [x] 배포 전 DB 백업 단계 추가 (mariadb-dump + gzip, 최근 7개 보관)
 - [x] 컨테이너 이미지 스캐닝 추가 (Trivy — CRITICAL/HIGH)
-- [x] appleboy/scp-action 버전 업데이트 (v0.1.7 → v0.1.9)
+- [ ] appleboy/scp-action 버전 업데이트 (v0.1.7 — 최신 버전 확인 후 진행)
 - [x] deploy.yml: 하드코딩된 이메일/도메인 → `secrets.DOMAIN`, `secrets.CERTBOT_EMAIL`로 분리
 
 ### 5단계: Nginx SSL 강화 (MEDIUM)
@@ -78,22 +80,22 @@
 
 ### 1단계: 데이터베이스 인덱스 추가 (HIGH)
 
-- [ ] User 엔티티: `login_id`, `status`, `dept_id` 인덱스 추가 (`@Table(indexes = ...)`)
-- [ ] Incident 엔티티: `status_cd`, `sla_deadline_at`, `created_at` 인덱스 추가
-- [ ] ServiceRequest 엔티티: `status_cd`, `created_at` 인덱스 추가
-- [ ] Asset 엔티티: 검색 대상 컬럼 인덱스 추가
+- [x] User 엔티티: `login_id`, `status`, `dept_id` 인덱스 추가 (`@Table(indexes = ...)`)
+- [x] Incident 엔티티: `status_cd`, `sla_deadline_at`, `created_at` 인덱스 추가
+- [x] ServiceRequest 엔티티: `status_cd`, `created_at` 인덱스 추가
+- [x] Asset 엔티티: 검색 대상 컬럼 인덱스 추가 (AssetHw, AssetSw, AssetOa + Change, Inspection)
 
 ### 2단계: DashboardService 쿼리 최적화 (HIGH)
 
-- [ ] `findByStatusCd` 다건 호출 → `findByStatusCdIn` 단일 쿼리로 변경
-- [ ] SLA 초과 건수를 Java 스트림 필터 → DB 집계 쿼리(`COUNT WHERE`)로 전환
-- [ ] 대시보드 통계 전용 Repository 메서드 작성 (집계 쿼리)
+- [x] `countByStatusCd` 다건 호출 → `countGroupByStatusCd` 집계 쿼리로 변경 (25회 → 4회)
+- [x] SLA 초과 건수를 Java 스트림 필터 → DB 집계 쿼리(`countSlaOverdue`, `countSlaWarning`)로 전환
+- [x] 대시보드 통계 전용 Repository 메서드 작성 (`countGroupByStatusCd`, `countActivePriorityGrouped`)
 
 ### 3단계: JPA 페치 전략 정리 (MEDIUM)
 
-- [ ] DTO 변환 시 접근하는 연관 엔티티에 대해 JOIN FETCH 일괄 정리
-- [ ] `saveAll()` 배치 저장으로 전환 (IncidentAsset 등 반복 save 제거)
-- [ ] 댓글, 이력 등 하위 목록 API에 페이징 적용 (현재 전체 조회)
+- [x] DTO 변환 시 접근하는 연관 엔티티에 대해 JOIN FETCH 일괄 정리 (`findRecentWithCompany`)
+- [x] `saveAll()` 배치 저장으로 전환 (IncidentAsset 등 반복 save 제거)
+- [x] 댓글, 이력 등 하위 목록 API에 페이징 적용 (IncidentComment, IncidentHistory)
 
 ---
 

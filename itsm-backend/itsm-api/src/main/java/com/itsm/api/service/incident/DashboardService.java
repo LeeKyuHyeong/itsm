@@ -3,19 +3,15 @@ package com.itsm.api.service.incident;
 import com.itsm.api.dto.incident.DashboardStatsResponse;
 import com.itsm.api.dto.incident.IncidentResponse;
 import com.itsm.api.dto.incident.MonthlyTrendItem;
-import com.itsm.core.domain.incident.Incident;
 import com.itsm.core.repository.change.ChangeRepository;
 import com.itsm.core.repository.incident.IncidentRepository;
 import com.itsm.core.repository.inspection.InspectionRepository;
 import com.itsm.core.repository.servicerequest.ServiceRequestRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
@@ -46,41 +42,22 @@ public class DashboardService {
             "SCHEDULED", "IN_PROGRESS", "ON_HOLD", "COMPLETED", "CLOSED");
 
     public DashboardStatsResponse getStats() {
-        // --- Incident stats ---
-        Map<String, Long> statusCounts = new LinkedHashMap<>();
-        long totalIncident = 0;
-        for (String status : INCIDENT_STATUSES) {
-            long count = incidentRepository.countByStatusCd(status);
-            statusCounts.put(status, count);
-            totalIncident += count;
-        }
-
-        Map<String, Long> priorityCounts = new LinkedHashMap<>();
-        for (String priority : PRIORITY_CODES) {
-            long count = incidentRepository.countByStatusCdAndPriorityCd("RECEIVED", priority)
-                    + incidentRepository.countByStatusCdAndPriorityCd("IN_PROGRESS", priority);
-            priorityCounts.put(priority, count);
-        }
-
         LocalDateTime now = LocalDateTime.now();
-        List<Incident> activeIncidents = new ArrayList<>(incidentRepository.findByStatusCd("RECEIVED"));
-        activeIncidents.addAll(incidentRepository.findByStatusCd("IN_PROGRESS"));
 
-        long slaOverdueCount = activeIncidents.stream()
-                .filter(i -> i.getSlaDeadlineAt() != null && i.getSlaDeadlineAt().isBefore(now))
-                .count();
+        // --- Incident stats (1 query instead of 5) ---
+        Map<String, Long> statusCounts = buildCountMap(INCIDENT_STATUSES, incidentRepository.countGroupByStatusCd());
+        long totalIncident = statusCounts.values().stream().mapToLong(Long::longValue).sum();
 
-        long slaWarningCount = activeIncidents.stream()
-                .filter(i -> i.getSlaDeadlineAt() != null && i.getSlaDeadlineAt().isAfter(now))
-                .filter(i -> {
-                    long total = Duration.between(i.getOccurredAt(), i.getSlaDeadlineAt()).toMinutes();
-                    long elapsed = Duration.between(i.getOccurredAt(), now).toMinutes();
-                    return total > 0 && ((double) elapsed / total * 100) >= 80;
-                })
-                .count();
+        // --- Priority stats (1 query instead of 8) ---
+        Map<String, Long> priorityCounts = buildCountMap(PRIORITY_CODES, incidentRepository.countActivePriorityGrouped());
 
+        // --- SLA stats (2 queries instead of loading all entities + Java filter) ---
+        long slaOverdueCount = incidentRepository.countSlaOverdue(now);
+        long slaWarningCount = incidentRepository.countSlaWarning(now);
+
+        // --- Recent incidents (JOIN FETCH company to avoid N+1) ---
         List<IncidentResponse> recentIncidents = incidentRepository
-                .findAll(PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt")))
+                .findRecentWithCompany(PageRequest.of(0, 10))
                 .getContent().stream()
                 .map(i -> IncidentResponse.builder()
                         .incidentId(i.getIncidentId())
@@ -93,33 +70,18 @@ public class DashboardService {
                         .build())
                 .toList();
 
-        // --- SR stats ---
-        Map<String, Long> srStatusCounts = new LinkedHashMap<>();
-        long totalSr = 0;
-        for (String status : SR_STATUSES) {
-            long count = serviceRequestRepository.countByStatusCd(status);
-            srStatusCounts.put(status, count);
-            totalSr += count;
-        }
+        // --- SR stats (1 query instead of 7) ---
+        Map<String, Long> srStatusCounts = buildCountMap(SR_STATUSES, serviceRequestRepository.countGroupByStatusCd());
+        long totalSr = srStatusCounts.values().stream().mapToLong(Long::longValue).sum();
         long pendingSrCount = srStatusCounts.getOrDefault("PENDING_COMPLETE", 0L);
 
-        // --- Change stats ---
-        Map<String, Long> changeStatusCounts = new LinkedHashMap<>();
-        long totalChange = 0;
-        for (String status : CHANGE_STATUSES) {
-            long count = changeRepository.countByStatusCd(status);
-            changeStatusCounts.put(status, count);
-            totalChange += count;
-        }
+        // --- Change stats (1 query instead of 8) ---
+        Map<String, Long> changeStatusCounts = buildCountMap(CHANGE_STATUSES, changeRepository.countGroupByStatusCd());
+        long totalChange = changeStatusCounts.values().stream().mapToLong(Long::longValue).sum();
 
-        // --- Inspection stats ---
-        Map<String, Long> inspectionStatusCounts = new LinkedHashMap<>();
-        long totalInspection = 0;
-        for (String status : INSPECTION_STATUSES) {
-            long count = inspectionRepository.countByStatusCd(status);
-            inspectionStatusCounts.put(status, count);
-            totalInspection += count;
-        }
+        // --- Inspection stats (1 query instead of 5) ---
+        Map<String, Long> inspectionStatusCounts = buildCountMap(INSPECTION_STATUSES, inspectionRepository.countGroupByStatusCd());
+        long totalInspection = inspectionStatusCounts.values().stream().mapToLong(Long::longValue).sum();
 
         // --- Monitoring metrics ---
         long unassignedIncidentCount = incidentRepository.countUnassigned();
@@ -160,5 +122,18 @@ public class DashboardService {
                 .totalInspectionCount(totalInspection)
                 .monthlyTrend(monthlyTrend)
                 .build();
+    }
+
+    private Map<String, Long> buildCountMap(List<String> allStatuses, List<Object[]> queryResults) {
+        Map<String, Long> map = new LinkedHashMap<>();
+        for (String status : allStatuses) {
+            map.put(status, 0L);
+        }
+        for (Object[] row : queryResults) {
+            String status = (String) row[0];
+            Long count = (Long) row[1];
+            map.put(status, count);
+        }
+        return map;
     }
 }

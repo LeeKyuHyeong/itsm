@@ -42,4 +42,7 @@ public interface ServiceRequestRepository extends JpaRepository<ServiceRequest, 
 
     @Query("SELECT COUNT(sr) FROM ServiceRequest sr WHERE sr.createdAt >= :from AND sr.createdAt < :to")
     long countByCreatedAtBetween(@Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
+
+    @Query("SELECT sr.statusCd, COUNT(sr) FROM ServiceRequest sr GROUP BY sr.statusCd")
+    List<Object[]> countGroupByStatusCd();
 }

@@ -12,7 +12,11 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "tb_asset_hw")
+@Table(name = "tb_asset_hw", indexes = {
+        @Index(name = "idx_asset_hw_status", columnList = "status"),
+        @Index(name = "idx_asset_hw_type_cd", columnList = "asset_type_cd"),
+        @Index(name = "idx_asset_hw_company_id", columnList = "company_id")
+})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class AssetHw extends BaseEntity {

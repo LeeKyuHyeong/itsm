@@ -38,4 +38,7 @@ public interface ChangeRepository extends JpaRepository<Change, Long> {
 
     @Query("SELECT COUNT(c) FROM Change c WHERE c.createdAt >= :from AND c.createdAt < :to")
     long countByCreatedAtBetween(@Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
+
+    @Query("SELECT c.statusCd, COUNT(c) FROM Change c GROUP BY c.statusCd")
+    List<Object[]> countGroupByStatusCd();
 }

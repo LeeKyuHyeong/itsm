@@ -76,16 +76,16 @@ public class IncidentService {
 
         Incident saved = incidentRepository.save(incident);
 
-        if (req.getAssets() != null) {
-            for (IncidentAssetRequest assetReq : req.getAssets()) {
-                IncidentAsset incidentAsset = IncidentAsset.builder()
-                        .incidentId(saved.getIncidentId())
-                        .assetType(assetReq.getAssetType())
-                        .assetId(assetReq.getAssetId())
-                        .createdBy(currentUserId)
-                        .build();
-                incidentAssetRepository.save(incidentAsset);
-            }
+        if (req.getAssets() != null && !req.getAssets().isEmpty()) {
+            List<IncidentAsset> incidentAssets = req.getAssets().stream()
+                    .map(assetReq -> IncidentAsset.builder()
+                            .incidentId(saved.getIncidentId())
+                            .assetType(assetReq.getAssetType())
+                            .assetId(assetReq.getAssetId())
+                            .createdBy(currentUserId)
+                            .build())
+                    .toList();
+            incidentAssetRepository.saveAll(incidentAssets);
         }
 
         return toResponse(saved);
@@ -215,17 +215,33 @@ public class IncidentService {
     }
 
     @Transactional(readOnly = true)
+    public Page<IncidentCommentResponse> getComments(Long incidentId, Pageable pageable) {
+        return incidentCommentRepository.findByIncidentIdOrderByCreatedAtAsc(incidentId, pageable)
+                .map(this::toCommentResponse);
+    }
+
+    @Transactional(readOnly = true)
     public List<IncidentHistoryResponse> getHistory(Long incidentId) {
         return incidentHistoryRepository.findByIncidentIdOrderByCreatedAtDesc(incidentId).stream()
-                .map(h -> IncidentHistoryResponse.builder()
-                        .historyId(h.getHistoryId())
-                        .changedField(h.getChangedField())
-                        .beforeValue(h.getBeforeValue())
-                        .afterValue(h.getAfterValue())
-                        .createdBy(h.getCreatedBy())
-                        .createdAt(h.getCreatedAt())
-                        .build())
+                .map(this::toHistoryResponse)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<IncidentHistoryResponse> getHistory(Long incidentId, Pageable pageable) {
+        return incidentHistoryRepository.findByIncidentIdOrderByCreatedAtDesc(incidentId, pageable)
+                .map(this::toHistoryResponse);
+    }
+
+    private IncidentHistoryResponse toHistoryResponse(IncidentHistory h) {
+        return IncidentHistoryResponse.builder()
+                .historyId(h.getHistoryId())
+                .changedField(h.getChangedField())
+                .beforeValue(h.getBeforeValue())
+                .afterValue(h.getAfterValue())
+                .createdBy(h.getCreatedBy())
+                .createdAt(h.getCreatedAt())
+                .build();
     }
 
     @Transactional(readOnly = true)

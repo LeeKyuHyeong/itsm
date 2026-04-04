@@ -2,8 +2,6 @@ package com.itsm.api.service.incident;
 
 import com.itsm.api.dto.incident.DashboardStatsResponse;
 import com.itsm.api.dto.incident.MonthlyTrendItem;
-import com.itsm.core.domain.company.Company;
-import com.itsm.core.domain.incident.Incident;
 import com.itsm.core.repository.change.ChangeRepository;
 import com.itsm.core.repository.incident.IncidentRepository;
 import com.itsm.core.repository.inspection.InspectionRepository;
@@ -16,9 +14,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -45,24 +43,27 @@ class DashboardServiceTest {
     private DashboardService dashboardService;
 
     @Test
-    @DisplayName("getStats - 인시던트 상태별 건수를 반환한다")
+    @DisplayName("getStats - 인시던트 상태별 건수를 집계 쿼리로 반환한다")
     void getStats_returnsIncidentStatusCounts() {
         // given
-        given(incidentRepository.countByStatusCd("RECEIVED")).willReturn(5L);
-        given(incidentRepository.countByStatusCd("IN_PROGRESS")).willReturn(3L);
-        given(incidentRepository.countByStatusCd("COMPLETED")).willReturn(10L);
-        given(incidentRepository.countByStatusCd("CLOSED")).willReturn(20L);
-        given(incidentRepository.countByStatusCd("REJECTED")).willReturn(2L);
-        given(incidentRepository.countByStatusCdAndPriorityCd(anyString(), anyString())).willReturn(0L);
-        given(incidentRepository.findByStatusCd(anyString())).willReturn(Collections.emptyList());
-        given(incidentRepository.findAll(any(Pageable.class))).willReturn(new PageImpl<>(Collections.emptyList()));
+        given(incidentRepository.countGroupByStatusCd()).willReturn(List.of(
+                new Object[]{"RECEIVED", 5L},
+                new Object[]{"IN_PROGRESS", 3L},
+                new Object[]{"COMPLETED", 10L},
+                new Object[]{"CLOSED", 20L},
+                new Object[]{"REJECTED", 2L}
+        ));
+        given(incidentRepository.countActivePriorityGrouped()).willReturn(Collections.emptyList());
+        given(incidentRepository.countSlaOverdue(any())).willReturn(0L);
+        given(incidentRepository.countSlaWarning(any())).willReturn(0L);
+        given(incidentRepository.findRecentWithCompany(any(Pageable.class))).willReturn(new PageImpl<>(Collections.emptyList()));
         given(incidentRepository.countUnassigned()).willReturn(0L);
         given(incidentRepository.countByCreatedAtBetween(any(), any())).willReturn(0L);
-        given(serviceRequestRepository.countByStatusCd(anyString())).willReturn(0L);
+        given(serviceRequestRepository.countGroupByStatusCd()).willReturn(Collections.emptyList());
         given(serviceRequestRepository.countByCreatedAtBetween(any(), any())).willReturn(0L);
-        given(changeRepository.countByStatusCd(anyString())).willReturn(0L);
+        given(changeRepository.countGroupByStatusCd()).willReturn(Collections.emptyList());
         given(changeRepository.countByCreatedAtBetween(any(), any())).willReturn(0L);
-        given(inspectionRepository.countByStatusCd(anyString())).willReturn(0L);
+        given(inspectionRepository.countGroupByStatusCd()).willReturn(Collections.emptyList());
 
         // when
         DashboardStatsResponse result = dashboardService.getStats();
@@ -77,21 +78,22 @@ class DashboardServiceTest {
     }
 
     @Test
-    @DisplayName("getStats - SR 상태별 건수를 반환한다")
+    @DisplayName("getStats - SR 상태별 건수를 집계 쿼리로 반환한다")
     void getStats_returnsSrStatusCounts() {
         // given
         stubAllIncidentDefaults();
-        given(serviceRequestRepository.countByStatusCd("RECEIVED")).willReturn(3L);
-        given(serviceRequestRepository.countByStatusCd("ASSIGNED")).willReturn(2L);
-        given(serviceRequestRepository.countByStatusCd("IN_PROGRESS")).willReturn(4L);
-        given(serviceRequestRepository.countByStatusCd("PENDING_COMPLETE")).willReturn(1L);
-        given(serviceRequestRepository.countByStatusCd("CLOSED")).willReturn(10L);
-        given(serviceRequestRepository.countByStatusCd("CANCELLED")).willReturn(0L);
-        given(serviceRequestRepository.countByStatusCd("REJECTED")).willReturn(1L);
+        given(serviceRequestRepository.countGroupByStatusCd()).willReturn(List.of(
+                new Object[]{"RECEIVED", 3L},
+                new Object[]{"ASSIGNED", 2L},
+                new Object[]{"IN_PROGRESS", 4L},
+                new Object[]{"PENDING_COMPLETE", 1L},
+                new Object[]{"CLOSED", 10L},
+                new Object[]{"REJECTED", 1L}
+        ));
         given(serviceRequestRepository.countByCreatedAtBetween(any(), any())).willReturn(0L);
-        given(changeRepository.countByStatusCd(anyString())).willReturn(0L);
+        given(changeRepository.countGroupByStatusCd()).willReturn(Collections.emptyList());
         given(changeRepository.countByCreatedAtBetween(any(), any())).willReturn(0L);
-        given(inspectionRepository.countByStatusCd(anyString())).willReturn(0L);
+        given(inspectionRepository.countGroupByStatusCd()).willReturn(Collections.emptyList());
 
         // when
         DashboardStatsResponse result = dashboardService.getStats();
@@ -109,18 +111,19 @@ class DashboardServiceTest {
     void getStats_returnsChangeStatusCounts() {
         // given
         stubAllIncidentDefaults();
-        given(serviceRequestRepository.countByStatusCd(anyString())).willReturn(0L);
+        given(serviceRequestRepository.countGroupByStatusCd()).willReturn(Collections.emptyList());
         given(serviceRequestRepository.countByCreatedAtBetween(any(), any())).willReturn(0L);
-        given(changeRepository.countByStatusCd("DRAFT")).willReturn(2L);
-        given(changeRepository.countByStatusCd("APPROVAL_REQUESTED")).willReturn(1L);
-        given(changeRepository.countByStatusCd("APPROVED")).willReturn(3L);
-        given(changeRepository.countByStatusCd("IN_PROGRESS")).willReturn(1L);
-        given(changeRepository.countByStatusCd("COMPLETED")).willReturn(5L);
-        given(changeRepository.countByStatusCd("CLOSED")).willReturn(8L);
-        given(changeRepository.countByStatusCd("REJECTED")).willReturn(0L);
-        given(changeRepository.countByStatusCd("CANCELLED")).willReturn(1L);
+        given(changeRepository.countGroupByStatusCd()).willReturn(List.of(
+                new Object[]{"DRAFT", 2L},
+                new Object[]{"APPROVAL_REQUESTED", 1L},
+                new Object[]{"APPROVED", 3L},
+                new Object[]{"IN_PROGRESS", 1L},
+                new Object[]{"COMPLETED", 5L},
+                new Object[]{"CLOSED", 8L},
+                new Object[]{"CANCELLED", 1L}
+        ));
         given(changeRepository.countByCreatedAtBetween(any(), any())).willReturn(0L);
-        given(inspectionRepository.countByStatusCd(anyString())).willReturn(0L);
+        given(inspectionRepository.countGroupByStatusCd()).willReturn(Collections.emptyList());
 
         // when
         DashboardStatsResponse result = dashboardService.getStats();
@@ -136,15 +139,17 @@ class DashboardServiceTest {
     void getStats_returnsInspectionStatusCounts() {
         // given
         stubAllIncidentDefaults();
-        given(serviceRequestRepository.countByStatusCd(anyString())).willReturn(0L);
+        given(serviceRequestRepository.countGroupByStatusCd()).willReturn(Collections.emptyList());
         given(serviceRequestRepository.countByCreatedAtBetween(any(), any())).willReturn(0L);
-        given(changeRepository.countByStatusCd(anyString())).willReturn(0L);
+        given(changeRepository.countGroupByStatusCd()).willReturn(Collections.emptyList());
         given(changeRepository.countByCreatedAtBetween(any(), any())).willReturn(0L);
-        given(inspectionRepository.countByStatusCd("SCHEDULED")).willReturn(4L);
-        given(inspectionRepository.countByStatusCd("IN_PROGRESS")).willReturn(2L);
-        given(inspectionRepository.countByStatusCd("ON_HOLD")).willReturn(1L);
-        given(inspectionRepository.countByStatusCd("COMPLETED")).willReturn(6L);
-        given(inspectionRepository.countByStatusCd("CLOSED")).willReturn(10L);
+        given(inspectionRepository.countGroupByStatusCd()).willReturn(List.of(
+                new Object[]{"SCHEDULED", 4L},
+                new Object[]{"IN_PROGRESS", 2L},
+                new Object[]{"ON_HOLD", 1L},
+                new Object[]{"COMPLETED", 6L},
+                new Object[]{"CLOSED", 10L}
+        ));
 
         // when
         DashboardStatsResponse result = dashboardService.getStats();
@@ -159,18 +164,19 @@ class DashboardServiceTest {
     @DisplayName("getStats - 모니터링 지표를 반환한다")
     void getStats_returnsMonitoringMetrics() {
         // given
-        given(incidentRepository.countByStatusCd(anyString())).willReturn(0L);
-        given(incidentRepository.countByStatusCdAndPriorityCd(anyString(), anyString())).willReturn(0L);
-        given(incidentRepository.findByStatusCd(anyString())).willReturn(Collections.emptyList());
-        given(incidentRepository.findAll(any(Pageable.class))).willReturn(new PageImpl<>(Collections.emptyList()));
+        given(incidentRepository.countGroupByStatusCd()).willReturn(Collections.emptyList());
+        given(incidentRepository.countActivePriorityGrouped()).willReturn(Collections.emptyList());
+        given(incidentRepository.countSlaOverdue(any())).willReturn(0L);
+        given(incidentRepository.countSlaWarning(any())).willReturn(0L);
+        given(incidentRepository.findRecentWithCompany(any(Pageable.class))).willReturn(new PageImpl<>(Collections.emptyList()));
         given(incidentRepository.countUnassigned()).willReturn(7L);
         given(incidentRepository.countByCreatedAtBetween(any(), any())).willReturn(0L);
-        given(serviceRequestRepository.countByStatusCd(anyString())).willReturn(0L);
-        given(serviceRequestRepository.countByStatusCd("PENDING_COMPLETE")).willReturn(3L);
+        given(serviceRequestRepository.countGroupByStatusCd()).willReturn(
+                Collections.singletonList(new Object[]{"PENDING_COMPLETE", 3L}));
         given(serviceRequestRepository.countByCreatedAtBetween(any(), any())).willReturn(0L);
-        given(changeRepository.countByStatusCd(anyString())).willReturn(0L);
+        given(changeRepository.countGroupByStatusCd()).willReturn(Collections.emptyList());
         given(changeRepository.countByCreatedAtBetween(any(), any())).willReturn(0L);
-        given(inspectionRepository.countByStatusCd(anyString())).willReturn(0L);
+        given(inspectionRepository.countGroupByStatusCd()).willReturn(Collections.emptyList());
 
         // when
         DashboardStatsResponse result = dashboardService.getStats();
@@ -181,39 +187,60 @@ class DashboardServiceTest {
     }
 
     @Test
-    @DisplayName("getStats - SLA 초과 건수를 delayedIncidentCount로도 반환한다")
+    @DisplayName("getStats - SLA 초과 건수를 DB 쿼리로 반환한다")
     void getStats_returnsDelayedIncidentCount() {
         // given
-        Company company = Company.builder().companyNm("테스트사").build();
-        Incident overdueIncident = Incident.builder()
-                .title("SLA 초과 장애")
-                .content("내용")
-                .incidentTypeCd("SYSTEM")
-                .priorityCd("HIGH")
-                .occurredAt(LocalDateTime.now().minusDays(5))
-                .company(company)
-                .build();
-        ReflectionTestUtils.setField(overdueIncident, "slaDeadlineAt", LocalDateTime.now().minusHours(1));
-
-        given(incidentRepository.countByStatusCd(anyString())).willReturn(0L);
-        given(incidentRepository.countByStatusCdAndPriorityCd(anyString(), anyString())).willReturn(0L);
-        given(incidentRepository.findByStatusCd("RECEIVED")).willReturn(List.of(overdueIncident));
-        given(incidentRepository.findByStatusCd("IN_PROGRESS")).willReturn(Collections.emptyList());
-        given(incidentRepository.findAll(any(Pageable.class))).willReturn(new PageImpl<>(Collections.emptyList()));
+        given(incidentRepository.countGroupByStatusCd()).willReturn(Collections.emptyList());
+        given(incidentRepository.countActivePriorityGrouped()).willReturn(Collections.emptyList());
+        given(incidentRepository.countSlaOverdue(any())).willReturn(3L);
+        given(incidentRepository.countSlaWarning(any())).willReturn(1L);
+        given(incidentRepository.findRecentWithCompany(any(Pageable.class))).willReturn(new PageImpl<>(Collections.emptyList()));
         given(incidentRepository.countUnassigned()).willReturn(0L);
         given(incidentRepository.countByCreatedAtBetween(any(), any())).willReturn(0L);
-        given(serviceRequestRepository.countByStatusCd(anyString())).willReturn(0L);
+        given(serviceRequestRepository.countGroupByStatusCd()).willReturn(Collections.emptyList());
         given(serviceRequestRepository.countByCreatedAtBetween(any(), any())).willReturn(0L);
-        given(changeRepository.countByStatusCd(anyString())).willReturn(0L);
+        given(changeRepository.countGroupByStatusCd()).willReturn(Collections.emptyList());
         given(changeRepository.countByCreatedAtBetween(any(), any())).willReturn(0L);
-        given(inspectionRepository.countByStatusCd(anyString())).willReturn(0L);
+        given(inspectionRepository.countGroupByStatusCd()).willReturn(Collections.emptyList());
 
         // when
         DashboardStatsResponse result = dashboardService.getStats();
 
         // then
-        assertThat(result.getSlaOverdueCount()).isEqualTo(1L);
-        assertThat(result.getDelayedIncidentCount()).isEqualTo(1L);
+        assertThat(result.getSlaOverdueCount()).isEqualTo(3L);
+        assertThat(result.getSlaWarningCount()).isEqualTo(1L);
+        assertThat(result.getDelayedIncidentCount()).isEqualTo(3L);
+    }
+
+    @Test
+    @DisplayName("getStats - 우선순위별 건수를 집계 쿼리로 반환한다")
+    void getStats_returnsPriorityCountsGrouped() {
+        // given
+        given(incidentRepository.countGroupByStatusCd()).willReturn(Collections.emptyList());
+        given(incidentRepository.countActivePriorityGrouped()).willReturn(List.of(
+                new Object[]{"CRITICAL", 2L},
+                new Object[]{"HIGH", 5L},
+                new Object[]{"MEDIUM", 3L}
+        ));
+        given(incidentRepository.countSlaOverdue(any())).willReturn(0L);
+        given(incidentRepository.countSlaWarning(any())).willReturn(0L);
+        given(incidentRepository.findRecentWithCompany(any(Pageable.class))).willReturn(new PageImpl<>(Collections.emptyList()));
+        given(incidentRepository.countUnassigned()).willReturn(0L);
+        given(incidentRepository.countByCreatedAtBetween(any(), any())).willReturn(0L);
+        given(serviceRequestRepository.countGroupByStatusCd()).willReturn(Collections.emptyList());
+        given(serviceRequestRepository.countByCreatedAtBetween(any(), any())).willReturn(0L);
+        given(changeRepository.countGroupByStatusCd()).willReturn(Collections.emptyList());
+        given(changeRepository.countByCreatedAtBetween(any(), any())).willReturn(0L);
+        given(inspectionRepository.countGroupByStatusCd()).willReturn(Collections.emptyList());
+
+        // when
+        DashboardStatsResponse result = dashboardService.getStats();
+
+        // then
+        assertThat(result.getPriorityCounts()).containsEntry("CRITICAL", 2L);
+        assertThat(result.getPriorityCounts()).containsEntry("HIGH", 5L);
+        assertThat(result.getPriorityCounts()).containsEntry("MEDIUM", 3L);
+        assertThat(result.getPriorityCounts()).containsEntry("LOW", 0L);
     }
 
     @Test
@@ -221,11 +248,9 @@ class DashboardServiceTest {
     void getStats_returnsMonthlyTrend() {
         // given
         stubAllIncidentDefaults();
-        given(serviceRequestRepository.countByStatusCd(anyString())).willReturn(0L);
-        given(changeRepository.countByStatusCd(anyString())).willReturn(0L);
-        given(inspectionRepository.countByStatusCd(anyString())).willReturn(0L);
-
-        // Mock monthly counts with specific values for the most recent month
+        given(serviceRequestRepository.countGroupByStatusCd()).willReturn(Collections.emptyList());
+        given(changeRepository.countGroupByStatusCd()).willReturn(Collections.emptyList());
+        given(inspectionRepository.countGroupByStatusCd()).willReturn(Collections.emptyList());
         given(incidentRepository.countByCreatedAtBetween(any(), any())).willReturn(5L);
         given(serviceRequestRepository.countByCreatedAtBetween(any(), any())).willReturn(3L);
         given(changeRepository.countByCreatedAtBetween(any(), any())).willReturn(2L);
@@ -243,10 +268,11 @@ class DashboardServiceTest {
     }
 
     private void stubAllIncidentDefaults() {
-        given(incidentRepository.countByStatusCd(anyString())).willReturn(0L);
-        given(incidentRepository.countByStatusCdAndPriorityCd(anyString(), anyString())).willReturn(0L);
-        given(incidentRepository.findByStatusCd(anyString())).willReturn(Collections.emptyList());
-        given(incidentRepository.findAll(any(Pageable.class))).willReturn(new PageImpl<>(Collections.emptyList()));
+        given(incidentRepository.countGroupByStatusCd()).willReturn(Collections.emptyList());
+        given(incidentRepository.countActivePriorityGrouped()).willReturn(Collections.emptyList());
+        given(incidentRepository.countSlaOverdue(any())).willReturn(0L);
+        given(incidentRepository.countSlaWarning(any())).willReturn(0L);
+        given(incidentRepository.findRecentWithCompany(any(Pageable.class))).willReturn(new PageImpl<>(Collections.emptyList()));
         given(incidentRepository.countUnassigned()).willReturn(0L);
         given(incidentRepository.countByCreatedAtBetween(any(), any())).willReturn(0L);
     }

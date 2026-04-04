@@ -13,7 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "tb_user")
+@Table(name = "tb_user", indexes = {
+        @Index(name = "idx_user_login_id", columnList = "login_id"),
+        @Index(name = "idx_user_status", columnList = "status"),
+        @Index(name = "idx_user_dept_id", columnList = "dept_id")
+})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntity {

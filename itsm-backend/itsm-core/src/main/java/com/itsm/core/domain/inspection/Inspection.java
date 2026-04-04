@@ -14,7 +14,9 @@ import java.util.Map;
 import java.util.Set;
 
 @Entity
-@Table(name = "tb_inspection")
+@Table(name = "tb_inspection", indexes = {
+        @Index(name = "idx_inspection_status_cd", columnList = "status_cd")
+})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Inspection extends BaseEntity {

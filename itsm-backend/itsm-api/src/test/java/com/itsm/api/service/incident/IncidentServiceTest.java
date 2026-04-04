@@ -34,6 +34,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -134,6 +135,34 @@ class IncidentServiceTest {
         assertThat(result.getStatusCd()).isEqualTo("RECEIVED");
         assertThat(result.getSlaDeadlineAt()).isNotNull();
         verify(incidentRepository).save(any(Incident.class));
+    }
+
+    @Test
+    @DisplayName("장애 생성 시 자산 연결은 saveAll로 일괄 저장한다")
+    void create_withAssets_usesSaveAll() {
+        List<IncidentAssetRequest> assets = List.of(
+                new IncidentAssetRequest("HW", 1L),
+                new IncidentAssetRequest("SW", 2L),
+                new IncidentAssetRequest("OA", 3L)
+        );
+        IncidentCreateRequest req = new IncidentCreateRequest(
+                "서버 장애", "메인 서버 다운", "SYSTEM_DOWN", "CRITICAL",
+                LocalDateTime.of(2026, 3, 13, 10, 0), 1L, null, assets);
+
+        given(companyRepository.findById(1L)).willReturn(Optional.of(company));
+        SlaPolicy slaPolicy = SlaPolicy.builder()
+                .priorityCd("CRITICAL").deadlineHours(4).warningPct(80).build();
+        given(slaPolicyRepository.findByCompanyIdAndPriorityCd(1L, "CRITICAL")).willReturn(Optional.of(slaPolicy));
+        given(incidentRepository.save(any(Incident.class))).willAnswer(inv -> {
+            Incident saved = inv.getArgument(0);
+            ReflectionTestUtils.setField(saved, "incidentId", 2L);
+            return saved;
+        });
+
+        incidentService.create(req, 1L);
+
+        verify(incidentAssetRepository).saveAll(any());
+        verify(incidentAssetRepository, never()).save(any(IncidentAsset.class));
     }
 
     @Test

@@ -92,7 +92,13 @@ public class IncidentController {
     }
 
     @GetMapping("/{incidentId}/comments")
-    public ApiResponse<List<IncidentCommentResponse>> getComments(@PathVariable Long incidentId) {
+    public ApiResponse<?> getComments(
+            @PathVariable Long incidentId,
+            @RequestParam(required = false) Integer page,
+            Pageable pageable) {
+        if (page != null) {
+            return ApiResponse.success(incidentService.getComments(incidentId, pageable));
+        }
         return ApiResponse.success(incidentService.getComments(incidentId));
     }
 
@@ -126,7 +132,13 @@ public class IncidentController {
     }
 
     @GetMapping("/{incidentId}/history")
-    public ApiResponse<List<IncidentHistoryResponse>> getHistory(@PathVariable Long incidentId) {
+    public ApiResponse<?> getHistory(
+            @PathVariable Long incidentId,
+            @RequestParam(required = false) Integer page,
+            Pageable pageable) {
+        if (page != null) {
+            return ApiResponse.success(incidentService.getHistory(incidentId, pageable));
+        }
         return ApiResponse.success(incidentService.getHistory(incidentId));
     }
 
