@@ -69,6 +69,7 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { changeApi } from '@/api/change.js'
+import { useToast } from '@/composables/useToast.js'
 import { useCommonCodeStore } from '@/stores/commonCode.js'
 import api from '@/api/index.js'
 import BaseDatePicker from '@/components/common/BaseDatePicker.vue'
@@ -77,6 +78,7 @@ const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const commonCodeStore = useCommonCodeStore()
+const toast = useToast()
 
 const isEdit = computed(() => !!route.params.id)
 const submitting = ref(false)
@@ -107,7 +109,7 @@ const loadDetail = async () => {
     form.companyId = data.companyId
   } catch (e) {
     console.error(t('message.loadFail'), e)
-    alert(t('message.loadFail'))
+    toast.error(t('message.loadFail'))
   }
 }
 
@@ -133,7 +135,7 @@ const handleSubmit = async () => {
     }
   } catch (e) {
     console.error(t('message.saveFail'), e)
-    alert(t('message.saveFail'))
+    toast.error(t('message.saveFail'))
   } finally {
     submitting.value = false
   }

@@ -141,12 +141,16 @@ import { ref, reactive, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import { assetHwApi, assetSwApi } from '@/api/asset.js'
+import { useToast } from '@/composables/useToast.js'
+import { useConfirm } from '@/composables/useConfirm.js'
 import { useCommonCodeStore } from '@/stores/commonCode.js'
 import BaseDatePicker from '@/components/common/BaseDatePicker.vue'
 
 const { t } = useI18n()
 const route = useRoute()
 const commonCodeStore = useCommonCodeStore()
+const toast = useToast()
+const { confirm } = useConfirm()
 const assetHwId = Number(route.params.id)
 
 const asset = ref(null)
@@ -228,13 +232,13 @@ async function loadSwAssets() {
 }
 
 async function changeStatus(status) {
-  if (!confirm(t('asset.confirmStatusChange', { status: statusLabel(status) }))) return
+  if (!await confirm({ message: t('asset.confirmStatusChange', { status: statusLabel(status) }) })) return
   try {
     await assetHwApi.changeStatus(assetHwId, status)
     loadDetail()
     loadHistory()
   } catch (e) {
-    alert(e.response?.data?.error?.message || t('asset.statusChangeFail'))
+    toast.error(e.response?.data?.error?.message || t('asset.statusChangeFail'))
   }
 }
 
@@ -257,12 +261,12 @@ async function addRelation() {
 }
 
 async function removeRelation(assetSwId) {
-  if (!confirm(t('message.deleteConfirm'))) return
+  if (!await confirm({ message: t('message.deleteConfirm') })) return
   try {
     await assetHwApi.removeRelation(assetHwId, assetSwId)
     loadRelations()
   } catch (e) {
-    alert(e.response?.data?.error?.message || t('asset.unlinkFail'))
+    toast.error(e.response?.data?.error?.message || t('asset.unlinkFail'))
   }
 }
 </script>

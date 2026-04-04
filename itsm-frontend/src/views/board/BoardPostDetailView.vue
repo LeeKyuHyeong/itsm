@@ -58,6 +58,11 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { boardApi } from '@/api/board.js'
+import { useToast } from '@/composables/useToast.js'
+import { useConfirm } from '@/composables/useConfirm.js'
+
+const toast = useToast()
+const { confirm } = useConfirm()
 
 const { t } = useI18n()
 const route = useRoute()
@@ -86,7 +91,7 @@ const loadPost = async () => {
     post.value = res.data.data || res.data
   } catch (e) {
     console.error('게시글 조회 실패:', e)
-    alert(t('message.loadFail'))
+    toast.error(t('message.loadFail'))
   }
 }
 
@@ -106,7 +111,7 @@ const addComment = async () => {
     newComment.value = ''
     loadComments()
   } catch (e) {
-    alert(t('message.saveFail'))
+    toast.error(t('message.saveFail'))
   }
 }
 
@@ -121,17 +126,17 @@ const saveEditComment = async (commentId) => {
     editingCommentId.value = null
     loadComments()
   } catch (e) {
-    alert(t('message.saveFail'))
+    toast.error(t('message.saveFail'))
   }
 }
 
 const deleteComment = async (commentId) => {
-  if (!confirm(t('board.commentDeleteConfirm'))) return
+  if (!await confirm({ message: t('board.commentDeleteConfirm') })) return
   try {
     await boardApi.deleteComment(boardId, postId, commentId)
     loadComments()
   } catch (e) {
-    alert(t('message.deleteFail'))
+    toast.error(t('message.deleteFail'))
   }
 }
 
@@ -140,12 +145,12 @@ const editPost = () => {
 }
 
 const deletePost = async () => {
-  if (!confirm(t('board.deleteConfirm'))) return
+  if (!await confirm({ message: t('board.deleteConfirm') })) return
   try {
     await boardApi.deletePost(boardId, postId)
     router.push(`/boards/${boardId}`)
   } catch (e) {
-    alert(t('message.deleteFail'))
+    toast.error(t('message.deleteFail'))
   }
 }
 

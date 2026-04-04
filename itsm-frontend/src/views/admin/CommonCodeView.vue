@@ -113,74 +113,26 @@
     </div>
 
     <!-- Group Modal -->
-    <div v-if="showGroupModal" class="modal-overlay" @click.self="closeGroupModal">
-      <div class="modal-card">
-        <div class="modal-header">
-          <h2 class="modal-title">{{ editingGroup ? t('admin.codeGroupEdit') : t('admin.codeGroupAdd') }}</h2>
-          <button class="modal-close" @click="closeGroupModal">&times;</button>
-        </div>
-        <form class="modal-body" @submit.prevent="saveGroup">
-          <div class="form-group">
-            <label class="form-label">{{ t('admin.groupCode') }}</label>
-            <input v-model="groupForm.groupCd" type="text" class="form-input" :disabled="!!editingGroup" required />
-          </div>
-          <div class="form-group">
-            <label class="form-label">{{ t('admin.groupName') }}</label>
-            <input v-model="groupForm.groupNm" type="text" class="form-input" required />
-          </div>
-          <div class="form-group">
-            <label class="form-label">{{ t('admin.groupNameEn') }}</label>
-            <input v-model="groupForm.groupNmEn" type="text" class="form-input" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">{{ t('admin.description') }}</label>
-            <input v-model="groupForm.description" type="text" class="form-input" />
-          </div>
-          <div v-if="groupSaveError" class="error-message">{{ groupSaveError }}</div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" @click="closeGroupModal">{{ t('common.cancel') }}</button>
-            <button type="submit" class="btn btn-primary" :disabled="groupSaving">
-              {{ groupSaving ? t('common.saving') : t('common.save') }}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+    <CodeGroupFormModal
+      :show="showGroupModal"
+      :is-editing="!!editingGroup"
+      :form="groupForm"
+      :saving="groupSaving"
+      :error="groupSaveError"
+      @close="closeGroupModal"
+      @save="saveGroup"
+    />
 
     <!-- Detail Modal -->
-    <div v-if="showDetailModal" class="modal-overlay" @click.self="closeDetailModal">
-      <div class="modal-card">
-        <div class="modal-header">
-          <h2 class="modal-title">{{ editingDetail ? t('admin.codeEdit') : t('admin.codeAdd') }}</h2>
-          <button class="modal-close" @click="closeDetailModal">&times;</button>
-        </div>
-        <form class="modal-body" @submit.prevent="saveDetail">
-          <div class="form-group">
-            <label class="form-label">{{ t('admin.codeValue') }}</label>
-            <input v-model="detailForm.codeVal" type="text" class="form-input" :disabled="!!editingDetail" required />
-          </div>
-          <div class="form-group">
-            <label class="form-label">{{ t('admin.codeName') }}</label>
-            <input v-model="detailForm.codeNm" type="text" class="form-input" required />
-          </div>
-          <div class="form-group">
-            <label class="form-label">{{ t('admin.codeNameEn') }}</label>
-            <input v-model="detailForm.codeNmEn" type="text" class="form-input" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">{{ t('admin.sortOrder') }}</label>
-            <input v-model.number="detailForm.sortOrder" type="number" class="form-input" />
-          </div>
-          <div v-if="detailSaveError" class="error-message">{{ detailSaveError }}</div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" @click="closeDetailModal">{{ t('common.cancel') }}</button>
-            <button type="submit" class="btn btn-primary" :disabled="detailSaving">
-              {{ detailSaving ? t('common.saving') : t('common.save') }}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+    <CodeDetailFormModal
+      :show="showDetailModal"
+      :is-editing="!!editingDetail"
+      :form="detailForm"
+      :saving="detailSaving"
+      :error="detailSaveError"
+      @close="closeDetailModal"
+      @save="saveDetail"
+    />
   </div>
 </template>
 
@@ -188,6 +140,8 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { commonCodeApi } from '@/api/admin/commonCode.js'
+import CodeGroupFormModal from './components/CodeGroupFormModal.vue'
+import CodeDetailFormModal from './components/CodeDetailFormModal.vue'
 
 const { t } = useI18n()
 
@@ -529,103 +483,4 @@ async function saveDetail() {
   background-color: var(--color-bg);
 }
 
-/* Modal */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: var(--color-overlay);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal-card {
-  background: var(--color-bg-white);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-lg);
-  width: 100%;
-  max-width: 480px;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-.modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--spacing-md) var(--spacing-lg);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.modal-title {
-  font-size: var(--font-size-lg);
-  font-weight: 600;
-}
-
-.modal-close {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  color: var(--color-text-secondary);
-  line-height: 1;
-  padding: 0;
-}
-
-.modal-close:hover {
-  color: var(--color-text);
-}
-
-.modal-body {
-  padding: var(--spacing-lg);
-}
-
-.modal-body .form-group {
-  margin-bottom: var(--spacing-md);
-}
-
-.modal-body .form-label {
-  display: block;
-  font-size: var(--font-size-sm);
-  font-weight: 500;
-  color: var(--color-text);
-  margin-bottom: var(--spacing-xs);
-}
-
-.modal-body .form-input {
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  font-size: var(--font-size-sm);
-  outline: none;
-}
-
-.modal-body .form-input:focus {
-  border-color: var(--color-primary);
-}
-
-.modal-body .form-input:disabled {
-  background-color: var(--color-bg);
-}
-
-.modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--spacing-sm);
-  margin-top: var(--spacing-lg);
-}
-
-.error-message {
-  padding: 8px 12px;
-  background-color: var(--color-notice-error-bg);
-  border: 1px solid var(--color-notice-error-border);
-  border-radius: var(--radius-sm);
-  color: var(--color-danger);
-  font-size: var(--font-size-sm);
-  margin-bottom: var(--spacing-sm);
-}
 </style>

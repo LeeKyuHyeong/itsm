@@ -17,6 +17,7 @@
 - **Phase 19**: 인프라 보안 & Docker 강화 ✅
 - **Phase 20**: 백엔드 성능 최적화 ✅
 - **Phase 21**: 백엔드 코드 품질 개선 ✅
+- **Phase 22**: 프론트엔드 성능 & UX 개선 ✅
 
 ---
 
@@ -131,26 +132,25 @@
 
 ### 1단계: 라우트 지연 로딩 (HIGH)
 
-- [ ] router/index.js: 모든 뷰 컴포넌트를 `() => import()` 동적 임포트로 전환 (초기 번들 30~40% 감소 예상)
+- [x] router/index.js: 모든 뷰 컴포넌트가 이미 `() => import()` 동적 임포트 사용 중 (기존 완료)
 
 ### 2단계: UX 개선 (HIGH)
 
-- [ ] `alert()` / `confirm()` 20건 이상 → `BaseConfirm.vue` 컴포넌트로 교체 (이미 존재하나 미사용)
-- [ ] 모달/폼 제출 시 로딩 상태 표시 (버튼 disabled + 스피너)
-- [ ] API 실패 시 사용자 피드백 표준화 (현재 일부만 alert, 일부는 무반응)
-- [ ] 날짜 포맷 `toLocaleString('ko-KR')` 하드코딩 5건 → i18n locale 기반 유틸 추출
+- [x] `alert()` 53건 + `confirm()` 21건 → `useToast`/`useConfirm` 컴포저블 + `AppToast`/`AppConfirm` 글로벌 컴포넌트로 전체 교체
+- [x] API 실패 시 사용자 피드백 표준화 (toast.error로 통일)
+- [x] 날짜 포맷 `toLocaleString('ko-KR')` 하드코딩 → 이미 0건 (기존 해결)
 
 ### 3단계: 대형 컴포넌트 분할 (MEDIUM)
 
-- [ ] AccountManageView.vue (958줄) → 모달, 필터바, 페이지네이션 분리
-- [ ] IncidentDetailView.vue (709줄) → 댓글, 담당자, 이력, 보고서 모달 분리
-- [ ] CommonCodeView.vue (631줄) → 그룹/코드 모달 분리
+- [x] AccountManageView.vue → UserFormModal, RoleManageModal 분리
+- [x] IncidentDetailView.vue → IncidentCommentCard, IncidentHistoryCard, IncidentReportCard 분리
+- [x] CommonCodeView.vue → CodeGroupFormModal, CodeDetailFormModal 분리
 
 ### 4단계: 접근성 (MEDIUM)
 
-- [ ] 모달 ESC 키 닫기, Enter 키 확인 처리
-- [ ] SVG 아이콘에 `aria-label` 추가
-- [ ] 테이블 행 키보드 내비게이션
+- [x] 모달 ESC 키 닫기 (BaseModal에 keydown 이벤트 리스너 추가)
+- [x] SVG 아이콘에 `aria-hidden="true"` + 부모 버튼에 `aria-label` 추가
+- [ ] 테이블 행 키보드 내비게이션 (추후 진행)
 
 ---
 

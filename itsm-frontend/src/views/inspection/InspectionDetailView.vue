@@ -114,10 +114,14 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { inspectionApi } from '@/api/inspection.js'
+import { useToast } from '@/composables/useToast.js'
+import { useConfirm } from '@/composables/useConfirm.js'
 import BaseStatusBadge from '@/components/common/BaseStatusBadge.vue'
 
 const { t } = useI18n()
 const route = useRoute()
+const toast = useToast()
+const { confirm } = useConfirm()
 const inspectionId = route.params.id
 
 const inspection = ref({})
@@ -201,12 +205,12 @@ const loadAll = async () => {
 }
 
 const doChangeStatus = async (status) => {
-  if (!confirm(t('inspection.confirmStatusChange', { status: statusLabel(status) }))) return
+  if (!await confirm({ message: t('inspection.confirmStatusChange', { status: statusLabel(status) }) })) return
   try {
     await inspectionApi.changeStatus(inspectionId, { status })
     loadAll()
   } catch (e) {
-    alert(e.response?.data?.error || t('message.saveFail'))
+    toast.error(e.response?.data?.error || t('message.saveFail'))
   }
 }
 
@@ -222,17 +226,17 @@ const addItem = async () => {
     showAddItem.value = false
     loadAll()
   } catch (e) {
-    alert(t('message.saveFail'))
+    toast.error(t('message.saveFail'))
   }
 }
 
 const removeItem = async (itemId) => {
-  if (!confirm(t('message.deleteConfirm'))) return
+  if (!await confirm({ message: t('message.deleteConfirm') })) return
   try {
     await inspectionApi.deleteItem(inspectionId, itemId)
     loadAll()
   } catch (e) {
-    alert(t('message.deleteFail'))
+    toast.error(t('message.deleteFail'))
   }
 }
 
@@ -247,10 +251,10 @@ const saveResults = async () => {
         remark: r.remark
       })
     }
-    alert(t('message.saveSuccess'))
+    toast.success(t('message.saveSuccess'))
     loadAll()
   } catch (e) {
-    alert(t('message.saveFail'))
+    toast.error(t('message.saveFail'))
   }
 }
 

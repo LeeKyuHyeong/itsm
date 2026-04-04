@@ -36,6 +36,9 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { boardApi } from '@/api/board.js'
+import { useToast } from '@/composables/useToast.js'
+
+const toast = useToast()
 
 const { t } = useI18n()
 const route = useRoute()
@@ -62,7 +65,7 @@ const loadDetail = async () => {
     isNotice.value = data.isNotice === 'Y'
   } catch (e) {
     console.error('게시글 조회 실패:', e)
-    alert(t('message.loadFail'))
+    toast.error(t('message.loadFail'))
   }
 }
 
@@ -84,7 +87,7 @@ const handleSubmit = async () => {
     }
   } catch (e) {
     console.error('게시글 저장 실패:', e)
-    alert(t('message.saveFail'))
+    toast.error(t('message.saveFail'))
   } finally {
     submitting.value = false
   }

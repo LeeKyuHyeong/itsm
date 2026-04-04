@@ -157,6 +157,8 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { changeApi } from '@/api/change.js'
+import { useToast } from '@/composables/useToast.js'
+import { useConfirm } from '@/composables/useConfirm.js'
 import { useCommonCodeStore } from '@/stores/commonCode.js'
 import BaseStatusBadge from '@/components/common/BaseStatusBadge.vue'
 import BaseModal from '@/components/common/BaseModal.vue'
@@ -165,6 +167,8 @@ const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const commonCodeStore = useCommonCodeStore()
+const toast = useToast()
+const { confirm } = useConfirm()
 const changeId = computed(() => route.params.id)
 
 const change = ref(null)
@@ -230,7 +234,7 @@ const loadDetail = async () => {
     change.value = res.data.data || res.data
   } catch (e) {
     console.error(t('message.loadFail'), e)
-    alert(t('message.loadFail'))
+    toast.error(t('message.loadFail'))
   }
 }
 
@@ -262,13 +266,13 @@ const loadHistory = async () => {
 }
 
 const handleChangeStatus = async (status) => {
-  if (!confirm(t('change.confirmStatusChange', { status: t(`status.${status}`) }))) return
+  if (!await confirm({ message: t('change.confirmStatusChange', { status: t(`status.${status}`) }) })) return
   try {
     await changeApi.changeStatus(changeId.value, { status })
     await loadDetail()
     await loadHistory()
   } catch (e) {
-    alert(e.response?.data?.error?.message || t('message.saveFail'))
+    toast.error(e.response?.data?.error?.message || t('message.saveFail'))
   }
 }
 
@@ -281,18 +285,18 @@ const handleAddApprover = async () => {
     await loadApprovers()
     await loadDetail()
   } catch (e) {
-    alert(e.response?.data?.error?.message || t('message.saveFail'))
+    toast.error(e.response?.data?.error?.message || t('message.saveFail'))
   }
 }
 
 const handleRemoveApprover = async (userId) => {
-  if (!confirm(t('message.deleteConfirm'))) return
+  if (!await confirm({ message: t('message.deleteConfirm') })) return
   try {
     await changeApi.removeApprover(changeId.value, userId)
     await loadApprovers()
     await loadDetail()
   } catch (e) {
-    alert(t('message.deleteFail'))
+    toast.error(t('message.deleteFail'))
   }
 }
 
@@ -312,7 +316,7 @@ const submitApprove = async () => {
     showApproveModal.value = false
     await Promise.all([loadDetail(), loadApprovers(), loadHistory()])
   } catch (e) {
-    alert(e.response?.data?.error?.message || t('message.saveFail'))
+    toast.error(e.response?.data?.error?.message || t('message.saveFail'))
   }
 }
 
@@ -323,17 +327,17 @@ const handleAddComment = async () => {
     newComment.value = ''
     await loadComments()
   } catch (e) {
-    alert(t('message.saveFail'))
+    toast.error(t('message.saveFail'))
   }
 }
 
 const handleDeleteComment = async (commentId) => {
-  if (!confirm(t('message.deleteConfirm'))) return
+  if (!await confirm({ message: t('message.deleteConfirm') })) return
   try {
     await changeApi.deleteComment(changeId.value, commentId)
     await loadComments()
   } catch (e) {
-    alert(t('message.deleteFail'))
+    toast.error(t('message.deleteFail'))
   }
 }
 

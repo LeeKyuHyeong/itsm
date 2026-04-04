@@ -110,6 +110,11 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { boardApi } from '@/api/board.js'
+import { useToast } from '@/composables/useToast.js'
+import { useConfirm } from '@/composables/useConfirm.js'
+
+const toast = useToast()
+const { confirm } = useConfirm()
 
 const { t } = useI18n()
 const boards = ref([])
@@ -183,17 +188,17 @@ const handleSave = async () => {
     showModal.value = false
     loadBoards()
   } catch (e) {
-    alert(t('message.saveFail'))
+    toast.error(t('message.saveFail'))
   }
 }
 
 const handleDelete = async (boardId) => {
-  if (!confirm(t('message.deleteConfirm'))) return
+  if (!await confirm({ message: t('message.deleteConfirm') })) return
   try {
     await boardApi.deleteConfig(boardId)
     loadBoards()
   } catch (e) {
-    alert(t('message.deleteFail'))
+    toast.error(t('message.deleteFail'))
   }
 }
 

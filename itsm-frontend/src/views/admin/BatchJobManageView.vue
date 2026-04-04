@@ -110,6 +110,11 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { batchJobApi } from '@/api/admin/batchJob.js'
+import { useToast } from '@/composables/useToast.js'
+import { useConfirm } from '@/composables/useConfirm.js'
+
+const toast = useToast()
+const { confirm } = useConfirm()
 
 const { t } = useI18n()
 
@@ -168,14 +173,14 @@ function closeModal() {
 }
 
 async function executeJob(job) {
-  if (!confirm(t('admin.confirmExecute', { name: job.jobName }))) return
+  if (!await confirm({ message: t('admin.confirmExecute', { name: job.jobName }) })) return
   executingJobId.value = job.batchJobId
   try {
     await batchJobApi.execute(job.batchJobId)
-    alert(t('admin.executeRequested'))
+    toast.success(t('admin.executeRequested'))
     loadJobs()
   } catch (e) {
-    alert(e.response?.data?.message || t('admin.executeFailed'))
+    toast.error(e.response?.data?.message || t('admin.executeFailed'))
   } finally {
     executingJobId.value = null
   }

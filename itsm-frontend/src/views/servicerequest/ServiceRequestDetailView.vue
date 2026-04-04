@@ -171,6 +171,8 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { serviceRequestApi } from '@/api/servicerequest.js'
+import { useToast } from '@/composables/useToast.js'
+import { useConfirm } from '@/composables/useConfirm.js'
 import { useCommonCodeStore } from '@/stores/commonCode.js'
 import BaseStatusBadge from '@/components/common/BaseStatusBadge.vue'
 import BaseSlaBar from '@/components/common/BaseSlaBar.vue'
@@ -180,6 +182,8 @@ const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const commonCodeStore = useCommonCodeStore()
+const toast = useToast()
+const { confirm } = useConfirm()
 const requestId = computed(() => route.params.id)
 
 const sr = ref(null)
@@ -265,7 +269,7 @@ const loadDetail = async () => {
     sr.value = res.data.data || res.data
   } catch (e) {
     console.error(t('message.loadFail'), e)
-    alert(t('message.loadFail'))
+    toast.error(t('message.loadFail'))
   }
 }
 
@@ -297,13 +301,13 @@ const loadHistory = async () => {
 }
 
 const handleChangeStatus = async (status) => {
-  if (!confirm(t('serviceRequest.confirmStatusChange', { status }))) return
+  if (!await confirm({ message: t('serviceRequest.confirmStatusChange', { status }) })) return
   try {
     await serviceRequestApi.changeStatus(requestId.value, { status })
     await loadDetail()
     await loadHistory()
   } catch (e) {
-    alert(e.response?.data?.error?.message || t('message.saveFail'))
+    toast.error(e.response?.data?.error?.message || t('message.saveFail'))
   }
 }
 
@@ -316,18 +320,18 @@ const handleAssignUser = async () => {
     await loadAssignees()
     await loadDetail()
   } catch (e) {
-    alert(e.response?.data?.error?.message || t('message.saveFail'))
+    toast.error(e.response?.data?.error?.message || t('message.saveFail'))
   }
 }
 
 const handleRemoveAssignee = async (userId) => {
-  if (!confirm(t('message.deleteConfirm'))) return
+  if (!await confirm({ message: t('message.deleteConfirm') })) return
   try {
     await serviceRequestApi.removeAssignee(requestId.value, userId)
     await loadAssignees()
     await loadDetail()
   } catch (e) {
-    alert(t('message.deleteFail'))
+    toast.error(t('message.deleteFail'))
   }
 }
 
@@ -341,18 +345,18 @@ const handleAddProcess = async () => {
     processContent.value = ''
     await loadProcesses()
   } catch (e) {
-    alert(t('message.saveFail'))
+    toast.error(t('message.saveFail'))
   }
 }
 
 const handleCompleteProcess = async (processId) => {
-  if (!confirm(t('serviceRequest.confirmCompleteProcess'))) return
+  if (!await confirm({ message: t('serviceRequest.confirmCompleteProcess') })) return
   try {
     await serviceRequestApi.completeProcess(requestId.value, processId)
     await loadProcesses()
     await loadDetail()
   } catch (e) {
-    alert(t('message.saveFail'))
+    toast.error(t('message.saveFail'))
   }
 }
 
@@ -365,7 +369,7 @@ const handleSubmitSatisfaction = async () => {
     })
     await loadDetail()
   } catch (e) {
-    alert(e.response?.data?.error?.message || t('message.saveFail'))
+    toast.error(e.response?.data?.error?.message || t('message.saveFail'))
   }
 }
 

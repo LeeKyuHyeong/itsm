@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createRouter, createWebHistory } from 'vue-router'
 import { createPinia } from 'pinia'
+import { createI18n } from 'vue-i18n'
 import App from './App.vue'
 
 describe('App.vue', () => {
@@ -11,12 +12,13 @@ describe('App.vue', () => {
       history: createWebHistory(),
       routes: [{ path: '/', component: TestComponent }]
     })
+    const i18n = createI18n({ legacy: false, locale: 'ko', messages: { ko: {} } })
     router.push('/')
     await router.isReady()
 
     const wrapper = mount(App, {
       global: {
-        plugins: [router, createPinia()]
+        plugins: [router, createPinia(), i18n]
       }
     })
 

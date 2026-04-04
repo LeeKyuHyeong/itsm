@@ -95,6 +95,9 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { notificationPolicyApi } from '@/api/admin/notificationPolicy.js'
+import { useToast } from '@/composables/useToast.js'
+
+const toast = useToast()
 
 const { t } = useI18n()
 
@@ -184,7 +187,7 @@ async function toggleStatus(policy, active) {
     await notificationPolicyApi.changeStatus(policy.id, { active })
     loadPolicies()
   } catch (error) {
-    alert(error.response?.data?.message || t('admin.statusChangeError'))
+    toast.error(error.response?.data?.message || t('admin.statusChangeError'))
   }
 }
 </script>

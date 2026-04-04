@@ -76,6 +76,11 @@ import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import { assetSwApi } from '@/api/asset.js'
 import { useCommonCodeStore } from '@/stores/commonCode.js'
+import { useToast } from '@/composables/useToast.js'
+import { useConfirm } from '@/composables/useConfirm.js'
+
+const toast = useToast()
+const { confirm } = useConfirm()
 
 const { t } = useI18n()
 const route = useRoute()
@@ -135,13 +140,13 @@ async function loadHistory() {
 }
 
 async function changeStatus(status) {
-  if (!confirm(t('asset.confirmStatusChange', { status: statusLabel(status) }))) return
+  if (!await confirm({ message: t('asset.confirmStatusChange', { status: statusLabel(status) }) })) return
   try {
     await assetSwApi.changeStatus(assetSwId, status)
     loadDetail()
     loadHistory()
   } catch (e) {
-    alert(e.response?.data?.error?.message || t('asset.statusChangeFail'))
+    toast.error(e.response?.data?.error?.message || t('asset.statusChangeFail'))
   }
 }
 </script>

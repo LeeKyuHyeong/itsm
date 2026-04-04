@@ -88,61 +88,22 @@
     </div>
 
     <!-- 댓글 -->
-    <div class="detail-card">
-      <h3>{{ t('incident.comment') }}</h3>
-      <div v-if="comments.length === 0" class="empty-state">{{ t('incident.noComment') }}</div>
-      <div v-else class="comment-list">
-        <div v-for="c in comments" :key="c.commentId" class="comment-item">
-          <div class="comment-header">
-            <span class="comment-author">{{ c.createdByNm || `${t('incident.user')}#${c.createdBy}` }}</span>
-            <span class="comment-date">{{ formatDate(c.createdAt) }}</span>
-            <button class="btn-link danger" @click="handleDeleteComment(c.commentId)">{{ t('common.delete') }}</button>
-          </div>
-          <div class="comment-content">{{ c.content }}</div>
-        </div>
-      </div>
-      <div class="comment-form">
-        <textarea v-model="newComment" rows="2" :placeholder="t('incident.commentPlaceholder')"></textarea>
-        <button class="btn btn-primary btn-sm" @click="handleAddComment" :disabled="!newComment.trim()">{{ t('common.create') }}</button>
-      </div>
-    </div>
+    <IncidentCommentCard
+      :comments="comments"
+      v-model="newComment"
+      @add-comment="handleAddComment"
+      @delete-comment="handleDeleteComment"
+    />
 
     <!-- 변경 이력 타임라인 -->
-    <div class="detail-card">
-      <h3>{{ t('incident.changeHistory') }}</h3>
-      <div v-if="histories.length === 0" class="empty-state">{{ t('incident.noHistory') }}</div>
-      <div v-else class="timeline">
-        <div v-for="h in histories" :key="h.historyId" class="timeline-item">
-          <div class="timeline-dot"></div>
-          <div class="timeline-content">
-            <div class="timeline-field">{{ h.changedField }}</div>
-            <div class="timeline-change">
-              <span class="before">{{ h.beforeValue || t('incident.none') }}</span>
-              <span class="arrow">&rarr;</span>
-              <span class="after">{{ h.afterValue || t('incident.none') }}</span>
-            </div>
-            <div class="timeline-date">{{ formatDate(h.createdAt) }}</div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <IncidentHistoryCard :histories="histories" />
 
     <!-- 장애보고서 -->
-    <div class="detail-card">
-      <div class="card-header">
-        <h3>{{ t('incident.report') }}</h3>
-        <button v-if="!report" class="btn btn-sm" @click="showReportModal = true">{{ t('incident.writeReport') }}</button>
-        <button v-else class="btn btn-sm" @click="showReportModal = true">{{ t('common.edit') }}</button>
-      </div>
-      <div v-if="!report" class="empty-state">{{ t('incident.noReport') }}</div>
-      <div v-else class="report-content">
-        <pre>{{ report.reportContent }}</pre>
-        <div class="report-meta">
-          {{ t('incident.createdAt') }}: {{ formatDate(report.createdAt) }}
-          <span v-if="report.updatedAt"> | {{ t('incident.updatedAt') }}: {{ formatDate(report.updatedAt) }}</span>
-        </div>
-      </div>
-    </div>
+    <IncidentReportCard
+      :report="report"
+      v-model="reportContent"
+      @save-report="handleSaveReport"
+    />
 
     <!-- 담당자 추가 모달 -->
     <BaseModal :show="showAssigneeModal" :title="t('incident.addAssignee')" @close="showAssigneeModal = false">
@@ -168,17 +129,6 @@
       </template>
     </BaseModal>
 
-    <!-- 장애보고서 모달 -->
-    <BaseModal :show="showReportModal" :title="t('incident.writeReport')" width="640px" @close="showReportModal = false">
-      <div class="form-group">
-        <label>{{ t('incident.reportContent') }}</label>
-        <textarea v-model="reportContent" rows="10" :placeholder="t('incident.reportPlaceholder')"></textarea>
-      </div>
-      <template #footer>
-        <button class="btn btn-secondary" @click="showReportModal = false">{{ t('common.cancel') }}</button>
-        <button class="btn btn-primary" @click="handleSaveReport">{{ t('common.save') }}</button>
-      </template>
-    </BaseModal>
   </div>
 </template>
 
@@ -187,15 +137,22 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { incidentApi } from '@/api/incident.js'
+import { useToast } from '@/composables/useToast.js'
+import { useConfirm } from '@/composables/useConfirm.js'
 import { useCommonCodeStore } from '@/stores/commonCode.js'
 import BaseStatusBadge from '@/components/common/BaseStatusBadge.vue'
 import BaseSlaBar from '@/components/common/BaseSlaBar.vue'
 import BaseModal from '@/components/common/BaseModal.vue'
+import IncidentCommentCard from './components/IncidentCommentCard.vue'
+import IncidentHistoryCard from './components/IncidentHistoryCard.vue'
+import IncidentReportCard from './components/IncidentReportCard.vue'
 
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const commonCodeStore = useCommonCodeStore()
+const toast = useToast()
+const { confirm } = useConfirm()
 const incidentId = computed(() => route.params.id)
 
 const incident = ref(null)
@@ -209,7 +166,6 @@ const mainManagerId = ref(null)
 const reportContent = ref('')
 const showAssigneeModal = ref(false)
 const showAssignManagerModal = ref(false)
-const showReportModal = ref(false)
 
 const STATUS_TRANSITIONS = {
   RECEIVED: [
@@ -276,7 +232,7 @@ const loadDetail = async () => {
     incident.value = res.data.data || res.data
   } catch (e) {
     console.error('장애 조회 실패:', e)
-    alert(t('message.loadFail'))
+    toast.error(t('message.loadFail'))
   }
 }
 
@@ -317,13 +273,13 @@ const loadReport = async () => {
 }
 
 const handleChangeStatus = async (status) => {
-  if (!confirm(t('incident.confirmStatusChange', { status }))) return
+  if (!await confirm({ message: t('incident.confirmStatusChange', { status }) })) return
   try {
     await incidentApi.changeStatus(incidentId.value, { status })
     await loadDetail()
     await loadHistory()
   } catch (e) {
-    alert(e.response?.data?.error?.message || t('incident.statusChangeFail'))
+    toast.error(e.response?.data?.error?.message || t('incident.statusChangeFail'))
   }
 }
 
@@ -335,17 +291,17 @@ const handleAssignUser = async () => {
     assigneeUserId.value = null
     await loadAssignees()
   } catch (e) {
-    alert(e.response?.data?.error?.message || t('incident.assignFail'))
+    toast.error(e.response?.data?.error?.message || t('incident.assignFail'))
   }
 }
 
 const handleRemoveAssignee = async (userId) => {
-  if (!confirm(t('incident.confirmRemoveAssignee'))) return
+  if (!await confirm({ message: t('incident.confirmRemoveAssignee') })) return
   try {
     await incidentApi.removeAssignee(incidentId.value, userId)
     await loadAssignees()
   } catch (e) {
-    alert(t('incident.removeAssigneeFail'))
+    toast.error(t('incident.removeAssigneeFail'))
   }
 }
 
@@ -357,7 +313,7 @@ const handleAssignMainManager = async () => {
     mainManagerId.value = null
     await loadDetail()
   } catch (e) {
-    alert(e.response?.data?.error?.message || t('incident.changeMainManagerFail'))
+    toast.error(e.response?.data?.error?.message || t('incident.changeMainManagerFail'))
   }
 }
 
@@ -368,17 +324,17 @@ const handleAddComment = async () => {
     newComment.value = ''
     await loadComments()
   } catch (e) {
-    alert(t('incident.commentAddFail'))
+    toast.error(t('incident.commentAddFail'))
   }
 }
 
 const handleDeleteComment = async (commentId) => {
-  if (!confirm(t('incident.confirmDeleteComment'))) return
+  if (!await confirm({ message: t('incident.confirmDeleteComment') })) return
   try {
     await incidentApi.deleteComment(incidentId.value, commentId)
     await loadComments()
   } catch (e) {
-    alert(t('incident.commentDeleteFail'))
+    toast.error(t('incident.commentDeleteFail'))
   }
 }
 
@@ -390,10 +346,9 @@ const handleSaveReport = async () => {
     } else {
       await incidentApi.saveReport(incidentId.value, payload)
     }
-    showReportModal.value = false
     await loadReport()
   } catch (e) {
-    alert(e.response?.data?.error?.message || t('incident.reportSaveFail'))
+    toast.error(e.response?.data?.error?.message || t('incident.reportSaveFail'))
   }
 }
 
@@ -548,116 +503,6 @@ onMounted(async () => {
   color: var(--color-text-muted);
   font-size: var(--font-size-xs);
   flex: 1;
-}
-.comment-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-  margin-bottom: var(--spacing-md);
-}
-.comment-item {
-  padding: var(--spacing-sm);
-  background: var(--color-bg-secondary);
-  border-radius: 4px;
-}
-.comment-header {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  margin-bottom: 4px;
-  font-size: var(--font-size-xs);
-}
-.comment-author {
-  font-weight: 600;
-}
-.comment-date {
-  color: var(--color-text-muted);
-  flex: 1;
-}
-.comment-content {
-  font-size: var(--font-size-sm);
-  white-space: pre-wrap;
-}
-.comment-form {
-  display: flex;
-  gap: var(--spacing-sm);
-  align-items: flex-end;
-}
-.comment-form textarea {
-  flex: 1;
-  padding: 8px;
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
-  font-size: var(--font-size-sm);
-  resize: none;
-}
-.timeline {
-  position: relative;
-  padding-left: 20px;
-}
-.timeline::before {
-  content: '';
-  position: absolute;
-  left: 6px;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: var(--color-border);
-}
-.timeline-item {
-  position: relative;
-  padding-bottom: var(--spacing-md);
-}
-.timeline-dot {
-  position: absolute;
-  left: -17px;
-  top: 4px;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--color-primary);
-}
-.timeline-content {
-  padding-left: var(--spacing-sm);
-}
-.timeline-field {
-  font-weight: 600;
-  font-size: var(--font-size-sm);
-  margin-bottom: 2px;
-}
-.timeline-change {
-  font-size: var(--font-size-sm);
-  display: flex;
-  gap: var(--spacing-xs);
-  align-items: center;
-}
-.timeline-change .before {
-  color: var(--color-priority-critical);
-  text-decoration: line-through;
-}
-.timeline-change .after {
-  color: var(--color-priority-low);
-  font-weight: 600;
-}
-.timeline-change .arrow {
-  color: var(--color-text-muted);
-}
-.timeline-date {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-muted);
-  margin-top: 2px;
-}
-.report-content pre {
-  background: var(--color-bg-secondary);
-  padding: var(--spacing-md);
-  border-radius: 4px;
-  white-space: pre-wrap;
-  font-size: var(--font-size-sm);
-}
-.report-meta {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-muted);
-  margin-top: var(--spacing-xs);
 }
 .empty-state {
   text-align: center;

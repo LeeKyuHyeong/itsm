@@ -148,110 +148,31 @@
     </div>
 
     <!-- Create/Edit Modal -->
-    <div v-if="showUserModal" class="modal-overlay" @click.self="closeUserModal">
-      <div class="modal-card">
-        <div class="modal-header">
-          <h2 class="modal-title">{{ isEditing ? t('admin.userEdit') : t('admin.userAdd') }}</h2>
-          <button class="modal-close" @click="closeUserModal">&times;</button>
-        </div>
-        <form class="modal-body" @submit.prevent="saveUser">
-          <div class="form-group">
-            <label class="form-label">{{ t('admin.loginId') }}</label>
-            <input
-              v-model="userForm.loginId"
-              type="text"
-              class="form-input"
-              :disabled="isEditing"
-              required
-            />
-          </div>
-          <div class="form-group">
-            <label class="form-label">{{ t('admin.name') }}</label>
-            <input v-model="userForm.name" type="text" class="form-input" required />
-          </div>
-          <div class="form-group">
-            <label class="form-label">{{ t('admin.email') }}</label>
-            <input v-model="userForm.email" type="email" class="form-input" required />
-          </div>
-          <div v-if="!isEditing" class="form-group">
-            <label class="form-label">{{ t('admin.password') }}</label>
-            <input v-model="userForm.password" type="password" class="form-input" required />
-          </div>
-          <div class="form-group">
-            <label class="form-label">{{ t('admin.phone') }}</label>
-            <input v-model="userForm.phone" type="text" class="form-input" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">{{ t('admin.company') }}</label>
-            <select v-model="userForm.companyId" class="form-input" @change="loadDepartments">
-              <option value="">{{ t('common.select') }}</option>
-              <option v-for="c in companies" :key="c.id" :value="c.id">{{ c.name }}</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">{{ t('admin.department') }}</label>
-            <select v-model="userForm.departmentId" class="form-input">
-              <option value="">{{ t('common.select') }}</option>
-              <option v-for="d in departments" :key="d.id" :value="d.id">{{ d.name }}</option>
-            </select>
-          </div>
-          <div v-if="saveError" class="error-message">{{ saveError }}</div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" @click="closeUserModal">{{ t('common.cancel') }}</button>
-            <button type="submit" class="btn btn-primary" :disabled="saving">
-              {{ saving ? t('common.saving') : t('common.save') }}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+    <UserFormModal
+      :show="showUserModal"
+      :is-editing="isEditing"
+      :form="userForm"
+      :companies="companies"
+      :departments="departments"
+      :saving="saving"
+      :error="saveError"
+      @close="closeUserModal"
+      @save="saveUser"
+      @load-departments="onLoadDepartments"
+      @update:form="onUpdateUserForm"
+    />
 
     <!-- Role Assignment Modal -->
-    <div v-if="showRoleModal" class="modal-overlay" @click.self="closeRoleModal">
-      <div class="modal-card">
-        <div class="modal-header">
-          <h2 class="modal-title">{{ t('admin.roleManage') }} - {{ roleTarget?.name }}</h2>
-          <button class="modal-close" @click="closeRoleModal">&times;</button>
-        </div>
-        <div class="modal-body">
-          <div class="role-section">
-            <h3 class="role-section-title">{{ t('admin.currentRoles') }}</h3>
-            <div v-if="roleTarget?.roles?.length" class="role-list">
-              <div v-for="role in roleTarget.roles" :key="role" class="role-item">
-                <span class="role-tag">{{ roleLabel(role) }}</span>
-                <button class="btn btn-sm btn-danger" @click="removeRoleFromUser(role)">{{ t('common.delete') }}</button>
-              </div>
-            </div>
-            <p v-else class="text-secondary">{{ t('admin.noRolesAssigned') }}</p>
-          </div>
-
-          <div class="role-section">
-            <h3 class="role-section-title">{{ t('admin.addRole') }}</h3>
-            <div class="role-add-row">
-              <select v-model="newRole" class="form-input">
-                <option value="">{{ t('admin.selectRole') }}</option>
-                <option
-                  v-for="(label, key) in availableRoles"
-                  :key="key"
-                  :value="key"
-                >
-                  {{ label }}
-                </option>
-              </select>
-              <button
-                class="btn btn-primary"
-                :disabled="!newRole"
-                @click="addRoleToUser"
-              >
-                {{ t('common.add') }}
-              </button>
-            </div>
-          </div>
-
-          <div v-if="roleError" class="error-message">{{ roleError }}</div>
-        </div>
-      </div>
-    </div>
+    <RoleManageModal
+      :show="showRoleModal"
+      :user="roleTarget"
+      :available-roles="availableRoles"
+      :saving="false"
+      :error="roleError"
+      @close="closeRoleModal"
+      @add-role="addRoleToUser"
+      @remove-role="removeRoleFromUser"
+    />
   </div>
 </template>
 
@@ -261,6 +182,13 @@ import { useI18n } from 'vue-i18n'
 import { userApi } from '@/api/user.js'
 import { companyApi } from '@/api/company.js'
 import { ROLES } from '@/constants/roles.js'
+import { useToast } from '@/composables/useToast.js'
+import { useConfirm } from '@/composables/useConfirm.js'
+import UserFormModal from './components/UserFormModal.vue'
+import RoleManageModal from './components/RoleManageModal.vue'
+
+const toast = useToast()
+const { confirm } = useConfirm()
 
 const { t, te } = useI18n()
 
@@ -437,6 +365,15 @@ async function loadDepartments() {
   }
 }
 
+function onLoadDepartments(companyId) {
+  userForm.companyId = companyId
+  loadDepartments()
+}
+
+function onUpdateUserForm(newForm) {
+  Object.assign(userForm, newForm)
+}
+
 function goToPage(page) {
   if (page < 1 || page > totalPages.value) return
   pagination.page = page
@@ -509,13 +446,13 @@ async function saveUser() {
 
 async function changeUserStatus(user, newStatus) {
   const statusText = statusLabel(newStatus)
-  if (!confirm(t('admin.confirmStatusChange', { name: user.name, status: statusText }))) return
+  if (!await confirm({ message: t('admin.confirmStatusChange', { name: user.name, status: statusText }) })) return
 
   try {
     await userApi.changeStatus(user.id, { status: newStatus })
     loadUsers()
   } catch (error) {
-    alert(error.response?.data?.message || t('admin.statusChangeError'))
+    toast.error(error.response?.data?.message || t('admin.statusChangeError'))
   }
 }
 
@@ -531,14 +468,15 @@ function closeRoleModal() {
   roleTarget.value = null
 }
 
-async function addRoleToUser() {
-  if (!newRole.value || !roleTarget.value) return
+async function addRoleToUser(roleCode) {
+  const role = roleCode || newRole.value
+  if (!role || !roleTarget.value) return
   roleError.value = ''
   try {
-    await userApi.assignRole(roleTarget.value.id, { role: newRole.value })
+    await userApi.assignRole(roleTarget.value.id, { role })
     // Update local state
     if (!roleTarget.value.roles) roleTarget.value.roles = []
-    roleTarget.value.roles.push(newRole.value)
+    roleTarget.value.roles.push(role)
     newRole.value = ''
     loadUsers()
   } catch (error) {
@@ -548,7 +486,7 @@ async function addRoleToUser() {
 
 async function removeRoleFromUser(role) {
   if (!roleTarget.value) return
-  if (!confirm(t('message.deleteConfirm'))) return
+  if (!await confirm({ message: t('message.deleteConfirm') })) return
   roleError.value = ''
   try {
     await userApi.removeRole(roleTarget.value.id, role)
@@ -815,144 +753,4 @@ async function removeRoleFromUser(role) {
   cursor: not-allowed;
 }
 
-/* Modal */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: var(--color-overlay);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal-card {
-  background: var(--color-bg-white);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-lg);
-  width: 100%;
-  max-width: 500px;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-.modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--spacing-md) var(--spacing-lg);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.modal-title {
-  font-size: var(--font-size-lg);
-  font-weight: 600;
-}
-
-.modal-close {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  color: var(--color-text-secondary);
-  line-height: 1;
-  padding: 0;
-}
-
-.modal-close:hover {
-  color: var(--color-text);
-}
-
-.modal-body {
-  padding: var(--spacing-lg);
-}
-
-.modal-body .form-group {
-  margin-bottom: var(--spacing-md);
-}
-
-.modal-body .form-label {
-  display: block;
-  font-size: var(--font-size-sm);
-  font-weight: 500;
-  color: var(--color-text);
-  margin-bottom: var(--spacing-xs);
-}
-
-.modal-body .form-input {
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  font-size: var(--font-size-sm);
-  outline: none;
-}
-
-.modal-body .form-input:focus {
-  border-color: var(--color-primary);
-}
-
-.modal-body .form-input:disabled {
-  background-color: var(--color-bg);
-}
-
-.modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--spacing-sm);
-  margin-top: var(--spacing-lg);
-}
-
-.error-message {
-  padding: 8px 12px;
-  background-color: var(--color-notice-error-bg);
-  border: 1px solid var(--color-notice-error-border);
-  border-radius: var(--radius-sm);
-  color: var(--color-danger);
-  font-size: var(--font-size-sm);
-  margin-bottom: var(--spacing-sm);
-}
-
-/* Role Modal Specific */
-.role-section {
-  margin-bottom: var(--spacing-lg);
-}
-
-.role-section-title {
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-  color: var(--color-text);
-  margin-bottom: var(--spacing-sm);
-}
-
-.role-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-}
-
-.role-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 6px 10px;
-  background-color: var(--color-bg);
-  border-radius: var(--radius-sm);
-}
-
-.role-add-row {
-  display: flex;
-  gap: var(--spacing-sm);
-}
-
-.role-add-row .form-input {
-  flex: 1;
-  padding: 6px 10px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  font-size: var(--font-size-sm);
-  outline: none;
-}
 </style>

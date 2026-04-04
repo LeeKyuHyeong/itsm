@@ -32,6 +32,9 @@ import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import { reportApi } from '@/api/report.js'
+import { useToast } from '@/composables/useToast.js'
+
+const toast = useToast()
 
 const { t } = useI18n()
 const route = useRoute()
@@ -60,7 +63,7 @@ onMounted(async () => {
     report.value = res.data.data || res.data
   } catch (e) {
     console.error('loadReport failed:', e)
-    alert(t('message.loadFail'))
+    toast.error(t('message.loadFail'))
   }
 })
 </script>

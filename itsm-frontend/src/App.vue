@@ -3,6 +3,8 @@
     <router-view />
   </AppLayout>
   <router-view v-else />
+  <AppToast />
+  <AppConfirm />
 </template>
 
 <script setup>
@@ -10,6 +12,8 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.js'
 import AppLayout from '@/components/layout/AppLayout.vue'
+import AppToast from '@/components/common/AppToast.vue'
+import AppConfirm from '@/components/common/AppConfirm.vue'
 
 const route = useRoute()
 const authStore = useAuthStore()
