@@ -26,6 +26,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { boardApi } from '@/api/board.js'
+import { formatDate } from '@/utils/date.js'
 import BaseTable from '@/components/common/BaseTable.vue'
 import BasePagination from '@/components/common/BasePagination.vue'
 
@@ -48,14 +49,6 @@ const columns = computed(() => [
   { key: 'createdAt', label: t('board.createdAt'), width: '150px' }
 ])
 
-const formatDate = (dateStr) => {
-  if (!dateStr) return '-'
-  return new Date(dateStr).toLocaleString('ko-KR', {
-    year: 'numeric', month: '2-digit', day: '2-digit',
-    hour: '2-digit', minute: '2-digit'
-  })
-}
-
 const fetchPosts = async () => {
   loading.value = true
   try {
@@ -68,7 +61,7 @@ const fetchPosts = async () => {
       boardConfig.value = { boardNm: posts.value[0].boardNm }
     }
   } catch (e) {
-    console.error('게시글 목록 조회 실패:', e)
+    console.error('Failed to load posts:', e)
   } finally {
     loading.value = false
   }
@@ -90,7 +83,7 @@ onMounted(async () => {
     const config = (configs || []).find(c => String(c.boardId) === String(boardId))
     if (config) boardConfig.value = config
   } catch (e) {
-    console.error('게시판 설정 조회 실패:', e)
+    console.error('Failed to load board config:', e)
   }
   fetchPosts()
 })

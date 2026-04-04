@@ -183,7 +183,7 @@ async function loadMenus() {
       menus.value = list
     }
   } catch (error) {
-    console.error('메뉴 목록 로드 실패:', error)
+    console.error('Failed to load menus:', error)
     menus.value = []
   } finally {
     loading.value = false

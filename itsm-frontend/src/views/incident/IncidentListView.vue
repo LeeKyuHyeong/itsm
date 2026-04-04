@@ -60,6 +60,7 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { incidentApi } from '@/api/incident.js'
+import { formatDate } from '@/utils/date.js'
 import { useCommonCodeStore } from '@/stores/commonCode.js'
 import BaseTable from '@/components/common/BaseTable.vue'
 import BasePagination from '@/components/common/BasePagination.vue'
@@ -100,14 +101,6 @@ const priorityLabel = (code) => {
   return t(`priority.${code}`, code)
 }
 
-const formatDate = (dateStr) => {
-  if (!dateStr) return '-'
-  return new Date(dateStr).toLocaleString('ko-KR', {
-    year: 'numeric', month: '2-digit', day: '2-digit',
-    hour: '2-digit', minute: '2-digit'
-  })
-}
-
 const fetchList = async () => {
   loading.value = true
   try {
@@ -123,7 +116,7 @@ const fetchList = async () => {
     totalPages.value = data.totalPages || 0
     totalElements.value = data.totalElements || 0
   } catch (e) {
-    console.error('장애 목록 조회 실패:', e)
+    console.error('Failed to load incident list:', e)
   } finally {
     loading.value = false
   }
@@ -148,7 +141,7 @@ onMounted(async () => {
     const codes = await commonCodeStore.fetchCodes('INCIDENT_TYPE')
     incidentTypes.value = codes || []
   } catch (e) {
-    console.error('공통코드 조회 실패:', e)
+    console.error('Failed to load common codes:', e)
   }
   fetchList()
 })

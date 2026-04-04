@@ -151,7 +151,7 @@ const loadBoards = async () => {
     const res = await boardApi.getConfigs()
     boards.value = (res.data.data || res.data) || []
   } catch (e) {
-    console.error('게시판 목록 조회 실패:', e)
+    console.error('Failed to load board list:', e)
   }
 }
 

@@ -108,7 +108,7 @@ const loadDetail = async () => {
     form.companyId = data.companyId
     form.processContent = data.processContent || ''
   } catch (e) {
-    console.error('장애 조회 실패:', e)
+    console.error('Failed to load incident:', e)
     toast.error(t('message.loadFail'))
   }
 }
@@ -134,7 +134,7 @@ const handleSubmit = async () => {
       router.push(`/incidents/${data.incidentId}`)
     }
   } catch (e) {
-    console.error('장애 저장 실패:', e)
+    console.error('Failed to save incident:', e)
     toast.error(t('message.saveFail'))
   } finally {
     submitting.value = false
@@ -146,7 +146,7 @@ onMounted(async () => {
     const codes = await commonCodeStore.fetchCodes('INCIDENT_TYPE')
     incidentTypes.value = codes || []
   } catch (e) {
-    console.error('공통코드 조회 실패:', e)
+    console.error('Failed to load common codes:', e)
   }
   if (!isEdit.value) {
     try {
@@ -154,7 +154,7 @@ onMounted(async () => {
       const data = res.data.data || res.data
       companies.value = data.content || data || []
     } catch (e) {
-      console.error('고객사 조회 실패:', e)
+      console.error('Failed to load companies:', e)
     }
   }
   loadDetail()

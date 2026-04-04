@@ -114,6 +114,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { inspectionApi } from '@/api/inspection.js'
+import { formatDate } from '@/utils/date.js'
 import { useToast } from '@/composables/useToast.js'
 import { useConfirm } from '@/composables/useConfirm.js'
 import BaseStatusBadge from '@/components/common/BaseStatusBadge.vue'
@@ -153,14 +154,6 @@ const canEditItems = computed(() => ['SCHEDULED', 'ON_HOLD'].includes(inspection
 const isInProgress = computed(() => inspection.value.statusCd === 'IN_PROGRESS')
 
 const statusLabel = (s) => STATUS_LABELS[s] || s
-
-const formatDate = (dateStr) => {
-  if (!dateStr) return '-'
-  return new Date(dateStr).toLocaleString('ko-KR', {
-    year: 'numeric', month: '2-digit', day: '2-digit',
-    hour: '2-digit', minute: '2-digit'
-  })
-}
 
 const getResultValue = (itemId) => {
   const r = results.value.find(r => r.itemId === itemId)

@@ -58,6 +58,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { boardApi } from '@/api/board.js'
+import { formatDate } from '@/utils/date.js'
 import { useToast } from '@/composables/useToast.js'
 import { useConfirm } from '@/composables/useConfirm.js'
 
@@ -77,20 +78,12 @@ const allowComment = ref(true)
 const editingCommentId = ref(null)
 const editCommentContent = ref('')
 
-const formatDate = (dateStr) => {
-  if (!dateStr) return '-'
-  return new Date(dateStr).toLocaleString('ko-KR', {
-    year: 'numeric', month: '2-digit', day: '2-digit',
-    hour: '2-digit', minute: '2-digit'
-  })
-}
-
 const loadPost = async () => {
   try {
     const res = await boardApi.getPost(boardId, postId)
     post.value = res.data.data || res.data
   } catch (e) {
-    console.error('게시글 조회 실패:', e)
+    console.error('Failed to load post:', e)
     toast.error(t('message.loadFail'))
   }
 }
@@ -100,7 +93,7 @@ const loadComments = async () => {
     const res = await boardApi.getComments(boardId, postId)
     comments.value = (res.data.data || res.data) || []
   } catch (e) {
-    console.error('댓글 조회 실패:', e)
+    console.error('Failed to load comments:', e)
   }
 }
 

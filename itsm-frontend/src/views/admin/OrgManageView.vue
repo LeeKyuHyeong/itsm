@@ -243,7 +243,7 @@ async function loadCompanies() {
       phone: c.tel ?? c.phone ?? ''
     }))
   } catch (error) {
-    console.error('회사 목록 로드 실패:', error)
+    console.error('Failed to load company list:', error)
     companies.value = []
   } finally {
     loadingCompanies.value = false
@@ -270,7 +270,7 @@ async function loadDepartments() {
       parentName: d.parentDeptNm ?? d.parentName ?? ''
     }))
   } catch (error) {
-    console.error('부서 목록 로드 실패:', error)
+    console.error('Failed to load departments:', error)
     departments.value = []
   } finally {
     loadingDepts.value = false

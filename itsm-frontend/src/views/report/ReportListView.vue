@@ -34,6 +34,7 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { reportApi } from '@/api/report.js'
+import { formatDate } from '@/utils/date.js'
 import BaseTable from '@/components/common/BaseTable.vue'
 import BasePagination from '@/components/common/BasePagination.vue'
 
@@ -58,14 +59,6 @@ const columns = computed(() => [
   { key: 'refId', label: t('report.refId'), width: '80px', align: 'center' },
   { key: 'createdAt', label: t('report.createdAt'), width: '150px' }
 ])
-
-const formatDate = (dateStr) => {
-  if (!dateStr) return '-'
-  return new Date(dateStr).toLocaleString('ko-KR', {
-    year: 'numeric', month: '2-digit', day: '2-digit',
-    hour: '2-digit', minute: '2-digit'
-  })
-}
 
 const fetchList = async () => {
   loading.value = true

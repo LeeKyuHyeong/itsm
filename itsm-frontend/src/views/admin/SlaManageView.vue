@@ -127,7 +127,7 @@ async function loadSlaList() {
       active: s.isActive === 'Y' || s.isActive === true || (s.active !== false && s.isActive !== 'N')
     }))
   } catch (error) {
-    console.error('SLA 목록 로드 실패:', error)
+    console.error('Failed to load SLA list:', error)
     slaList.value = []
   } finally {
     loading.value = false
@@ -145,7 +145,7 @@ async function loadCompanies() {
       name: c.companyNm ?? c.name ?? ''
     }))
   } catch (error) {
-    console.error('회사 목록 로드 실패:', error)
+    console.error('Failed to load company list:', error)
   }
 }
 

@@ -133,7 +133,7 @@ async function loadPolicies() {
       active: p.isActive === 'Y' || p.isActive === true || (p.active !== false && p.isActive !== 'N')
     }))
   } catch (error) {
-    console.error('알림 정책 목록 로드 실패:', error)
+    console.error('Failed to load notification policies:', error)
     policies.value = []
   } finally {
     loading.value = false

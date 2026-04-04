@@ -19,7 +19,7 @@ export const useNotificationStore = defineStore('notification', () => {
       const result = data.data || {}
       notifications.value = result.content || result.items || result || []
     } catch (e) {
-      console.error('알림 목록 로드 실패:', e)
+      console.error('Failed to load notifications:', e)
     }
   }
 
@@ -36,7 +36,7 @@ export const useNotificationStore = defineStore('notification', () => {
         }
       })
     } catch (e) {
-      console.error('미읽은 알림 조회 실패:', e)
+      console.error('Failed to load unread notifications:', e)
     }
   }
 

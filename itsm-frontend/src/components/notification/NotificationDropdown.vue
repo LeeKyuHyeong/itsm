@@ -84,7 +84,7 @@ async function handleClickNotification(noti) {
       await notificationApi.markAsRead(noti.id)
       notificationStore.markAsRead(noti.id)
     } catch (e) {
-      console.error('알림 읽음 처리 실패:', e)
+      console.error('Failed to mark notification as read:', e)
     }
   }
   const safeLink = buildSafeRefLink(noti.refType, noti.refId)
@@ -99,7 +99,7 @@ async function handleMarkAllAsRead() {
     await notificationApi.markAllAsRead()
     notificationStore.markAllAsRead()
   } catch (e) {
-    console.error('전체 읽음 처리 실패:', e)
+    console.error('Failed to mark all as read:', e)
   }
 }
 

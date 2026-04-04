@@ -171,6 +171,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { serviceRequestApi } from '@/api/servicerequest.js'
+import { formatDate } from '@/utils/date.js'
 import { useToast } from '@/composables/useToast.js'
 import { useConfirm } from '@/composables/useConfirm.js'
 import { useCommonCodeStore } from '@/stores/commonCode.js'
@@ -253,14 +254,6 @@ const slaUrgency = computed(() => {
 const processStatusLabel = (status) => {
   const map = { PENDING: t('status.PENDING'), IN_PROGRESS: t('status.IN_PROGRESS'), COMPLETED: t('status.COMPLETED') }
   return map[status] || status
-}
-
-const formatDate = (dateStr) => {
-  if (!dateStr) return '-'
-  return new Date(dateStr).toLocaleString('ko-KR', {
-    year: 'numeric', month: '2-digit', day: '2-digit',
-    hour: '2-digit', minute: '2-digit'
-  })
 }
 
 const loadDetail = async () => {

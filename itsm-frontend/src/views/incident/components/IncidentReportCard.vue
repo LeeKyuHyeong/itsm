@@ -31,6 +31,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { formatDate } from '@/utils/date.js'
 import BaseModal from '@/components/common/BaseModal.vue'
 
 const { t } = useI18n()
@@ -53,14 +54,6 @@ const showModal = ref(false)
 const handleSave = () => {
   emit('save-report')
   showModal.value = false
-}
-
-const formatDate = (dateStr) => {
-  if (!dateStr) return '-'
-  return new Date(dateStr).toLocaleString('ko-KR', {
-    year: 'numeric', month: '2-digit', day: '2-digit',
-    hour: '2-digit', minute: '2-digit'
-  })
 }
 </script>
 

@@ -137,6 +137,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { incidentApi } from '@/api/incident.js'
+import { formatDate } from '@/utils/date.js'
 import { useToast } from '@/composables/useToast.js'
 import { useConfirm } from '@/composables/useConfirm.js'
 import { useCommonCodeStore } from '@/stores/commonCode.js'
@@ -218,20 +219,12 @@ const priorityLabel = (code) => {
   return t(`priority.${code}`, code)
 }
 
-const formatDate = (dateStr) => {
-  if (!dateStr) return '-'
-  return new Date(dateStr).toLocaleString('ko-KR', {
-    year: 'numeric', month: '2-digit', day: '2-digit',
-    hour: '2-digit', minute: '2-digit'
-  })
-}
-
 const loadDetail = async () => {
   try {
     const res = await incidentApi.getDetail(incidentId.value)
     incident.value = res.data.data || res.data
   } catch (e) {
-    console.error('장애 조회 실패:', e)
+    console.error('Failed to load incident:', e)
     toast.error(t('message.loadFail'))
   }
 }

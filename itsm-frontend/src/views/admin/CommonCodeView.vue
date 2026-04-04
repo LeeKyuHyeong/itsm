@@ -196,7 +196,7 @@ async function loadGroups() {
       active: g.isActive === 'Y' || g.isActive === true || (g.active !== false && g.isActive !== 'N')
     }))
   } catch (error) {
-    console.error('코드그룹 목록 로드 실패:', error)
+    console.error('Failed to load code groups:', error)
     groups.value = []
   } finally {
     loadingGroups.value = false
@@ -220,7 +220,7 @@ async function loadDetails() {
       active: d.isActive === 'Y' || d.isActive === true || (d.active !== false && d.isActive !== 'N')
     }))
   } catch (error) {
-    console.error('코드상세 목록 로드 실패:', error)
+    console.error('Failed to load code details:', error)
     details.value = []
   } finally {
     loadingDetails.value = false

@@ -32,6 +32,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import { reportApi } from '@/api/report.js'
+import { formatDate } from '@/utils/date.js'
 import { useToast } from '@/composables/useToast.js'
 
 const toast = useToast()
@@ -48,14 +49,6 @@ const formattedContent = computed(() => {
     return report.value.reportContent
   }
 })
-
-const formatDate = (dateStr) => {
-  if (!dateStr) return '-'
-  return new Date(dateStr).toLocaleString('ko-KR', {
-    year: 'numeric', month: '2-digit', day: '2-digit',
-    hour: '2-digit', minute: '2-digit'
-  })
-}
 
 onMounted(async () => {
   try {

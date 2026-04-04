@@ -305,7 +305,7 @@ async function loadUsers() {
     }))
     pagination.total = result.totalElements || result.total || 0
   } catch (error) {
-    console.error('사용자 목록 로드 실패:', error)
+    console.error('Failed to load user list:', error)
     users.value = []
   } finally {
     loading.value = false
@@ -323,7 +323,7 @@ async function loadCompanies() {
       name: c.companyNm ?? c.name ?? ''
     }))
   } catch (error) {
-    console.error('회사 목록 로드 실패:', error)
+    console.error('Failed to load company list:', error)
   }
 }
 
@@ -345,7 +345,7 @@ async function loadAllDepartments() {
     const deptArrays = await Promise.all(deptPromises)
     allDepartments.value = deptArrays.flat()
   } catch (error) {
-    console.error('부서 전체 목록 로드 실패:', error)
+    console.error('Failed to load all departments:', error)
   }
 }
 
@@ -361,7 +361,7 @@ async function loadDepartments() {
       name: d.deptNm ?? d.name ?? ''
     }))
   } catch (error) {
-    console.error('부서 목록 로드 실패:', error)
+    console.error('Failed to load departments:', error)
   }
 }
 

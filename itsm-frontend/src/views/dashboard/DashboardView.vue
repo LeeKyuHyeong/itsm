@@ -198,6 +198,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import api from '@/api/index.js'
+import { formatDate } from '@/utils/date.js'
 import { assetStatApi } from '@/api/asset.js'
 import BaseTable from '@/components/common/BaseTable.vue'
 import BaseStatusBadge from '@/components/common/BaseStatusBadge.vue'
@@ -236,14 +237,6 @@ const barWidth = (count) => {
   return pct + '%'
 }
 
-const formatDate = (dateStr) => {
-  if (!dateStr) return '-'
-  return new Date(dateStr).toLocaleString('ko-KR', {
-    year: 'numeric', month: '2-digit', day: '2-digit',
-    hour: '2-digit', minute: '2-digit'
-  })
-}
-
 const goDetail = (row) => {
   router.push(`/incidents/${row.incidentId}`)
 }
@@ -254,7 +247,7 @@ const loadStats = async () => {
     const res = await api.get('/dashboard/stats')
     stats.value = res.data.data || res.data
   } catch (e) {
-    console.error('대시보드 조회 실패:', e)
+    console.error('Failed to load dashboard:', e)
   } finally {
     loading.value = false
   }
@@ -265,7 +258,7 @@ const loadAssetStats = async () => {
     const res = await assetStatApi.getStats()
     assetStats.value = res.data.data || res.data
   } catch (e) {
-    console.error('자산 통계 조회 실패:', e)
+    console.error('Failed to load asset statistics:', e)
   }
 }
 

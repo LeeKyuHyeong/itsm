@@ -62,6 +62,7 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { serviceRequestApi } from '@/api/servicerequest.js'
+import { formatDate } from '@/utils/date.js'
 import { useCommonCodeStore } from '@/stores/commonCode.js'
 import BaseTable from '@/components/common/BaseTable.vue'
 import BasePagination from '@/components/common/BasePagination.vue'
@@ -96,14 +97,6 @@ const columns = computed(() => [
   { key: 'slaPercentage', label: 'SLA', width: '140px' },
   { key: 'occurredAt', label: t('incident.occurredAt'), width: '150px' }
 ])
-
-const formatDate = (dateStr) => {
-  if (!dateStr) return '-'
-  return new Date(dateStr).toLocaleString('ko-KR', {
-    year: 'numeric', month: '2-digit', day: '2-digit',
-    hour: '2-digit', minute: '2-digit'
-  })
-}
 
 const fetchList = async () => {
   loading.value = true

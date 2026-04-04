@@ -47,7 +47,7 @@ export const useCommonCodeStore = defineStore('commonCode', () => {
         nameEn: d.codeNmEn || ''
       }))
     } catch (e) {
-      console.error(`공통코드 로드 실패: ${groupCd}`, e)
+      console.error(`Failed to load common codes: ${groupCd}`, e)
     }
   }
 

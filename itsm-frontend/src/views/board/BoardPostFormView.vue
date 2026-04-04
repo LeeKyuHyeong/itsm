@@ -64,7 +64,7 @@ const loadDetail = async () => {
     form.value.content = data.content
     isNotice.value = data.isNotice === 'Y'
   } catch (e) {
-    console.error('게시글 조회 실패:', e)
+    console.error('Failed to load post:', e)
     toast.error(t('message.loadFail'))
   }
 }
@@ -86,7 +86,7 @@ const handleSubmit = async () => {
       router.push(`/boards/${boardId}/posts/${data.postId}`)
     }
   } catch (e) {
-    console.error('게시글 저장 실패:', e)
+    console.error('Failed to save post:', e)
     toast.error(t('message.saveFail'))
   } finally {
     submitting.value = false

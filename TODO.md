@@ -18,6 +18,7 @@
 - **Phase 20**: 백엔드 성능 최적화 ✅
 - **Phase 21**: 백엔드 코드 품질 개선 ✅
 - **Phase 22**: 프론트엔드 성능 & UX 개선 ✅
+- **Phase 23**: i18n 완성 ✅
 
 ---
 
@@ -158,11 +159,11 @@
 
 > 하드코딩된 한국어 문자열 제거, 번역 누락 보완.
 
-- [ ] `constants/roles.js`: `ROLE_LABEL` 한국어 → i18n 키로 전환
-- [ ] `constants/status.js`: 전체 상태 레이블 (접수, 처리중, 완료 등) → i18n 키로 전환
-- [ ] `i18n/locales/en.js` 번역 누락 보완 (현재 약 100줄, 불완전)
-- [ ] 에러 메시지 다국어 처리
-- [ ] 날짜 포맷 locale 기반 통일 (Phase 22 2단계와 연계)
+- [x] `constants/roles.js`: `ROLE_LABEL` 한국어 제거 → `getRoleLabel(t, code)` i18n 함수로 전환
+- [x] `constants/status.js`: 전체 `*_LABEL` 객체 제거 → `getStatusLabel(t, code)` i18n 함수로 전환
+- [x] `i18n/locales/en.js` 번역 누락 보완 (630줄, ko.js 645줄과 동등 수준 확인)
+- [x] console.error 한국어 메시지 33건 → 영어로 통일 (17개 파일)
+- [x] 날짜 포맷 `toLocaleString('ko-KR')` 하드코딩 16건 → `formatDate()` locale 기반 유틸 추출
 
 ---
 
