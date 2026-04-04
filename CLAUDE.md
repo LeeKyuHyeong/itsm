@@ -27,3 +27,25 @@
 - 프론트엔드 UI 작업 시 두 테마 모두에서 정상 표시되는지 확인한다. CSS 변수(`var(--color-*)`)를 사용하고, 하드코딩된 색상값을 쓰지 않는다.
 - 사용자에게 보이는 모든 텍스트는 i18n 키(`t('...')`)를 사용한다. 하드코딩된 한국어/영어 문자열을 직접 넣지 않는다.
 - DB에서 관리되는 데이터(메뉴명, 공통코드, 게시판명, 배치명 등)는 `_en` 접미사 컬럼(예: `menu_nm_en`, `code_nm_en`)을 통해 영문명을 함께 저장하고, 프론트엔드에서 locale에 따라 분기 표시한다.
+
+## 운영 Nginx 구조 (중요)
+- 운영 서버에는 **호스트 Nginx**와 **컨테이너 Nginx** 두 레이어가 있다.
+  - 호스트 Nginx (`/etc/nginx/conf.d/default.conf`): SSL 종단 + 리버스 프록시 (Certbot 관리). **ITSM 전용 conf 파일을 별도로 만들지 않는다** — `default.conf`에서 `itsm.kyuhyeong.com` 서버 블록을 Certbot이 관리한다.
+  - 컨테이너 Nginx (`itsm-frontend/nginx.conf`): 정적 파일 서빙 + API 리버스 프록시 + 보안 헤더 + Rate Limiting.
+- **요청 흐름**: `브라우저 → 호스트 Nginx (443/SSL) → 컨테이너 Nginx (8084) → Spring API (8080)`
+
+### Nginx 설정 시 주의사항
+- **`add_header`는 반드시 `location` 블록 안에 작성**한다. `server` 블록에 넣으면 모든 location에 적용되어 API upstream의 CORS 헤더를 덮어쓴다.
+- 컨테이너 Nginx에서 보안 헤더(`CSP`, `X-Frame-Options` 등)는 `location /` (정적 파일)에만 적용하고, `location /api/`에는 넣지 않는다 (Spring Security가 처리).
+- 호스트 Nginx에는 `add_header`를 넣지 않는다 — 보안 헤더는 컨테이너 Nginx와 Spring Security에서 처리.
+- **CSP `script-src`에 `'unsafe-eval'` 필수** — `vue-i18n` 런타임 메시지 컴파일러가 `new Function()`을 사용하므로, 없으면 Vue 앱 마운트가 실패한다.
+- `deploy/nginx-itsm.conf`는 소스 관리용이며, 운영 서버에는 `default.conf`를 사용한다. **이 파일을 운영에 복사하지 않는다.**
+
+### GitHub Actions Secrets (배포에 필요)
+- `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN`: Docker Hub 인증
+- `DB_PASSWORD`: MariaDB root 비밀번호
+- `JWT_SECRET`: JWT 서명 키 (base64, 256bit 이상)
+- `CORS_ORIGINS`: `https://itsm.kyuhyeong.com`
+- `DOMAIN`: `itsm.kyuhyeong.com`
+- `CERTBOT_EMAIL`: SSL 인증서 발급용 이메일
+- `SERVER_IP`, `SERVER_PORT`, `SERVER_USER`, `SERVER_SSH_KEY`: 운영 서버 SSH 접속 정보
