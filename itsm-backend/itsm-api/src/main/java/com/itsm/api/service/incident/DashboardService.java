@@ -3,6 +3,8 @@ package com.itsm.api.service.incident;
 import com.itsm.api.dto.incident.DashboardStatsResponse;
 import com.itsm.api.dto.incident.IncidentResponse;
 import com.itsm.api.dto.incident.MonthlyTrendItem;
+import com.itsm.core.constant.IncidentStatus;
+import com.itsm.core.constant.ServiceRequestStatus;
 import com.itsm.core.repository.change.ChangeRepository;
 import com.itsm.core.repository.incident.IncidentRepository;
 import com.itsm.core.repository.inspection.InspectionRepository;
@@ -30,12 +32,8 @@ public class DashboardService {
     private final ChangeRepository changeRepository;
     private final InspectionRepository inspectionRepository;
 
-    private static final List<String> INCIDENT_STATUSES = List.of(
-            "RECEIVED", "IN_PROGRESS", "COMPLETED", "CLOSED", "REJECTED");
     private static final List<String> PRIORITY_CODES = List.of(
             "CRITICAL", "HIGH", "MEDIUM", "LOW");
-    private static final List<String> SR_STATUSES = List.of(
-            "RECEIVED", "ASSIGNED", "IN_PROGRESS", "PENDING_COMPLETE", "CLOSED", "CANCELLED", "REJECTED");
     private static final List<String> CHANGE_STATUSES = List.of(
             "DRAFT", "APPROVAL_REQUESTED", "APPROVED", "IN_PROGRESS", "COMPLETED", "CLOSED", "REJECTED", "CANCELLED");
     private static final List<String> INSPECTION_STATUSES = List.of(
@@ -45,7 +43,7 @@ public class DashboardService {
         LocalDateTime now = LocalDateTime.now();
 
         // --- Incident stats (1 query instead of 5) ---
-        Map<String, Long> statusCounts = buildCountMap(INCIDENT_STATUSES, incidentRepository.countGroupByStatusCd());
+        Map<String, Long> statusCounts = buildCountMap(IncidentStatus.ALL, incidentRepository.countGroupByStatusCd());
         long totalIncident = statusCounts.values().stream().mapToLong(Long::longValue).sum();
 
         // --- Priority stats (1 query instead of 8) ---
@@ -71,7 +69,7 @@ public class DashboardService {
                 .toList();
 
         // --- SR stats (1 query instead of 7) ---
-        Map<String, Long> srStatusCounts = buildCountMap(SR_STATUSES, serviceRequestRepository.countGroupByStatusCd());
+        Map<String, Long> srStatusCounts = buildCountMap(ServiceRequestStatus.ALL, serviceRequestRepository.countGroupByStatusCd());
         long totalSr = srStatusCounts.values().stream().mapToLong(Long::longValue).sum();
         long pendingSrCount = srStatusCounts.getOrDefault("PENDING_COMPLETE", 0L);
 

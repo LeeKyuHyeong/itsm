@@ -5,9 +5,8 @@ import com.itsm.api.dto.common.StatusChangeRequest;
 import com.itsm.api.dto.common.UserIdRequest;
 import com.itsm.api.dto.servicerequest.*;
 import com.itsm.api.service.servicerequest.ServiceRequestService;
+import com.itsm.api.util.AuthUtils;
 import com.itsm.core.dto.ApiResponse;
-import com.itsm.core.exception.BusinessException;
-import com.itsm.core.exception.ErrorCode;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -44,7 +43,7 @@ public class ServiceRequestController {
     public ApiResponse<SrResponse> create(
             @Valid @RequestBody SrCreateRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(serviceRequestService.create(req, currentUserId));
     }
 
@@ -53,7 +52,7 @@ public class ServiceRequestController {
             @PathVariable Long requestId,
             @Valid @RequestBody SrUpdateRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(serviceRequestService.update(requestId, req, currentUserId));
     }
 
@@ -62,7 +61,7 @@ public class ServiceRequestController {
             @PathVariable Long requestId,
             @Valid @RequestBody StatusChangeRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         serviceRequestService.changeStatus(requestId, req.getStatus(), currentUserId);
         return ApiResponse.success();
     }
@@ -72,7 +71,7 @@ public class ServiceRequestController {
             @PathVariable Long requestId,
             @Valid @RequestBody UserIdRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(serviceRequestService.assignUser(requestId, req.getUserId(), currentUserId));
     }
 
@@ -81,7 +80,7 @@ public class ServiceRequestController {
             @PathVariable Long requestId,
             @PathVariable Long userId,
             Authentication authentication) {
-        getCurrentUserId(authentication);
+        AuthUtils.getCurrentUserId(authentication);
         serviceRequestService.removeAssignee(requestId, userId);
         return ApiResponse.success();
     }
@@ -104,7 +103,7 @@ public class ServiceRequestController {
             @PathVariable Long requestId,
             @PathVariable Long processId,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         serviceRequestService.completeProcess(requestId, processId);
         serviceRequestService.checkAutoTransition(requestId, currentUserId);
         return ApiResponse.success();
@@ -127,12 +126,5 @@ public class ServiceRequestController {
     @GetMapping("/{requestId}/history")
     public ApiResponse<List<SrHistoryResponse>> getHistory(@PathVariable Long requestId) {
         return ApiResponse.success(serviceRequestService.getHistory(requestId));
-    }
-
-    private Long getCurrentUserId(Authentication authentication) {
-        if (authentication == null || authentication.getPrincipal() == null) {
-            throw new BusinessException(ErrorCode.UNAUTHORIZED, "인증 정보가 없습니다.");
-        }
-        return (Long) authentication.getPrincipal();
     }
 }

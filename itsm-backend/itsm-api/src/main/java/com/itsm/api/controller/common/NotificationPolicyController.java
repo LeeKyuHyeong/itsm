@@ -5,6 +5,7 @@ import com.itsm.api.dto.common.NotificationPolicyCreateRequest;
 import com.itsm.api.dto.common.NotificationPolicyResponse;
 import com.itsm.api.dto.common.NotificationPolicyUpdateRequest;
 import com.itsm.api.service.common.NotificationPolicyService;
+import com.itsm.api.util.AuthUtils;
 import com.itsm.core.dto.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +35,7 @@ public class NotificationPolicyController {
     public ApiResponse<NotificationPolicyResponse> createPolicy(
             @Valid @RequestBody NotificationPolicyCreateRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(notificationPolicyService.createPolicy(req, currentUserId));
     }
 
@@ -43,7 +44,7 @@ public class NotificationPolicyController {
             @PathVariable Long policyId,
             @Valid @RequestBody NotificationPolicyUpdateRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(notificationPolicyService.updatePolicy(policyId, req, currentUserId));
     }
 
@@ -53,9 +54,5 @@ public class NotificationPolicyController {
             @Valid @RequestBody IsActiveChangeRequest req) {
         notificationPolicyService.changePolicyStatus(policyId, req.getIsActive());
         return ApiResponse.success();
-    }
-
-    private Long getCurrentUserId(Authentication authentication) {
-        return (Long) authentication.getPrincipal();
     }
 }

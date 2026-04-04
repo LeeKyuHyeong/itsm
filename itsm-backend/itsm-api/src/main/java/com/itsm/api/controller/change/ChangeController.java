@@ -5,9 +5,8 @@ import com.itsm.api.dto.common.ContentRequest;
 import com.itsm.api.dto.common.StatusChangeRequest;
 import com.itsm.api.dto.common.UserIdRequest;
 import com.itsm.api.service.change.ChangeService;
+import com.itsm.api.util.AuthUtils;
 import com.itsm.core.dto.ApiResponse;
-import com.itsm.core.exception.BusinessException;
-import com.itsm.core.exception.ErrorCode;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -44,7 +43,7 @@ public class ChangeController {
     public ApiResponse<ChangeResponse> create(
             @Valid @RequestBody ChangeCreateRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(changeService.create(req, currentUserId));
     }
 
@@ -53,7 +52,7 @@ public class ChangeController {
             @PathVariable Long changeId,
             @Valid @RequestBody ChangeUpdateRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(changeService.update(changeId, req, currentUserId));
     }
 
@@ -62,7 +61,7 @@ public class ChangeController {
             @PathVariable Long changeId,
             @Valid @RequestBody StatusChangeRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         changeService.changeStatus(changeId, req.getStatus(), currentUserId);
         return ApiResponse.success();
     }
@@ -72,7 +71,7 @@ public class ChangeController {
             @PathVariable Long changeId,
             @Valid @RequestBody UserIdRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(changeService.addApprover(changeId, req.getUserId(), currentUserId));
     }
 
@@ -81,7 +80,7 @@ public class ChangeController {
             @PathVariable Long changeId,
             @PathVariable Long userId,
             Authentication authentication) {
-        getCurrentUserId(authentication);
+        AuthUtils.getCurrentUserId(authentication);
         changeService.removeApprover(changeId, userId);
         return ApiResponse.success();
     }
@@ -97,7 +96,7 @@ public class ChangeController {
             @PathVariable Long userId,
             @Valid @RequestBody ApprovalDecisionRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         changeService.approveChange(changeId, userId, req.getDecision(), req.getComment(), currentUserId);
         return ApiResponse.success();
     }
@@ -112,7 +111,7 @@ public class ChangeController {
             @PathVariable Long changeId,
             @Valid @RequestBody ContentRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(changeService.addComment(changeId, req.getContent(), currentUserId));
     }
 
@@ -122,7 +121,7 @@ public class ChangeController {
             @PathVariable Long commentId,
             @Valid @RequestBody ContentRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(changeService.updateComment(changeId, commentId, req.getContent(), currentUserId));
     }
 
@@ -131,7 +130,7 @@ public class ChangeController {
             @PathVariable Long changeId,
             @PathVariable Long commentId,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         changeService.deleteComment(changeId, commentId, currentUserId);
         return ApiResponse.success();
     }
@@ -139,12 +138,5 @@ public class ChangeController {
     @GetMapping("/{changeId}/history")
     public ApiResponse<List<ChangeHistoryResponse>> getHistory(@PathVariable Long changeId) {
         return ApiResponse.success(changeService.getHistory(changeId));
-    }
-
-    private Long getCurrentUserId(Authentication authentication) {
-        if (authentication == null || authentication.getPrincipal() == null) {
-            throw new BusinessException(ErrorCode.UNAUTHORIZED, "인증 정보가 없습니다.");
-        }
-        return (Long) authentication.getPrincipal();
     }
 }

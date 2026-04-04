@@ -3,6 +3,7 @@ package com.itsm.api.service.common;
 import com.itsm.api.dto.common.*;
 import com.itsm.core.domain.common.CommonCode;
 import com.itsm.core.domain.common.CommonCodeDetail;
+import com.itsm.core.constant.RoleCode;
 import com.itsm.core.exception.BusinessException;
 import com.itsm.core.exception.ErrorCode;
 import com.itsm.core.repository.common.CommonCodeDetailRepository;
@@ -30,7 +31,7 @@ public class CommonCodeService {
                 .toList();
     }
 
-    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ITSM_ADMIN')")
+    @PreAuthorize(RoleCode.HAS_ADMIN_ROLE)
     public CommonCodeGroupResponse createGroup(CommonCodeGroupCreateRequest req, Long currentUserId) {
         if (commonCodeRepository.existsByGroupCd(req.getGroupCd())) {
             throw new BusinessException(ErrorCode.DUPLICATE_VALUE, "이미 존재하는 그룹코드입니다.");
@@ -49,7 +50,7 @@ public class CommonCodeService {
         return toGroupResponse(savedGroup);
     }
 
-    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ITSM_ADMIN')")
+    @PreAuthorize(RoleCode.HAS_ADMIN_ROLE)
     public CommonCodeGroupResponse updateGroup(Long groupId, CommonCodeGroupUpdateRequest req, Long currentUserId) {
         CommonCode commonCode = commonCodeRepository.findById(groupId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND, "공통코드 그룹을 찾을 수 없습니다."));
@@ -58,7 +59,7 @@ public class CommonCodeService {
         return toGroupResponse(commonCode);
     }
 
-    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ITSM_ADMIN')")
+    @PreAuthorize(RoleCode.HAS_ADMIN_ROLE)
     public void changeGroupStatus(Long groupId, String isActive) {
         CommonCode commonCode = commonCodeRepository.findById(groupId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND, "공통코드 그룹을 찾을 수 없습니다."));
@@ -81,7 +82,7 @@ public class CommonCodeService {
                 .toList();
     }
 
-    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ITSM_ADMIN')")
+    @PreAuthorize(RoleCode.HAS_ADMIN_ROLE)
     public CommonCodeDetailResponse createDetail(Long groupId, CommonCodeDetailCreateRequest req, Long currentUserId) {
         CommonCode commonCode = commonCodeRepository.findById(groupId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND, "공통코드 그룹을 찾을 수 없습니다."));
@@ -104,7 +105,7 @@ public class CommonCodeService {
         return toDetailResponse(savedDetail);
     }
 
-    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ITSM_ADMIN')")
+    @PreAuthorize(RoleCode.HAS_ADMIN_ROLE)
     public CommonCodeDetailResponse updateDetail(Long groupId, Long detailId, CommonCodeDetailUpdateRequest req, Long currentUserId) {
         CommonCodeDetail detail = commonCodeDetailRepository.findById(detailId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND, "공통코드 상세를 찾을 수 없습니다."));
@@ -113,7 +114,7 @@ public class CommonCodeService {
         return toDetailResponse(detail);
     }
 
-    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ITSM_ADMIN')")
+    @PreAuthorize(RoleCode.HAS_ADMIN_ROLE)
     public void changeDetailStatus(Long detailId, String isActive) {
         CommonCodeDetail detail = commonCodeDetailRepository.findById(detailId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND, "공통코드 상세를 찾을 수 없습니다."));

@@ -1,6 +1,7 @@
 package com.itsm.api.service.servicerequest;
 
 import com.itsm.api.dto.servicerequest.*;
+import com.itsm.core.constant.ServiceRequestStatus;
 import com.itsm.core.domain.common.SlaPolicy;
 import com.itsm.core.domain.company.Company;
 import com.itsm.core.domain.servicerequest.*;
@@ -119,7 +120,7 @@ public class ServiceRequestService {
             throw new BusinessException(ErrorCode.INVALID_STATE_TRANSITION, e.getMessage());
         }
 
-        if ("REJECTED".equals(newStatus) && sr.getSlaDeadlineAt() != null) {
+        if (ServiceRequestStatus.REJECTED.equals(newStatus) && sr.getSlaDeadlineAt() != null) {
             sr.extendSlaDeadline(getSlaDeadlineHours(sr.getCompany().getCompanyId(), sr.getPriorityCd()));
         }
 
@@ -205,7 +206,7 @@ public class ServiceRequestService {
 
     public void submitSatisfaction(Long requestId, int score, String comment) {
         ServiceRequest sr = findById(requestId);
-        if (!"CLOSED".equals(sr.getStatusCd())) {
+        if (!ServiceRequestStatus.CLOSED.equals(sr.getStatusCd())) {
             throw new BusinessException(ErrorCode.INVALID_STATE_TRANSITION, "종료된 요청만 만족도를 제출할 수 있습니다.");
         }
         sr.submitSatisfaction(score, comment);
@@ -227,7 +228,7 @@ public class ServiceRequestService {
 
     public void checkAutoTransition(Long requestId, Long currentUserId) {
         ServiceRequest sr = findById(requestId);
-        if (!"IN_PROGRESS".equals(sr.getStatusCd())) {
+        if (!ServiceRequestStatus.IN_PROGRESS.equals(sr.getStatusCd())) {
             return;
         }
         List<ServiceRequestAssignee> assignees = assigneeRepository.findByRequestId(requestId);
@@ -237,7 +238,7 @@ public class ServiceRequestService {
         boolean allCompleted = assignees.stream()
                 .allMatch(a -> "COMPLETED".equals(a.getProcessStatus()));
         if (allCompleted) {
-            changeStatus(requestId, "PENDING_COMPLETE", currentUserId);
+            changeStatus(requestId, ServiceRequestStatus.PENDING_COMPLETE, currentUserId);
         }
     }
 
@@ -264,7 +265,7 @@ public class ServiceRequestService {
         if (sr.getSlaDeadlineAt() == null || sr.getOccurredAt() == null) {
             return null;
         }
-        if ("CLOSED".equals(sr.getStatusCd()) || "PENDING_COMPLETE".equals(sr.getStatusCd())) {
+        if (ServiceRequestStatus.CLOSED.equals(sr.getStatusCd()) || ServiceRequestStatus.PENDING_COMPLETE.equals(sr.getStatusCd())) {
             LocalDateTime endTime = sr.getCompletedAt() != null ? sr.getCompletedAt() : LocalDateTime.now();
             long totalMinutes = Duration.between(sr.getOccurredAt(), sr.getSlaDeadlineAt()).toMinutes();
             long elapsedMinutes = Duration.between(sr.getOccurredAt(), endTime).toMinutes();

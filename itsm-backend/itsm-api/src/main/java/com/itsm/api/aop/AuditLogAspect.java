@@ -3,6 +3,7 @@ package com.itsm.api.aop;
 import com.itsm.core.domain.common.AuditLog;
 import com.itsm.core.repository.common.AuditLogRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
@@ -14,6 +15,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.lang.reflect.Method;
 
+@Slf4j
 @Aspect
 @Component
 @RequiredArgsConstructor
@@ -50,6 +52,7 @@ public class AuditLogAspect {
             }
             return Long.valueOf(principal.toString());
         } catch (Exception e) {
+            log.warn("감사 로그: 현재 사용자 ID 추출 실패", e);
             return null;
         }
     }
@@ -63,6 +66,7 @@ public class AuditLogAspect {
             }
             return attributes.getRequest().getRemoteAddr();
         } catch (Exception e) {
+            log.warn("감사 로그: 클라이언트 IP 추출 실패", e);
             return null;
         }
     }
@@ -84,7 +88,8 @@ public class AuditLogAspect {
                 if (id instanceof Long) {
                     return (Long) id;
                 }
-            } catch (Exception ignored) {
+            } catch (Exception e) {
+                log.debug("감사 로그: getId() 리플렉션 실패 - {}", e.getMessage());
             }
 
             // Try common *Id pattern methods
@@ -97,7 +102,8 @@ public class AuditLogAspect {
                         if (id instanceof Long) {
                             return (Long) id;
                         }
-                    } catch (Exception ignored) {
+                    } catch (Exception e) {
+                        log.debug("감사 로그: {}() 리플렉션 실패 - {}", name, e.getMessage());
                     }
                 }
             }

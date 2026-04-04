@@ -3,6 +3,7 @@ package com.itsm.api.controller.common;
 import com.itsm.api.dto.common.SystemConfigResponse;
 import com.itsm.api.dto.common.SystemConfigUpdateRequest;
 import com.itsm.api.service.common.SystemConfigService;
+import com.itsm.api.util.AuthUtils;
 import com.itsm.core.dto.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,11 +34,7 @@ public class SystemConfigController {
             @PathVariable String configKey,
             @Valid @RequestBody SystemConfigUpdateRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(systemConfigService.updateConfig(configKey, req, currentUserId));
-    }
-
-    private Long getCurrentUserId(Authentication authentication) {
-        return (Long) authentication.getPrincipal();
     }
 }

@@ -1,5 +1,6 @@
 package com.itsm.core.domain.user;
 
+import com.itsm.core.constant.UserStatus;
 import com.itsm.core.domain.BaseEntity;
 import com.itsm.core.domain.company.Department;
 import jakarta.persistence.*;
@@ -80,7 +81,7 @@ public class User extends BaseEntity {
         this.department = department;
         this.email = email;
         this.tel = tel;
-        this.status = status != null ? status : "ACTIVE";
+        this.status = status != null ? status : UserStatus.ACTIVE;
         this.validFrom = LocalDateTime.now();
         this.loginFailCnt = 0;
     }
@@ -95,7 +96,7 @@ public class User extends BaseEntity {
 
     public void changeStatus(String status) {
         this.status = status;
-        if ("DELETED".equals(status)) {
+        if (UserStatus.DELETED.equals(status)) {
             this.loginId = "DELETED_" + this.userId + "_" + this.loginId;
             this.validTo = LocalDateTime.now();
         }
@@ -120,15 +121,15 @@ public class User extends BaseEntity {
     }
 
     public boolean isLocked() {
-        return "LOCKED".equals(this.status);
+        return UserStatus.LOCKED.equals(this.status);
     }
 
     public void lock() {
-        this.status = "LOCKED";
+        this.status = UserStatus.LOCKED;
     }
 
     public void unlock() {
-        this.status = "ACTIVE";
+        this.status = UserStatus.ACTIVE;
         this.loginFailCnt = 0;
     }
 }

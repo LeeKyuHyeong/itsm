@@ -4,6 +4,7 @@ import com.itsm.api.dto.common.SlaPolicyCreateRequest;
 import com.itsm.api.dto.common.SlaPolicyResponse;
 import com.itsm.api.dto.common.SlaPolicyUpdateRequest;
 import com.itsm.core.domain.common.SlaPolicy;
+import com.itsm.core.constant.RoleCode;
 import com.itsm.core.exception.BusinessException;
 import com.itsm.core.exception.ErrorCode;
 import com.itsm.core.repository.common.SlaPolicyRepository;
@@ -41,7 +42,7 @@ public class SlaPolicyService {
                 .toList();
     }
 
-    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ITSM_ADMIN')")
+    @PreAuthorize(RoleCode.HAS_ADMIN_ROLE)
     public SlaPolicyResponse createPolicy(SlaPolicyCreateRequest req, Long currentUserId) {
         SlaPolicy slaPolicy = SlaPolicy.builder()
                 .companyId(req.getCompanyId())
@@ -55,7 +56,7 @@ public class SlaPolicyService {
         return toResponse(saved);
     }
 
-    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ITSM_ADMIN')")
+    @PreAuthorize(RoleCode.HAS_ADMIN_ROLE)
     public SlaPolicyResponse updatePolicy(Long policyId, SlaPolicyUpdateRequest req, Long currentUserId) {
         SlaPolicy slaPolicy = slaPolicyRepository.findById(policyId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND, "SLA 정책을 찾을 수 없습니다."));
@@ -64,7 +65,7 @@ public class SlaPolicyService {
         return toResponse(slaPolicy);
     }
 
-    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ITSM_ADMIN')")
+    @PreAuthorize(RoleCode.HAS_ADMIN_ROLE)
     public void changePolicyStatus(Long policyId, String isActive) {
         SlaPolicy slaPolicy = slaPolicyRepository.findById(policyId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND, "SLA 정책을 찾을 수 없습니다."));

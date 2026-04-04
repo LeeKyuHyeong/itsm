@@ -3,6 +3,7 @@ package com.itsm.api.service.batch;
 import com.itsm.api.dto.batch.BatchJobResponse;
 import com.itsm.api.dto.batch.BatchJobUpdateRequest;
 import com.itsm.core.domain.batch.BatchJob;
+import com.itsm.core.constant.RoleCode;
 import com.itsm.core.exception.BusinessException;
 import com.itsm.core.exception.ErrorCode;
 import com.itsm.core.repository.batch.BatchJobRepository;
@@ -31,7 +32,7 @@ public class BatchJobService {
         return toResponse(findById(batchJobId));
     }
 
-    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ITSM_ADMIN')")
+    @PreAuthorize(RoleCode.HAS_ADMIN_ROLE)
     public BatchJobResponse updateJob(Long batchJobId, BatchJobUpdateRequest req, Long currentUserId) {
         BatchJob job = findById(batchJobId);
         job.update(req.getCronExpression(), req.getIsActive(), req.getJobDescription(), req.getJobNameEn());
@@ -39,7 +40,7 @@ public class BatchJobService {
         return toResponse(job);
     }
 
-    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ITSM_ADMIN')")
+    @PreAuthorize(RoleCode.HAS_ADMIN_ROLE)
     public void executeNow(Long batchJobId, Long currentUserId) {
         BatchJob job = findById(batchJobId);
         job.requestTrigger();

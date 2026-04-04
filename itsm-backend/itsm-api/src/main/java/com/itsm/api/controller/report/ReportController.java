@@ -3,6 +3,7 @@ package com.itsm.api.controller.report;
 import com.itsm.api.dto.common.ReportContentRequest;
 import com.itsm.api.dto.report.*;
 import com.itsm.api.service.report.ReportService;
+import com.itsm.api.util.AuthUtils;
 import com.itsm.core.dto.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +38,7 @@ public class ReportController {
     public ApiResponse<ReportFormResponse> createForm(
             @Valid @RequestBody ReportFormRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(reportService.createForm(req, currentUserId));
     }
 
@@ -46,7 +47,7 @@ public class ReportController {
             @PathVariable Long formId,
             @Valid @RequestBody ReportFormRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(reportService.updateForm(formId, req, currentUserId));
     }
 
@@ -70,7 +71,7 @@ public class ReportController {
     public ApiResponse<ReportResponse> createReport(
             @Valid @RequestBody ReportCreateRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(reportService.createReport(req, currentUserId));
     }
 
@@ -84,7 +85,7 @@ public class ReportController {
             @PathVariable Long reportId,
             @Valid @RequestBody ReportContentRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(reportService.updateReport(reportId, req.getReportContent(), currentUserId));
     }
 
@@ -92,9 +93,5 @@ public class ReportController {
     public ApiResponse<Void> deleteReport(@PathVariable Long reportId) {
         reportService.deleteReport(reportId);
         return ApiResponse.success();
-    }
-
-    private Long getCurrentUserId(Authentication authentication) {
-        return (Long) authentication.getPrincipal();
     }
 }

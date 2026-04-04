@@ -1,5 +1,6 @@
 package com.itsm.core.domain.servicerequest;
 
+import com.itsm.core.constant.ServiceRequestStatus;
 import com.itsm.core.domain.BaseEntity;
 import com.itsm.core.domain.company.Company;
 import jakarta.persistence.*;
@@ -22,13 +23,13 @@ import java.util.Set;
 public class ServiceRequest extends BaseEntity {
 
     private static final Map<String, Set<String>> VALID_TRANSITIONS = Map.of(
-            "RECEIVED", Set.of("ASSIGNED", "CANCELLED", "REJECTED"),
-            "ASSIGNED", Set.of("IN_PROGRESS", "RECEIVED", "REJECTED"),
-            "IN_PROGRESS", Set.of("PENDING_COMPLETE", "REJECTED"),
-            "PENDING_COMPLETE", Set.of("CLOSED"),
-            "CLOSED", Set.of(),
-            "CANCELLED", Set.of(),
-            "REJECTED", Set.of("RECEIVED")
+            ServiceRequestStatus.RECEIVED, Set.of(ServiceRequestStatus.ASSIGNED, ServiceRequestStatus.CANCELLED, ServiceRequestStatus.REJECTED),
+            ServiceRequestStatus.ASSIGNED, Set.of(ServiceRequestStatus.IN_PROGRESS, ServiceRequestStatus.RECEIVED, ServiceRequestStatus.REJECTED),
+            ServiceRequestStatus.IN_PROGRESS, Set.of(ServiceRequestStatus.PENDING_COMPLETE, ServiceRequestStatus.REJECTED),
+            ServiceRequestStatus.PENDING_COMPLETE, Set.of(ServiceRequestStatus.CLOSED),
+            ServiceRequestStatus.CLOSED, Set.of(),
+            ServiceRequestStatus.CANCELLED, Set.of(),
+            ServiceRequestStatus.REJECTED, Set.of(ServiceRequestStatus.RECEIVED)
     );
 
     @Id
@@ -86,7 +87,7 @@ public class ServiceRequest extends BaseEntity {
         this.content = content;
         this.requestTypeCd = requestTypeCd;
         this.priorityCd = priorityCd;
-        this.statusCd = "RECEIVED";
+        this.statusCd = ServiceRequestStatus.RECEIVED;
         this.occurredAt = occurredAt;
         this.company = company;
         this.rejectCnt = 0;
@@ -98,13 +99,13 @@ public class ServiceRequest extends BaseEntity {
             throw new IllegalStateException(
                     String.format("유효하지 않은 상태 전이: %s → %s", this.statusCd, newStatus));
         }
-        if ("REJECTED".equals(newStatus)) {
+        if (ServiceRequestStatus.REJECTED.equals(newStatus)) {
             this.rejectCnt++;
         }
-        if ("PENDING_COMPLETE".equals(newStatus)) {
+        if (ServiceRequestStatus.PENDING_COMPLETE.equals(newStatus)) {
             this.completedAt = LocalDateTime.now();
         }
-        if ("CLOSED".equals(newStatus)) {
+        if (ServiceRequestStatus.CLOSED.equals(newStatus)) {
             this.closedAt = LocalDateTime.now();
         }
         this.statusCd = newStatus;

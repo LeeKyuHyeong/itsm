@@ -1,8 +1,8 @@
 package com.itsm.api.security;
 
+import com.itsm.api.util.CookieUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -68,15 +68,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         // 2. httpOnly 쿠키에서 추출
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (ACCESS_TOKEN_COOKIE.equals(cookie.getName())) {
-                    return cookie.getValue();
-                }
-            }
-        }
-
-        return null;
+        return CookieUtils.extractCookie(request, ACCESS_TOKEN_COOKIE);
     }
 }

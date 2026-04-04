@@ -2,6 +2,7 @@ package com.itsm.api.controller.common;
 
 import com.itsm.api.dto.common.*;
 import com.itsm.api.service.common.CommonCodeService;
+import com.itsm.api.util.AuthUtils;
 import com.itsm.core.dto.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,7 @@ public class CommonCodeController {
     public ApiResponse<CommonCodeGroupResponse> createGroup(
             @Valid @RequestBody CommonCodeGroupCreateRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(commonCodeService.createGroup(req, currentUserId));
     }
 
@@ -34,7 +35,7 @@ public class CommonCodeController {
             @PathVariable Long groupId,
             @Valid @RequestBody CommonCodeGroupUpdateRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(commonCodeService.updateGroup(groupId, req, currentUserId));
     }
 
@@ -56,7 +57,7 @@ public class CommonCodeController {
             @PathVariable Long groupId,
             @Valid @RequestBody CommonCodeDetailCreateRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(commonCodeService.createDetail(groupId, req, currentUserId));
     }
 
@@ -66,7 +67,7 @@ public class CommonCodeController {
             @PathVariable Long detailId,
             @Valid @RequestBody CommonCodeDetailUpdateRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(commonCodeService.updateDetail(groupId, detailId, req, currentUserId));
     }
 
@@ -83,9 +84,5 @@ public class CommonCodeController {
     public ApiResponse<List<CommonCodeDetailResponse>> getActiveDetailsByGroupCd(
             @PathVariable String groupCd) {
         return ApiResponse.success(commonCodeService.getActiveDetailsByGroupCd(groupCd));
-    }
-
-    private Long getCurrentUserId(Authentication authentication) {
-        return (Long) authentication.getPrincipal();
     }
 }

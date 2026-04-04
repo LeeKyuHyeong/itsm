@@ -1,5 +1,6 @@
 package com.itsm.core.domain.incident;
 
+import com.itsm.core.constant.IncidentStatus;
 import com.itsm.core.domain.BaseEntity;
 import com.itsm.core.domain.company.Company;
 import com.itsm.core.domain.user.User;
@@ -24,11 +25,11 @@ import java.util.Set;
 public class Incident extends BaseEntity {
 
     private static final Map<String, Set<String>> VALID_TRANSITIONS = Map.of(
-            "RECEIVED", Set.of("IN_PROGRESS", "REJECTED"),
-            "IN_PROGRESS", Set.of("COMPLETED", "REJECTED"),
-            "COMPLETED", Set.of("CLOSED"),
-            "REJECTED", Set.of("RECEIVED"),
-            "CLOSED", Set.of()
+            IncidentStatus.RECEIVED, Set.of(IncidentStatus.IN_PROGRESS, IncidentStatus.REJECTED),
+            IncidentStatus.IN_PROGRESS, Set.of(IncidentStatus.COMPLETED, IncidentStatus.REJECTED),
+            IncidentStatus.COMPLETED, Set.of(IncidentStatus.CLOSED),
+            IncidentStatus.REJECTED, Set.of(IncidentStatus.RECEIVED),
+            IncidentStatus.CLOSED, Set.of()
     );
 
     @Id
@@ -81,7 +82,7 @@ public class Incident extends BaseEntity {
         this.content = content;
         this.incidentTypeCd = incidentTypeCd;
         this.priorityCd = priorityCd;
-        this.statusCd = "RECEIVED";
+        this.statusCd = IncidentStatus.RECEIVED;
         this.occurredAt = occurredAt;
         this.company = company;
         this.mainManager = mainManager;
@@ -95,9 +96,9 @@ public class Incident extends BaseEntity {
         }
         this.statusCd = newStatus;
 
-        if ("COMPLETED".equals(newStatus)) {
+        if (IncidentStatus.COMPLETED.equals(newStatus)) {
             this.completedAt = LocalDateTime.now();
-        } else if ("CLOSED".equals(newStatus)) {
+        } else if (IncidentStatus.CLOSED.equals(newStatus)) {
             this.closedAt = LocalDateTime.now();
         }
     }

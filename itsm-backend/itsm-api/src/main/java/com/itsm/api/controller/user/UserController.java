@@ -2,6 +2,7 @@ package com.itsm.api.controller.user;
 
 import com.itsm.api.dto.user.*;
 import com.itsm.api.service.user.UserService;
+import com.itsm.api.util.AuthUtils;
 import com.itsm.core.domain.user.UserHistory;
 import com.itsm.core.dto.ApiResponse;
 import jakarta.validation.Valid;
@@ -34,7 +35,7 @@ public class UserController {
     public ApiResponse<UserDetailResponse> createUser(
             @Valid @RequestBody UserCreateRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(userService.createUser(req, currentUserId));
     }
 
@@ -48,7 +49,7 @@ public class UserController {
             @PathVariable Long userId,
             @Valid @RequestBody UserUpdateRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(userService.updateUser(userId, req, currentUserId));
     }
 
@@ -57,7 +58,7 @@ public class UserController {
             @PathVariable Long userId,
             @Valid @RequestBody UserStatusRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         userService.changeUserStatus(userId, req, currentUserId);
         return ApiResponse.success();
     }
@@ -72,7 +73,7 @@ public class UserController {
             @PathVariable Long userId,
             @Valid @RequestBody RoleGrantRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         userService.grantRole(userId, req, currentUserId);
         return ApiResponse.success();
     }
@@ -82,12 +83,8 @@ public class UserController {
             @PathVariable Long userId,
             @PathVariable Long roleId,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         userService.revokeRole(userId, roleId, currentUserId);
         return ApiResponse.success();
-    }
-
-    private Long getCurrentUserId(Authentication authentication) {
-        return (Long) authentication.getPrincipal();
     }
 }

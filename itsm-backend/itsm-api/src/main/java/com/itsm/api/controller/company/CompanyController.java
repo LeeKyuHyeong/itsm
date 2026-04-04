@@ -2,6 +2,7 @@ package com.itsm.api.controller.company;
 
 import com.itsm.api.dto.company.*;
 import com.itsm.api.service.company.CompanyService;
+import com.itsm.api.util.AuthUtils;
 import com.itsm.core.dto.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,7 @@ public class CompanyController {
     public ApiResponse<CompanyResponse> createCompany(
             @Valid @RequestBody CompanyCreateRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(companyService.createCompany(req, currentUserId));
     }
 
@@ -44,7 +45,7 @@ public class CompanyController {
             @PathVariable Long companyId,
             @Valid @RequestBody CompanyUpdateRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(companyService.updateCompany(companyId, req, currentUserId));
     }
 
@@ -58,7 +59,7 @@ public class CompanyController {
             @PathVariable Long companyId,
             @Valid @RequestBody DepartmentCreateRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(companyService.createDepartment(companyId, req, currentUserId));
     }
 
@@ -67,11 +68,7 @@ public class CompanyController {
             @PathVariable Long deptId,
             @Valid @RequestBody DepartmentUpdateRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(companyService.updateDepartment(deptId, req, currentUserId));
-    }
-
-    private Long getCurrentUserId(Authentication authentication) {
-        return (Long) authentication.getPrincipal();
     }
 }

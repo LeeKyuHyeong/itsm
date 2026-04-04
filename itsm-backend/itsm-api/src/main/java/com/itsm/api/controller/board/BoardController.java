@@ -3,9 +3,8 @@ package com.itsm.api.controller.board;
 import com.itsm.api.dto.board.*;
 import com.itsm.api.dto.common.ContentRequest;
 import com.itsm.api.service.board.BoardService;
+import com.itsm.api.util.AuthUtils;
 import com.itsm.core.dto.ApiResponse;
-import com.itsm.core.exception.BusinessException;
-import com.itsm.core.exception.ErrorCode;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -32,7 +31,7 @@ public class BoardController {
     public ApiResponse<BoardConfigResponse> createConfig(
             @Valid @RequestBody BoardConfigRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(boardService.createConfig(req, currentUserId));
     }
 
@@ -41,7 +40,7 @@ public class BoardController {
             @PathVariable Long boardId,
             @Valid @RequestBody BoardConfigRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(boardService.updateConfig(boardId, req, currentUserId));
     }
 
@@ -65,7 +64,7 @@ public class BoardController {
             @PathVariable Long boardId,
             @Valid @RequestBody BoardPostCreateRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(boardService.createPost(boardId, req, currentUserId));
     }
 
@@ -82,7 +81,7 @@ public class BoardController {
             @PathVariable Long postId,
             @Valid @RequestBody BoardPostUpdateRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(boardService.updatePost(boardId, postId, req, currentUserId));
     }
 
@@ -109,7 +108,7 @@ public class BoardController {
             @PathVariable Long postId,
             @Valid @RequestBody ContentRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(boardService.createComment(boardId, postId, req.getContent(), currentUserId));
     }
 
@@ -120,7 +119,7 @@ public class BoardController {
             @PathVariable Long commentId,
             @Valid @RequestBody ContentRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(boardService.updateComment(boardId, postId, commentId, req.getContent(), currentUserId));
     }
 
@@ -131,12 +130,5 @@ public class BoardController {
             @PathVariable Long commentId) {
         boardService.deleteComment(boardId, postId, commentId);
         return ApiResponse.success();
-    }
-
-    private Long getCurrentUserId(Authentication authentication) {
-        if (authentication == null || authentication.getPrincipal() == null) {
-            throw new BusinessException(ErrorCode.UNAUTHORIZED, "인증 정보가 없습니다.");
-        }
-        return (Long) authentication.getPrincipal();
     }
 }

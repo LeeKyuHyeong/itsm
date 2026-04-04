@@ -3,6 +3,7 @@ package com.itsm.api.controller.asset;
 import com.itsm.api.dto.asset.*;
 import com.itsm.api.dto.common.StatusChangeRequest;
 import com.itsm.api.service.asset.AssetOaService;
+import com.itsm.api.util.AuthUtils;
 import com.itsm.core.dto.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +40,7 @@ public class AssetOaController {
     public ApiResponse<AssetOaResponse> create(
             @Valid @RequestBody AssetOaCreateRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(assetOaService.create(req, currentUserId));
     }
 
@@ -48,7 +49,7 @@ public class AssetOaController {
             @PathVariable Long assetOaId,
             @Valid @RequestBody AssetOaUpdateRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(assetOaService.update(assetOaId, req, currentUserId));
     }
 
@@ -57,7 +58,7 @@ public class AssetOaController {
             @PathVariable Long assetOaId,
             @Valid @RequestBody StatusChangeRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         assetOaService.changeStatus(assetOaId, req.getStatus(), currentUserId);
         return ApiResponse.success();
     }
@@ -65,9 +66,5 @@ public class AssetOaController {
     @GetMapping("/{assetOaId}/history")
     public ApiResponse<List<AssetHistoryResponse>> getHistory(@PathVariable Long assetOaId) {
         return ApiResponse.success(assetOaService.getHistory(assetOaId));
-    }
-
-    private Long getCurrentUserId(Authentication authentication) {
-        return (Long) authentication.getPrincipal();
     }
 }

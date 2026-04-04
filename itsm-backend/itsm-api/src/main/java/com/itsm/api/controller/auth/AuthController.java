@@ -4,10 +4,10 @@ import com.itsm.api.dto.auth.*;
 import com.itsm.api.security.JwtTokenProvider;
 import com.itsm.api.security.LoginRateLimiter;
 import com.itsm.api.service.auth.AuthService;
+import com.itsm.api.util.CookieUtils;
 import com.itsm.core.dto.ApiResponse;
 import com.itsm.core.exception.BusinessException;
 import com.itsm.core.exception.ErrorCode;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -58,7 +58,7 @@ public class AuthController {
     @PostMapping("/refresh")
     public ApiResponse<LoginResponse> refresh(HttpServletRequest request,
                                               HttpServletResponse httpResponse) {
-        String refreshToken = extractRefreshTokenFromCookie(request);
+        String refreshToken = CookieUtils.extractCookie(request, REFRESH_TOKEN_COOKIE);
         if (refreshToken == null) {
             throw new BusinessException(ErrorCode.INVALID_TOKEN, "리프레시 토큰이 없습니다.");
         }
@@ -81,13 +81,13 @@ public class AuthController {
         String ipAddress = request.getRemoteAddr();
 
         // Blacklist current access token
-        String accessToken = extractAccessTokenFromCookie(request);
+        String accessToken = CookieUtils.extractCookie(request, ACCESS_TOKEN_COOKIE);
         if (accessToken != null) {
             jwtTokenProvider.invalidate(accessToken);
         }
 
         // Blacklist refresh token
-        String refreshToken = extractRefreshTokenFromCookie(request);
+        String refreshToken = CookieUtils.extractCookie(request, REFRESH_TOKEN_COOKIE);
         if (refreshToken != null) {
             jwtTokenProvider.invalidate(refreshToken);
         }
@@ -159,27 +159,4 @@ public class AuthController {
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
-    private String extractAccessTokenFromCookie(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (ACCESS_TOKEN_COOKIE.equals(cookie.getName())) {
-                    return cookie.getValue();
-                }
-            }
-        }
-        return null;
-    }
-
-    private String extractRefreshTokenFromCookie(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (REFRESH_TOKEN_COOKIE.equals(cookie.getName())) {
-                    return cookie.getValue();
-                }
-            }
-        }
-        return null;
-    }
 }

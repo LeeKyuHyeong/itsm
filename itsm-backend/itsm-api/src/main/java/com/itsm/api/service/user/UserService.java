@@ -1,6 +1,8 @@
 package com.itsm.api.service.user;
 
 import com.itsm.api.dto.user.*;
+import com.itsm.core.constant.RoleCode;
+import com.itsm.core.constant.UserStatus;
 import com.itsm.core.domain.company.Department;
 import com.itsm.core.domain.user.*;
 import com.itsm.core.exception.BusinessException;
@@ -57,7 +59,7 @@ public class UserService {
         return toUserDetailResponse(user, userRoles);
     }
 
-    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ITSM_ADMIN')")
+    @PreAuthorize(RoleCode.HAS_ADMIN_ROLE)
     public UserDetailResponse createUser(UserCreateRequest req, Long currentUserId) {
         // Check loginId duplicate
         if (userRepository.existsByLoginId(req.getLoginId())) {
@@ -85,7 +87,7 @@ public class UserService {
                 .department(department)
                 .email(req.getEmail())
                 .tel(req.getTel())
-                .status("ACTIVE")
+                .status(UserStatus.ACTIVE)
                 .build();
 
         user.setCreatedBy(currentUserId);
@@ -101,12 +103,12 @@ public class UserService {
         return toUserDetailResponse(savedUser, userRoles);
     }
 
-    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ITSM_ADMIN')")
+    @PreAuthorize(RoleCode.HAS_ADMIN_ROLE)
     public UserDetailResponse updateUser(Long userId, UserUpdateRequest req, Long currentUserId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND, "사용자를 찾을 수 없습니다."));
 
-        if ("DELETED".equals(user.getStatus())) {
+        if (UserStatus.DELETED.equals(user.getStatus())) {
             throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE, "삭제된 사용자는 수정할 수 없습니다.");
         }
 
@@ -127,7 +129,7 @@ public class UserService {
         return toUserDetailResponse(user, userRoles);
     }
 
-    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ITSM_ADMIN')")
+    @PreAuthorize(RoleCode.HAS_ADMIN_ROLE)
     public void changeUserStatus(Long userId, UserStatusRequest req, Long currentUserId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND, "사용자를 찾을 수 없습니다."));
@@ -160,7 +162,7 @@ public class UserService {
         return userHistoryRepository.findByUserIdOrderByCreatedAtDesc(userId);
     }
 
-    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ITSM_ADMIN')")
+    @PreAuthorize(RoleCode.HAS_ADMIN_ROLE)
     public void grantRole(Long userId, RoleGrantRequest req, Long currentUserId) {
         // Check user exists
         if (!userRepository.existsById(userId)) {
@@ -182,7 +184,7 @@ public class UserService {
         userRoleRepository.save(userRole);
     }
 
-    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ITSM_ADMIN')")
+    @PreAuthorize(RoleCode.HAS_ADMIN_ROLE)
     public void revokeRole(Long userId, Long roleId, Long currentUserId) {
         userRoleRepository.deleteByUserIdAndRoleId(userId, roleId);
     }

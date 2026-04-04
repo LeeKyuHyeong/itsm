@@ -1,6 +1,7 @@
 package com.itsm.api.service.incident;
 
 import com.itsm.api.dto.incident.*;
+import com.itsm.core.constant.IncidentStatus;
 import com.itsm.core.domain.common.SlaPolicy;
 import com.itsm.core.domain.company.Company;
 import com.itsm.core.domain.incident.*;
@@ -120,7 +121,7 @@ public class IncidentService {
             throw new BusinessException(ErrorCode.INVALID_STATE_TRANSITION, e.getMessage());
         }
 
-        if ("REJECTED".equals(newStatus) && incident.getSlaDeadlineAt() != null) {
+        if (IncidentStatus.REJECTED.equals(newStatus) && incident.getSlaDeadlineAt() != null) {
             incident.extendSlaDeadline(
                     getSlaDeadlineHours(incident.getCompany().getCompanyId(), incident.getPriorityCd()));
         }
@@ -353,7 +354,7 @@ public class IncidentService {
         if (incident.getSlaDeadlineAt() == null || incident.getOccurredAt() == null) {
             return null;
         }
-        if ("CLOSED".equals(incident.getStatusCd()) || "COMPLETED".equals(incident.getStatusCd())) {
+        if (IncidentStatus.CLOSED.equals(incident.getStatusCd()) || IncidentStatus.COMPLETED.equals(incident.getStatusCd())) {
             LocalDateTime endTime = incident.getCompletedAt() != null ?
                     incident.getCompletedAt() : LocalDateTime.now();
             long totalMinutes = Duration.between(incident.getOccurredAt(), incident.getSlaDeadlineAt()).toMinutes();

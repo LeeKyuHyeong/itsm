@@ -3,6 +3,7 @@ package com.itsm.api.controller.asset;
 import com.itsm.api.dto.asset.*;
 import com.itsm.api.dto.common.StatusChangeRequest;
 import com.itsm.api.service.asset.AssetHwService;
+import com.itsm.api.util.AuthUtils;
 import com.itsm.core.dto.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +43,7 @@ public class AssetHwController {
     public ApiResponse<AssetHwResponse> create(
             @Valid @RequestBody AssetHwCreateRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(assetHwService.create(req, currentUserId));
     }
 
@@ -51,7 +52,7 @@ public class AssetHwController {
             @PathVariable Long assetHwId,
             @Valid @RequestBody AssetHwUpdateRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(assetHwService.update(assetHwId, req, currentUserId));
     }
 
@@ -60,7 +61,7 @@ public class AssetHwController {
             @PathVariable Long assetHwId,
             @Valid @RequestBody StatusChangeRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         assetHwService.changeStatus(assetHwId, req.getStatus(), currentUserId);
         return ApiResponse.success();
     }
@@ -74,7 +75,7 @@ public class AssetHwController {
     public ApiResponse<AssetRelationResponse> addRelation(
             @Valid @RequestBody AssetRelationRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(assetHwService.addRelation(req, currentUserId));
     }
 
@@ -89,9 +90,5 @@ public class AssetHwController {
     @GetMapping("/{assetHwId}/relations")
     public ApiResponse<List<AssetRelationResponse>> getRelations(@PathVariable Long assetHwId) {
         return ApiResponse.success(assetHwService.getRelations(assetHwId));
-    }
-
-    private Long getCurrentUserId(Authentication authentication) {
-        return (Long) authentication.getPrincipal();
     }
 }

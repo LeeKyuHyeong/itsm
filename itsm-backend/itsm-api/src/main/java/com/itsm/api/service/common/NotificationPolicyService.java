@@ -4,6 +4,7 @@ import com.itsm.api.dto.common.NotificationPolicyCreateRequest;
 import com.itsm.api.dto.common.NotificationPolicyResponse;
 import com.itsm.api.dto.common.NotificationPolicyUpdateRequest;
 import com.itsm.core.domain.common.NotificationPolicy;
+import com.itsm.core.constant.RoleCode;
 import com.itsm.core.exception.BusinessException;
 import com.itsm.core.exception.ErrorCode;
 import com.itsm.core.repository.common.NotificationPolicyRepository;
@@ -35,7 +36,7 @@ public class NotificationPolicyService {
                 .toList();
     }
 
-    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ITSM_ADMIN')")
+    @PreAuthorize(RoleCode.HAS_ADMIN_ROLE)
     public NotificationPolicyResponse createPolicy(NotificationPolicyCreateRequest req, Long currentUserId) {
         NotificationPolicy policy = NotificationPolicy.builder()
                 .notiTypeCd(req.getNotiTypeCd())
@@ -48,7 +49,7 @@ public class NotificationPolicyService {
         return toResponse(saved);
     }
 
-    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ITSM_ADMIN')")
+    @PreAuthorize(RoleCode.HAS_ADMIN_ROLE)
     public NotificationPolicyResponse updatePolicy(Long policyId, NotificationPolicyUpdateRequest req, Long currentUserId) {
         NotificationPolicy policy = notificationPolicyRepository.findById(policyId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND, "알림 정책을 찾을 수 없습니다."));
@@ -57,7 +58,7 @@ public class NotificationPolicyService {
         return toResponse(policy);
     }
 
-    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ITSM_ADMIN')")
+    @PreAuthorize(RoleCode.HAS_ADMIN_ROLE)
     public void changePolicyStatus(Long policyId, String isActive) {
         NotificationPolicy policy = notificationPolicyRepository.findById(policyId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND, "알림 정책을 찾을 수 없습니다."));

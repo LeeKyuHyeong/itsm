@@ -16,6 +16,7 @@
 - **Phase 18**: 보안 강화 2차 (OWASP Top 10 기반 전 항목) ✅
 - **Phase 19**: 인프라 보안 & Docker 강화 ✅
 - **Phase 20**: 백엔드 성능 최적화 ✅
+- **Phase 21**: 백엔드 코드 품질 개선 ✅
 
 ---
 
@@ -105,21 +106,22 @@
 
 ### 1단계: 중복 코드 통합 (HIGH)
 
-- [ ] `getCurrentUserId()` — 7개 Controller에 중복 → 공통 유틸 또는 ArgumentResolver로 추출
-- [ ] `extractAccessTokenFromCookie()` — AuthController, JwtAuthFilter 중복 → `CookieUtils` 유틸 추출
-- [ ] CORS origin 파싱 시 `trim()` 누락 수정 (SecurityConfig)
+- [x] `getCurrentUserId()` — 16개 Controller에 중복 → `AuthUtils` 유틸 추출
+- [x] `extractAccessTokenFromCookie()` — AuthController, JwtAuthFilter 중복 → `CookieUtils` 유틸 추출
+- [x] CORS origin 파싱 시 `trim()` 누락 수정 (SecurityConfig) — Phase 19에서 완료
 
 ### 2단계: 매직 스트링 상수화 (MEDIUM)
 
-- [ ] 사용자 상태(`ACTIVE`, `LOCKED`, `DELETED`) → 상수 클래스 또는 enum 추출
-- [ ] 인시던트 상태(`RECEIVED`, `IN_PROGRESS`, `COMPLETED` 등) → 상수화
-- [ ] 역할 코드(`SUPER_ADMIN`, `ITSM_ADMIN` 등) → 상수화
+- [x] 사용자 상태(`ACTIVE`, `LOCKED`, `DELETED`) → `UserStatus` 상수 클래스 추출
+- [x] 인시던트 상태(`RECEIVED`, `IN_PROGRESS`, `COMPLETED` 등) → `IncidentStatus` 상수화
+- [x] 서비스요청 상태 → `ServiceRequestStatus` 상수화
+- [x] 역할 코드(`SUPER_ADMIN`, `ITSM_ADMIN` 등) → `RoleCode` 상수화 (`@PreAuthorize` 14건 통합)
 
 ### 3단계: 에러 처리 표준화 (MEDIUM)
 
-- [ ] AuditLogAspect: silent catch → 최소 `log.warn` 추가
-- [ ] 인증 null 체크 일관성 확보 (일부 Controller만 검증 중)
-- [ ] 입력 검증 강화: 자산 IP/MAC 주소 `@Pattern` 검증, 텍스트 필드 `@Size(max)` 추가
+- [x] AuditLogAspect: silent catch → `log.warn`/`log.debug` 추가
+- [x] 인증 null 체크 일관성 확보 — `AuthUtils`로 통합하여 모든 Controller 일관 검증
+- [x] 입력 검증 강화: 자산 IP/MAC 주소 `@Pattern` 검증, 텍스트 필드 `@Size(max)` 추가 (HW/OA 4개 DTO)
 
 ---
 

@@ -1,6 +1,7 @@
 package com.itsm.api.service.company;
 
 import com.itsm.api.dto.company.*;
+import com.itsm.core.constant.UserStatus;
 import com.itsm.core.domain.company.*;
 import com.itsm.core.exception.BusinessException;
 import com.itsm.core.exception.ErrorCode;
@@ -56,7 +57,7 @@ public class CompanyService {
                 .ceoNm(req.getCeoNm())
                 .tel(req.getTel())
                 .defaultPmId(req.getDefaultPmId())
-                .status("ACTIVE")
+                .status(UserStatus.ACTIVE)
                 .build();
 
         company.setCreatedBy(currentUserId);
@@ -92,7 +93,7 @@ public class CompanyService {
         Department department = Department.builder()
                 .deptNm(req.getDeptNm())
                 .company(company)
-                .status("ACTIVE")
+                .status(UserStatus.ACTIVE)
                 .build();
 
         department.setCreatedBy(currentUserId);

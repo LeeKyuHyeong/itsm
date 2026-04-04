@@ -2,6 +2,7 @@ package com.itsm.api.service.auth;
 
 import com.itsm.api.dto.auth.*;
 import com.itsm.api.security.JwtTokenProvider;
+import com.itsm.core.constant.UserStatus;
 import com.itsm.core.domain.user.AccessLog;
 import com.itsm.core.domain.user.User;
 import com.itsm.core.domain.user.UserRole;
@@ -44,7 +45,7 @@ public class AuthService {
                 });
 
         // Check account status
-        if (!"ACTIVE".equals(user.getStatus()) && !"LOCKED".equals(user.getStatus())) {
+        if (!UserStatus.ACTIVE.equals(user.getStatus()) && !UserStatus.LOCKED.equals(user.getStatus())) {
             logAccess(user.getUserId(), user.getLoginId(), "LOGIN", ipAddress, false, "비활성 계정");
             throw new BusinessException(ErrorCode.UNAUTHORIZED, "비활성 계정입니다.");
         }

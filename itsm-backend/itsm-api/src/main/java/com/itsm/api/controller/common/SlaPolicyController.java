@@ -5,6 +5,7 @@ import com.itsm.api.dto.common.SlaPolicyCreateRequest;
 import com.itsm.api.dto.common.SlaPolicyResponse;
 import com.itsm.api.dto.common.SlaPolicyUpdateRequest;
 import com.itsm.api.service.common.SlaPolicyService;
+import com.itsm.api.util.AuthUtils;
 import com.itsm.core.dto.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +34,7 @@ public class SlaPolicyController {
     public ApiResponse<SlaPolicyResponse> createPolicy(
             @Valid @RequestBody SlaPolicyCreateRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(slaPolicyService.createPolicy(req, currentUserId));
     }
 
@@ -42,7 +43,7 @@ public class SlaPolicyController {
             @PathVariable Long policyId,
             @Valid @RequestBody SlaPolicyUpdateRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(slaPolicyService.updatePolicy(policyId, req, currentUserId));
     }
 
@@ -52,9 +53,5 @@ public class SlaPolicyController {
             @Valid @RequestBody IsActiveChangeRequest req) {
         slaPolicyService.changePolicyStatus(policyId, req.getIsActive());
         return ApiResponse.success();
-    }
-
-    private Long getCurrentUserId(Authentication authentication) {
-        return (Long) authentication.getPrincipal();
     }
 }

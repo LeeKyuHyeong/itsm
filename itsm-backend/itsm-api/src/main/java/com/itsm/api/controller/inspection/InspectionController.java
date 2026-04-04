@@ -3,9 +3,8 @@ package com.itsm.api.controller.inspection;
 import com.itsm.api.dto.common.StatusChangeRequest;
 import com.itsm.api.dto.inspection.*;
 import com.itsm.api.service.inspection.InspectionService;
+import com.itsm.api.util.AuthUtils;
 import com.itsm.core.dto.ApiResponse;
-import com.itsm.core.exception.BusinessException;
-import com.itsm.core.exception.ErrorCode;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -41,7 +40,7 @@ public class InspectionController {
     public ApiResponse<InspectionResponse> create(
             @Valid @RequestBody InspectionCreateRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(inspectionService.create(req, currentUserId));
     }
 
@@ -50,7 +49,7 @@ public class InspectionController {
             @PathVariable Long inspectionId,
             @Valid @RequestBody InspectionUpdateRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(inspectionService.update(inspectionId, req, currentUserId));
     }
 
@@ -59,7 +58,7 @@ public class InspectionController {
             @PathVariable Long inspectionId,
             @Valid @RequestBody StatusChangeRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         inspectionService.changeStatus(inspectionId, req.getStatus(), currentUserId);
         return ApiResponse.success();
     }
@@ -74,7 +73,7 @@ public class InspectionController {
             @PathVariable Long inspectionId,
             @Valid @RequestBody InspectionItemRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(inspectionService.addItem(inspectionId, req, currentUserId));
     }
 
@@ -91,7 +90,7 @@ public class InspectionController {
             @PathVariable Long inspectionId,
             @Valid @RequestBody InspectionResultRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(inspectionService.addResult(inspectionId, req, currentUserId));
     }
 
@@ -103,12 +102,5 @@ public class InspectionController {
     @GetMapping("/{inspectionId}/history")
     public ApiResponse<List<InspectionHistoryResponse>> getHistory(@PathVariable Long inspectionId) {
         return ApiResponse.success(inspectionService.getHistory(inspectionId));
-    }
-
-    private Long getCurrentUserId(Authentication authentication) {
-        if (authentication == null || authentication.getPrincipal() == null) {
-            throw new BusinessException(ErrorCode.UNAUTHORIZED, "인증 정보가 없습니다.");
-        }
-        return (Long) authentication.getPrincipal();
     }
 }

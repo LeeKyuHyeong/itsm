@@ -5,9 +5,8 @@ import com.itsm.api.dto.common.StatusChangeRequest;
 import com.itsm.api.dto.common.UserIdRequest;
 import com.itsm.api.dto.incident.*;
 import com.itsm.api.service.incident.IncidentService;
+import com.itsm.api.util.AuthUtils;
 import com.itsm.core.dto.ApiResponse;
-import com.itsm.core.exception.BusinessException;
-import com.itsm.core.exception.ErrorCode;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -44,7 +43,7 @@ public class IncidentController {
     public ApiResponse<IncidentResponse> create(
             @Valid @RequestBody IncidentCreateRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(incidentService.create(req, currentUserId));
     }
 
@@ -53,7 +52,7 @@ public class IncidentController {
             @PathVariable Long incidentId,
             @Valid @RequestBody IncidentUpdateRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(incidentService.update(incidentId, req, currentUserId));
     }
 
@@ -62,7 +61,7 @@ public class IncidentController {
             @PathVariable Long incidentId,
             @Valid @RequestBody StatusChangeRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         incidentService.changeStatus(incidentId, req.getStatus(), currentUserId);
         return ApiResponse.success();
     }
@@ -72,7 +71,7 @@ public class IncidentController {
             @PathVariable Long incidentId,
             @Valid @RequestBody UserIdRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(incidentService.assignUser(incidentId, req.getUserId(), currentUserId));
     }
 
@@ -81,7 +80,7 @@ public class IncidentController {
             @PathVariable Long incidentId,
             @PathVariable Long userId,
             Authentication authentication) {
-        getCurrentUserId(authentication);
+        AuthUtils.getCurrentUserId(authentication);
         incidentService.removeAssignee(incidentId, userId);
         return ApiResponse.success();
     }
@@ -107,7 +106,7 @@ public class IncidentController {
             @PathVariable Long incidentId,
             @Valid @RequestBody ContentRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(incidentService.addComment(incidentId, req.getContent(), currentUserId));
     }
 
@@ -117,7 +116,7 @@ public class IncidentController {
             @PathVariable Long commentId,
             @Valid @RequestBody ContentRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(incidentService.updateComment(incidentId, commentId, req.getContent(), currentUserId));
     }
 
@@ -126,7 +125,7 @@ public class IncidentController {
             @PathVariable Long incidentId,
             @PathVariable Long commentId,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         incidentService.deleteComment(incidentId, commentId, currentUserId);
         return ApiResponse.success();
     }
@@ -152,7 +151,7 @@ public class IncidentController {
             @PathVariable Long incidentId,
             @Valid @RequestBody IncidentReportRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(incidentService.saveReport(incidentId, req, currentUserId));
     }
 
@@ -161,7 +160,7 @@ public class IncidentController {
             @PathVariable Long incidentId,
             @Valid @RequestBody IncidentReportRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(incidentService.updateReport(incidentId, req, currentUserId));
     }
 
@@ -170,7 +169,7 @@ public class IncidentController {
             @PathVariable Long incidentId,
             @Valid @RequestBody IncidentAssetRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         return ApiResponse.success(incidentService.addAsset(incidentId, req, currentUserId));
     }
 
@@ -193,15 +192,8 @@ public class IncidentController {
             @PathVariable Long incidentId,
             @Valid @RequestBody UserIdRequest req,
             Authentication authentication) {
-        Long currentUserId = getCurrentUserId(authentication);
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
         incidentService.assignMainManager(incidentId, req.getUserId(), currentUserId);
         return ApiResponse.success();
-    }
-
-    private Long getCurrentUserId(Authentication authentication) {
-        if (authentication == null || authentication.getPrincipal() == null) {
-            throw new BusinessException(ErrorCode.UNAUTHORIZED, "인증 정보가 없습니다.");
-        }
-        return (Long) authentication.getPrincipal();
     }
 }
