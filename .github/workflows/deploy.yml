@@ -157,13 +157,13 @@ jobs:
             cd ~/itsm
 
             # .env 파일 생성/갱신
-            cat > .env << ENVEOF
-            DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
-            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-            JWT_SECRET=${{ secrets.JWT_SECRET }}
-            CORS_ORIGINS=${{ secrets.CORS_ORIGINS }}
-            IMAGE_TAG=${{ github.sha }}
-            ENVEOF
+            cat > .env <<'ENVEOF'
+DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
+DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+JWT_SECRET=${{ secrets.JWT_SECRET }}
+CORS_ORIGINS=${{ secrets.CORS_ORIGINS }}
+IMAGE_TAG=${{ github.sha }}
+ENVEOF
 
             # 호스트 nginx 설정 (최초 1회만 복사)
             NGINX_CONF=/etc/nginx/conf.d/itsm.conf
