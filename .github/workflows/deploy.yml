@@ -195,17 +195,17 @@ jobs:
             docker compose pull
             docker compose up -d --remove-orphans
 
-            # 헬스체크 검증 (최대 60초 대기)
+            # 헬스체크 검증 (최대 90초 대기)
             echo "==> Waiting for health check..."
             HEALTHY=false
-            for i in $(seq 1 12); do
+            for i in $(seq 1 18); do
               sleep 5
-              if docker compose exec -T itsm-api wget -q --spider http://localhost:8080/actuator/health 2>/dev/null; then
+              if docker compose exec -T itsm-frontend curl -sf http://itsm-api:8080/actuator/health > /dev/null 2>&1; then
                 echo "==> API is healthy!"
                 HEALTHY=true
                 break
               fi
-              echo "==> Attempt $i/12: API not ready yet..."
+              echo "==> Attempt $i/18: API not ready yet..."
             done
 
             if [ "$HEALTHY" = "false" ]; then
