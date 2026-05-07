@@ -4,6 +4,20 @@
 
 ---
 
+## 다음 작업 (Next Up)
+
+**Phase 24-1: 백엔드 서비스 레이어 테스트 (HIGH)** — TDD 방식으로 진행
+
+진행 순서:
+1. `AuthService` (로그인, 토큰 갱신, 비밀번호 변경)
+2. `IncidentService` (생성, 상태 변경, SLA 계산)
+3. `DashboardService` (통계 집계)
+4. `UserService` (CRUD, 권한 검증)
+
+테스트 스택: JUnit 5 + Mockito (CLAUDE.md 가이드 준수)
+
+---
+
 ## 완료된 Phase
 
 - **Phase 11**: UI 테마 (라이트/다크 모드) ✅
@@ -11,7 +25,7 @@
 - **Phase 13**: 데모/시뮬레이션 배치 ✅
 - **Phase 14**: 전체 i18n (ko/en) 대응 ✅
 - **Phase 15**: CI/CD + 운영 배포 ✅
-- **Phase 16**: 운영 이슈 & OA 자산 분리 ✅ (운영 DB 반영 미완)
+- **Phase 16**: 운영 이슈 & OA 자산 분리 ✅
 - **Phase 17**: 소스 위험도 분석 및 품질 개선 ✅
 - **Phase 18**: 보안 강화 2차 (OWASP Top 10 기반 전 항목) ✅
 - **Phase 19**: 인프라 보안 & Docker 강화 ✅
@@ -24,8 +38,8 @@
 
 ## Phase 16 잔여 (운영 환경)
 
-- [ ] 운영 로그인 무반응 조사 (CORS / Cookie Secure / 브라우저 Network 탭 확인 필요)
-- [ ] SSL "주의 요함" 경고 확인 필요 (Mixed Content 또는 브라우저 캐시 문제 추정)
+- [x] 운영 로그인 무반응 조사 (CORS / Cookie Secure / 브라우저 Network 탭 확인 필요)
+- [x] SSL "주의 요함" 경고 확인 필요 (Mixed Content 또는 브라우저 캐시 문제 추정)
 - [x] 운영 DB에 tb_asset_oa, tb_asset_oa_history 테이블 생성 (ddl-auto: update로 자동생성 예상) → `sql/phase16_prod_migration.sql`
 - [x] 운영 DB에 OA 메뉴, OA 공통코드 시드데이터 INSERT → `sql/phase16_prod_migration.sql`
 
