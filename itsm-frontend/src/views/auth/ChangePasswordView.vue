@@ -112,7 +112,7 @@ const hasMinLength = computed(() => form.newPassword.length >= 8)
 const hasUppercase = computed(() => /[A-Z]/.test(form.newPassword))
 const hasLowercase = computed(() => /[a-z]/.test(form.newPassword))
 const hasDigit = computed(() => /[0-9]/.test(form.newPassword))
-const hasSpecialChar = computed(() => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(form.newPassword))
+const hasSpecialChar = computed(() => /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(form.newPassword))
 
 const isNewPasswordValid = computed(() =>
   hasMinLength.value && hasUppercase.value && hasLowercase.value && hasDigit.value && hasSpecialChar.value

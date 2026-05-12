@@ -8,21 +8,30 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest",
-    "test:run": "vitest run"
+    "test:run": "vitest run",
+    "lint": "eslint src --ext .js,.vue",
+    "lint:fix": "eslint src --ext .js,.vue --fix",
+    "format": "prettier --write \"src/**/*.{js,vue,json}\"",
+    "format:check": "prettier --check \"src/**/*.{js,vue,json}\""
   },
   "dependencies": {
     "@vuepic/vue-datepicker": "^12.1.0",
     "axios": "^1.14.0",
-    "chart.js": "^4.4.0",
     "pinia": "^2.1.0",
     "vue": "^3.4.0",
     "vue-i18n": "^9.14.5",
     "vue-router": "^4.3.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.4",
     "@vitejs/plugin-vue": "^6.0.5",
+    "@vue/eslint-config-prettier": "^10.2.0",
     "@vue/test-utils": "^2.4.0",
+    "eslint": "^9.39.4",
+    "eslint-plugin-vue": "^9.33.0",
+    "globals": "^17.6.0",
     "jsdom": "^24.0.0",
+    "prettier": "^3.8.3",
     "vite": "^6.4.1",
     "vitest": "^3.2.4"
   }

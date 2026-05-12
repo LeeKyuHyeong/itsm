@@ -2,6 +2,7 @@ package com.itsm.api.config;
 
 import com.itsm.api.interceptor.AuthInterceptor;
 import com.itsm.api.interceptor.MenuAccessInterceptor;
+import com.itsm.api.interceptor.PasswordExpiryInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +27,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     private final AuthInterceptor authInterceptor;
     private final MenuAccessInterceptor menuAccessInterceptor;
+    private final PasswordExpiryInterceptor passwordExpiryInterceptor;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
@@ -41,6 +43,15 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(authInterceptor)
+                .addPathPatterns("/api/**")
+                .excludePathPatterns(
+                        "/api/v1/auth/**",
+                        "/v3/api-docs/**",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html"
+                );
+
+        registry.addInterceptor(passwordExpiryInterceptor)
                 .addPathPatterns("/api/**")
                 .excludePathPatterns(
                         "/api/v1/auth/**",

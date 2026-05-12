@@ -27,3 +27,11 @@ security:
 logging:
   level:
     org.hibernate.SQL: warn
+
+# 프로덕션 환경: Swagger UI / OpenAPI 엔드포인트 비활성화 (보안 강화)
+# Nginx에서도 차단되지만 다중 방어를 위해 백엔드 레벨에서도 차단
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false

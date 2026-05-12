@@ -14,6 +14,7 @@ export default {
     loading: 'Loading...',
     processing: 'Processing...',
     noData: 'No data available.',
+    row: 'Row',
     required: 'Required',
     all: 'All',
     yes: 'Yes',

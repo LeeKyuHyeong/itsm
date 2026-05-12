@@ -6,11 +6,9 @@
 
 ## 다음 작업 (Next Up)
 
-**Phase 19 잔여 + Phase 22 잔여 + Phase 25 추가 개선** — 안정화 작업
+**Phase 25-7: Spring Boot 3.2.5 → 3.3.x 업그레이드** (보류) — 별도 작업으로 분리
 
-- Phase 19: appleboy/scp-action 버전 업데이트
-- Phase 22: 테이블 행 키보드 내비게이션
-- Phase 25: 안정화 후 선택적 진행 (7항목)
+> 의존성 충돌/호환성 이슈 발생 가능성 있어 단독 PR로 진행 예정.
 
 ---
 
@@ -74,7 +72,7 @@
 - [x] 배포 실패 시 자동 롤백 메커니즘 구현 (이전 IMAGE_TAG로 복원)
 - [x] 배포 전 DB 백업 단계 추가 (mariadb-dump + gzip, 최근 7개 보관)
 - [x] 컨테이너 이미지 스캐닝 추가 (Trivy — CRITICAL/HIGH)
-- [ ] appleboy/scp-action 버전 업데이트 (v0.1.7 — 최신 버전 확인 후 진행)
+- [x] appleboy/scp-action v0.1.7 → v1.0.0, ssh-action v1.0.3 → v1.2.5 업데이트
 - [x] deploy.yml: 하드코딩된 이메일/도메인 → `secrets.DOMAIN`, `secrets.CERTBOT_EMAIL`로 분리
 
 ### 5단계: Nginx SSL 강화 (MEDIUM)
@@ -162,7 +160,7 @@
 
 - [x] 모달 ESC 키 닫기 (BaseModal에 keydown 이벤트 리스너 추가)
 - [x] SVG 아이콘에 `aria-hidden="true"` + 부모 버튼에 `aria-label` 추가
-- [ ] 테이블 행 키보드 내비게이션 (추후 진행)
+- [x] 테이블 행 키보드 내비게이션 (BaseTable: tabindex, 화살표/Home/End/Enter/Space + 16개 테스트)
 
 ---
 
@@ -208,13 +206,13 @@
 
 > 안정화 후 선택적 진행.
 
-- [ ] 비밀번호 만료(90일) 시 강제 변경 인터셉터 구현
-- [ ] 요청 추적용 Request ID 필터 추가 (MDC 기반 Correlation ID)
-- [ ] 프로덕션 Swagger UI 접근 차단 (환경별 분기)
-- [ ] chart.js 사용 여부 확인 후 미사용 시 제거
-- [ ] `.env.example` 파일 추가 (필수 환경변수 목록 문서화)
-- [ ] ESLint + Prettier 프론트엔드 도입
-- [ ] Spring Boot 3.2.5 → 3.3.x 업그레이드
+- [x] 비밀번호 만료(90일) 시 강제 변경 인터셉터 구현 (PasswordExpiryInterceptor + 9 테스트)
+- [x] 요청 추적용 Request ID 필터 추가 (RequestIdFilter, MDC 기반 + logging 패턴 통합)
+- [x] 프로덕션 Swagger UI 접근 차단 (application-prod.yml `springdoc.*.enabled: false`)
+- [x] chart.js 사용 여부 확인 후 미사용 시 제거 (의존성 제거)
+- [x] `.env.example` 파일 추가 (필수 환경변수 목록 문서화)
+- [x] ESLint + Prettier 프론트엔드 도입 (eslint 9, prettier 3, lint/format 스크립트)
+- [ ] Spring Boot 3.2.5 → 3.3.x 업그레이드 (별도 작업으로 분리)
 
 ---
 

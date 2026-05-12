@@ -14,6 +14,7 @@ export default {
     loading: '로딩중...',
     processing: '처리중...',
     noData: '데이터가 없습니다.',
+    row: '행',
     required: '필수',
     all: '전체',
     yes: '예',

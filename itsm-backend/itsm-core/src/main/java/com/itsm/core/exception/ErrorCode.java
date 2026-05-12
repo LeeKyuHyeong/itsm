@@ -20,6 +20,7 @@ public enum ErrorCode {
 
     // 403 Forbidden
     ACCESS_DENIED(403, "E403_001", "접근 권한이 없습니다."),
+    PASSWORD_EXPIRED(403, "E403_002", "비밀번호 만료. 변경이 필요합니다."),
 
     // 404 Not Found
     ENTITY_NOT_FOUND(404, "E404_001", "대상을 찾을 수 없습니다."),
