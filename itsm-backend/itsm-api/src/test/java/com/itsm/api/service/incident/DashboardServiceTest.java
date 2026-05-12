@@ -1,7 +1,10 @@
 package com.itsm.api.service.incident;
 
 import com.itsm.api.dto.incident.DashboardStatsResponse;
+import com.itsm.api.dto.incident.IncidentResponse;
 import com.itsm.api.dto.incident.MonthlyTrendItem;
+import com.itsm.core.domain.company.Company;
+import com.itsm.core.domain.incident.Incident;
 import com.itsm.core.repository.change.ChangeRepository;
 import com.itsm.core.repository.incident.IncidentRepository;
 import com.itsm.core.repository.inspection.InspectionRepository;
@@ -14,9 +17,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -275,5 +278,130 @@ class DashboardServiceTest {
         given(incidentRepository.findRecentWithCompany(any(Pageable.class))).willReturn(new PageImpl<>(Collections.emptyList()));
         given(incidentRepository.countUnassigned()).willReturn(0L);
         given(incidentRepository.countByCreatedAtBetween(any(), any())).willReturn(0L);
+    }
+
+    @Test
+    @DisplayName("getStats - 모든 데이터가 비어있어도 0으로 초기화된 통계를 반환한다")
+    void getStats_emptyData_returnsZeroCounts() {
+        // given
+        stubAllIncidentDefaults();
+        given(serviceRequestRepository.countGroupByStatusCd()).willReturn(Collections.emptyList());
+        given(serviceRequestRepository.countByCreatedAtBetween(any(), any())).willReturn(0L);
+        given(changeRepository.countGroupByStatusCd()).willReturn(Collections.emptyList());
+        given(changeRepository.countByCreatedAtBetween(any(), any())).willReturn(0L);
+        given(inspectionRepository.countGroupByStatusCd()).willReturn(Collections.emptyList());
+
+        // when
+        DashboardStatsResponse result = dashboardService.getStats();
+
+        // then
+        assertThat(result.getTotalIncidentCount()).isZero();
+        assertThat(result.getTotalSrCount()).isZero();
+        assertThat(result.getTotalChangeCount()).isZero();
+        assertThat(result.getTotalInspectionCount()).isZero();
+        assertThat(result.getPriorityCounts()).containsEntry("CRITICAL", 0L);
+        assertThat(result.getPriorityCounts()).containsEntry("HIGH", 0L);
+        assertThat(result.getPriorityCounts()).containsEntry("MEDIUM", 0L);
+        assertThat(result.getPriorityCounts()).containsEntry("LOW", 0L);
+        assertThat(result.getRecentIncidents()).isEmpty();
+        assertThat(result.getMonthlyTrend()).hasSize(6);
+    }
+
+    @Test
+    @DisplayName("getStats - 최근 인시던트 목록을 회사명과 함께 매핑한다")
+    void getStats_returnsRecentIncidentsWithCompany() {
+        // given
+        Company company = Company.builder().companyNm("ACME").build();
+        ReflectionTestUtils.setField(company, "companyId", 1L);
+        Incident inc = Incident.builder()
+                .title("Server Down")
+                .priorityCd("HIGH")
+                .occurredAt(LocalDateTime.now())
+                .company(company)
+                .build();
+        ReflectionTestUtils.setField(inc, "incidentId", 100L);
+
+        given(incidentRepository.countGroupByStatusCd()).willReturn(Collections.emptyList());
+        given(incidentRepository.countActivePriorityGrouped()).willReturn(Collections.emptyList());
+        given(incidentRepository.countSlaOverdue(any())).willReturn(0L);
+        given(incidentRepository.countSlaWarning(any())).willReturn(0L);
+        given(incidentRepository.findRecentWithCompany(any(Pageable.class)))
+                .willReturn(new PageImpl<>(List.of(inc)));
+        given(incidentRepository.countUnassigned()).willReturn(0L);
+        given(incidentRepository.countByCreatedAtBetween(any(), any())).willReturn(0L);
+        given(serviceRequestRepository.countGroupByStatusCd()).willReturn(Collections.emptyList());
+        given(serviceRequestRepository.countByCreatedAtBetween(any(), any())).willReturn(0L);
+        given(changeRepository.countGroupByStatusCd()).willReturn(Collections.emptyList());
+        given(changeRepository.countByCreatedAtBetween(any(), any())).willReturn(0L);
+        given(inspectionRepository.countGroupByStatusCd()).willReturn(Collections.emptyList());
+
+        // when
+        DashboardStatsResponse result = dashboardService.getStats();
+
+        // then
+        assertThat(result.getRecentIncidents()).hasSize(1);
+        IncidentResponse mapped = result.getRecentIncidents().get(0);
+        assertThat(mapped.getIncidentId()).isEqualTo(100L);
+        assertThat(mapped.getTitle()).isEqualTo("Server Down");
+        assertThat(mapped.getCompanyNm()).isEqualTo("ACME");
+        assertThat(mapped.getPriorityCd()).isEqualTo("HIGH");
+    }
+
+    @Test
+    @DisplayName("getStats - 회사가 null인 인시던트도 매핑한다")
+    void getStats_recentIncidentsWithNullCompany() {
+        // given
+        Incident inc = Incident.builder()
+                .title("Standalone Incident")
+                .priorityCd("LOW")
+                .occurredAt(LocalDateTime.now())
+                .build();
+        ReflectionTestUtils.setField(inc, "incidentId", 200L);
+
+        given(incidentRepository.countGroupByStatusCd()).willReturn(Collections.emptyList());
+        given(incidentRepository.countActivePriorityGrouped()).willReturn(Collections.emptyList());
+        given(incidentRepository.countSlaOverdue(any())).willReturn(0L);
+        given(incidentRepository.countSlaWarning(any())).willReturn(0L);
+        given(incidentRepository.findRecentWithCompany(any(Pageable.class)))
+                .willReturn(new PageImpl<>(List.of(inc)));
+        given(incidentRepository.countUnassigned()).willReturn(0L);
+        given(incidentRepository.countByCreatedAtBetween(any(), any())).willReturn(0L);
+        given(serviceRequestRepository.countGroupByStatusCd()).willReturn(Collections.emptyList());
+        given(serviceRequestRepository.countByCreatedAtBetween(any(), any())).willReturn(0L);
+        given(changeRepository.countGroupByStatusCd()).willReturn(Collections.emptyList());
+        given(changeRepository.countByCreatedAtBetween(any(), any())).willReturn(0L);
+        given(inspectionRepository.countGroupByStatusCd()).willReturn(Collections.emptyList());
+
+        // when
+        DashboardStatsResponse result = dashboardService.getStats();
+
+        // then
+        assertThat(result.getRecentIncidents()).hasSize(1);
+        assertThat(result.getRecentIncidents().get(0).getCompanyNm()).isNull();
+    }
+
+    @Test
+    @DisplayName("getStats - 월별 추이는 yyyy-MM 형식의 6개월을 시간 순서대로 반환한다")
+    void getStats_monthlyTrendOrderedAscending() {
+        // given
+        stubAllIncidentDefaults();
+        given(serviceRequestRepository.countGroupByStatusCd()).willReturn(Collections.emptyList());
+        given(serviceRequestRepository.countByCreatedAtBetween(any(), any())).willReturn(0L);
+        given(changeRepository.countGroupByStatusCd()).willReturn(Collections.emptyList());
+        given(changeRepository.countByCreatedAtBetween(any(), any())).willReturn(0L);
+        given(inspectionRepository.countGroupByStatusCd()).willReturn(Collections.emptyList());
+
+        // when
+        DashboardStatsResponse result = dashboardService.getStats();
+
+        // then
+        assertThat(result.getMonthlyTrend()).hasSize(6);
+        for (MonthlyTrendItem item : result.getMonthlyTrend()) {
+            assertThat(item.getMonth()).matches("\\d{4}-\\d{2}");
+        }
+        // 시간 순서 보장 (오름차순)
+        String first = result.getMonthlyTrend().get(0).getMonth();
+        String last = result.getMonthlyTrend().get(5).getMonth();
+        assertThat(first.compareTo(last)).isLessThanOrEqualTo(0);
     }
 }

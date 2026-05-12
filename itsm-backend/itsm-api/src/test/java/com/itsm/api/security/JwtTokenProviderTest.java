@@ -138,4 +138,45 @@ class JwtTokenProviderTest {
         assertThat(claims.getSubject()).isEqualTo("1");
         assertThat(claims.get("type", String.class)).isEqualTo("REFRESH");
     }
+
+    @Test
+    @DisplayName("invalidate 호출 후 토큰은 더 이상 유효하지 않다 (블랙리스트)")
+    void invalidate_blacklistedToken_failsValidation() {
+        // given
+        String token = jwtTokenProvider.createAccessToken(1L, "admin", List.of("ADMIN"));
+        assertThat(jwtTokenProvider.validateToken(token)).isTrue();
+
+        // when
+        jwtTokenProvider.invalidate(token);
+
+        // then
+        assertThat(jwtTokenProvider.validateToken(token)).isFalse();
+    }
+
+    @Test
+    @DisplayName("다른 secret으로 서명된 토큰은 validateToken이 false를 반환한다 (변조 방지)")
+    void validateToken_tamperedSignature_returnsFalse() {
+        // given
+        String otherSecret = "ZGlmZmVyZW50LXNlY3JldC1rZXktZm9yLXRhbXBlcmluZy10ZXN0LW1pbmltdW0tMjU2LWJpdHMtbG9uZw==";
+        JwtTokenProvider otherProvider = new JwtTokenProvider(
+                otherSecret, ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY, new JwtBlacklist());
+        String tampered = otherProvider.createAccessToken(1L, "admin", List.of("ADMIN"));
+
+        // when & then
+        assertThat(jwtTokenProvider.validateToken(tampered)).isFalse();
+    }
+
+    @Test
+    @DisplayName("getAccessTokenExpirySeconds는 밀리초를 초로 변환하여 반환한다")
+    void getAccessTokenExpirySeconds_returnsConvertedValue() {
+        assertThat(jwtTokenProvider.getAccessTokenExpirySeconds()).isEqualTo(1800L);
+    }
+
+    @Test
+    @DisplayName("유효하지 않은 토큰을 invalidate해도 예외가 발생하지 않는다")
+    void invalidate_invalidToken_doesNotThrow() {
+        // 만료된 토큰이나 변조된 토큰도 invalidate 호출 시 silent하게 처리
+        jwtTokenProvider.invalidate("not.a.valid.token");
+        jwtTokenProvider.invalidate("");
+    }
 }

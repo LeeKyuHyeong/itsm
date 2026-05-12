@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -306,5 +307,178 @@ class UserServiceTest {
 
         // then
         verify(userRoleRepository).deleteByUserIdAndRoleId(1L, 2L);
+    }
+
+    @Test
+    @DisplayName("사용자 상세 정보를 조회한다")
+    void getUser_success() {
+        given(userRepository.findById(1L)).willReturn(Optional.of(activeUser));
+        given(userRoleRepository.findByUserIdWithRole(1L)).willReturn(List.of(userRole));
+
+        UserDetailResponse result = userService.getUser(1L);
+
+        assertThat(result.getUserId()).isEqualTo(1L);
+        assertThat(result.getLoginId()).isEqualTo("testuser");
+        assertThat(result.getDeptName()).isEqualTo("IT부서");
+        assertThat(result.getCompanyName()).isEqualTo("테스트회사");
+        assertThat(result.getRoles()).hasSize(1);
+        assertThat(result.getRoles().get(0).getRoleCd()).isEqualTo("ADMIN");
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 사용자 조회 시 예외가 발생한다")
+    void getUser_notFound_throwsException() {
+        given(userRepository.findById(999L)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> userService.getUser(999L))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(ErrorCode.ENTITY_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("사용자 생성 시 부서가 존재하지 않으면 예외가 발생한다")
+    void createUser_deptNotFound_throwsException() {
+        UserCreateRequest req = new UserCreateRequest(
+                "newuser", "Password1!", "신규사용자", null, 999L, null, null);
+        given(userRepository.existsByLoginId("newuser")).willReturn(false);
+        given(departmentRepository.findById(999L)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> userService.createUser(req, 1L))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(ErrorCode.ENTITY_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("사용자 저장 중 데이터 무결성 위반 시 DUPLICATE_VALUE 예외로 변환된다")
+    void createUser_dataIntegrityViolation_throwsDuplicateValue() {
+        UserCreateRequest req = new UserCreateRequest(
+                "newuser", "Password1!", "신규사용자", null, null, null, null);
+        given(userRepository.existsByLoginId("newuser")).willReturn(false);
+        given(passwordEncoder.encode("Password1!")).willReturn("encoded");
+        given(userRepository.save(any(User.class))).willThrow(new DataIntegrityViolationException("duplicate"));
+
+        assertThatThrownBy(() -> userService.createUser(req, 1L))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(ErrorCode.DUPLICATE_VALUE);
+    }
+
+    @Test
+    @DisplayName("사용자 수정 시 사용자가 존재하지 않으면 예외가 발생한다")
+    void updateUser_notFound_throwsException() {
+        UserUpdateRequest req = new UserUpdateRequest("이름", "EMP", 1L, "e@t.com", "010-0");
+        given(userRepository.findById(999L)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> userService.updateUser(999L, req, 1L))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(ErrorCode.ENTITY_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("DELETED 사용자 수정 시 INVALID_INPUT_VALUE 예외가 발생한다")
+    void updateUser_deletedUser_throwsException() {
+        ReflectionTestUtils.setField(activeUser, "status", "DELETED");
+        UserUpdateRequest req = new UserUpdateRequest("이름", "EMP", 1L, "e@t.com", "010-0");
+        given(userRepository.findById(1L)).willReturn(Optional.of(activeUser));
+
+        assertThatThrownBy(() -> userService.updateUser(1L, req, 1L))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(ErrorCode.INVALID_INPUT_VALUE);
+    }
+
+    @Test
+    @DisplayName("사용자 수정 시 부서가 존재하지 않으면 예외가 발생한다")
+    void updateUser_deptNotFound_throwsException() {
+        UserUpdateRequest req = new UserUpdateRequest("이름", "EMP", 999L, "e@t.com", "010-0");
+        given(userRepository.findById(1L)).willReturn(Optional.of(activeUser));
+        given(departmentRepository.findById(999L)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> userService.updateUser(1L, req, 1L))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(ErrorCode.ENTITY_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("사용자 상태 변경 시 사용자가 존재하지 않으면 예외가 발생한다")
+    void changeUserStatus_notFound_throwsException() {
+        UserStatusRequest req = new UserStatusRequest("LOCKED");
+        given(userRepository.findById(999L)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> userService.changeUserStatus(999L, req, 1L))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(ErrorCode.ENTITY_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("사용자 상태를 LOCKED로 변경한다")
+    void changeUserStatus_toLocked_success() {
+        UserStatusRequest req = new UserStatusRequest("LOCKED");
+        given(userRepository.findById(1L)).willReturn(Optional.of(activeUser));
+
+        userService.changeUserStatus(1L, req, 1L);
+
+        assertThat(activeUser.getStatus()).isEqualTo("LOCKED");
+        verify(userHistoryRepository).save(any(UserHistory.class));
+    }
+
+    @Test
+    @DisplayName("사용자 이력 목록을 조회한다")
+    void getUserHistory_returnsList() {
+        UserHistory history = UserHistory.builder()
+                .userId(1L).loginId("testuser").userNm("이름")
+                .changedField("email").beforeValue("a@b.com").afterValue("c@d.com")
+                .createdBy(1L)
+                .build();
+        given(userHistoryRepository.findByUserIdOrderByCreatedAtDesc(1L)).willReturn(List.of(history));
+
+        List<UserHistory> result = userService.getUserHistory(1L);
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getChangedField()).isEqualTo("email");
+    }
+
+    @Test
+    @DisplayName("역할 부여 시 사용자가 존재하지 않으면 예외가 발생한다")
+    void grantRole_userNotFound_throwsException() {
+        RoleGrantRequest req = new RoleGrantRequest(2L);
+        given(userRepository.existsById(999L)).willReturn(false);
+
+        assertThatThrownBy(() -> userService.grantRole(999L, req, 1L))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(ErrorCode.ENTITY_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("역할 부여 시 역할이 존재하지 않으면 예외가 발생한다")
+    void grantRole_roleNotFound_throwsException() {
+        RoleGrantRequest req = new RoleGrantRequest(999L);
+        given(userRepository.existsById(1L)).willReturn(true);
+        given(roleRepository.existsById(999L)).willReturn(false);
+
+        assertThatThrownBy(() -> userService.grantRole(1L, req, 1L))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(ErrorCode.ENTITY_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("이미 부여된 역할 재부여 시 DUPLICATE_VALUE 예외가 발생한다")
+    void grantRole_alreadyGranted_throwsException() {
+        RoleGrantRequest req = new RoleGrantRequest(2L);
+        given(userRepository.existsById(1L)).willReturn(true);
+        given(roleRepository.existsById(2L)).willReturn(true);
+        given(userRoleRepository.existsById(any(UserRoleId.class))).willReturn(true);
+
+        assertThatThrownBy(() -> userService.grantRole(1L, req, 1L))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(ErrorCode.DUPLICATE_VALUE);
     }
 }

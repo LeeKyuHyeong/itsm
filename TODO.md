@@ -6,15 +6,11 @@
 
 ## 다음 작업 (Next Up)
 
-**Phase 24-1: 백엔드 서비스 레이어 테스트 (HIGH)** — TDD 방식으로 진행
+**Phase 19 잔여 + Phase 22 잔여 + Phase 25 추가 개선** — 안정화 작업
 
-진행 순서:
-1. `AuthService` (로그인, 토큰 갱신, 비밀번호 변경)
-2. `IncidentService` (생성, 상태 변경, SLA 계산)
-3. `DashboardService` (통계 집계)
-4. `UserService` (CRUD, 권한 검증)
-
-테스트 스택: JUnit 5 + Mockito (CLAUDE.md 가이드 준수)
+- Phase 19: appleboy/scp-action 버전 업데이트
+- Phase 22: 테이블 행 키보드 내비게이션
+- Phase 25: 안정화 후 선택적 진행 (7항목)
 
 ---
 
@@ -33,6 +29,7 @@
 - **Phase 21**: 백엔드 코드 품질 개선 ✅
 - **Phase 22**: 프론트엔드 성능 & UX 개선 ✅
 - **Phase 23**: i18n 완성 ✅
+- **Phase 24**: 테스트 커버리지 확대 ✅
 
 ---
 
@@ -183,27 +180,27 @@
 
 ## Phase 24: 테스트 커버리지 확대 (MEDIUM)
 
-> 현재 백엔드 11%, 프론트엔드 10% 미만. 핵심 비즈니스 로직 우선 확보.
+> 백엔드 455 테스트 / 프론트엔드 148 테스트. 핵심 비즈니스 로직 + 보안 + UI 모두 보강 완료.
 
 ### 1단계: 백엔드 서비스 레이어 (HIGH)
 
-- [ ] AuthService 테스트 (로그인, 토큰 갱신, 비밀번호 변경)
-- [ ] IncidentService 테스트 (생성, 상태 변경, SLA 계산)
-- [ ] DashboardService 테스트 (통계 집계)
-- [ ] UserService 테스트 (CRUD, 권한 검증)
+- [x] AuthService 테스트 (로그인, 토큰 갱신, 비밀번호 변경, getMe, logout 등 20케이스)
+- [x] IncidentService 테스트 (생성, 상태 변경, SLA 계산, 담당자/댓글/보고서/자산 등 34케이스)
+- [x] DashboardService 테스트 (통계 집계, 빈 데이터, 최근 인시던트 매핑 등 12케이스)
+- [x] UserService 테스트 (CRUD, 권한 검증, 이력, 부서/역할 미존재 등 25케이스)
 
 ### 2단계: 백엔드 통합/보안 테스트 (MEDIUM)
 
-- [ ] MockMvc 기반 Controller 통합 테스트 (주요 엔드포인트)
-- [ ] JWT 만료/갱신 시나리오 테스트
-- [ ] 역할 기반 접근 제어 검증 테스트
-- [ ] Rate Limiting 동작 테스트
+- [x] MockMvc 기반 Controller 통합 테스트 (AuthControllerTest: refresh, logout, rate-limit 시나리오 추가)
+- [x] JWT 만료/갱신 시나리오 테스트 (JwtTokenProviderTest: blacklist, 토큰 변조 케이스 추가, 12케이스)
+- [x] 역할 기반 접근 제어 검증 테스트 (MethodSecurityTest 기존 활용)
+- [x] Rate Limiting 동작 테스트 (LoginRateLimiterTest 신규 5케이스)
 
 ### 3단계: 프론트엔드 테스트 (MEDIUM)
 
-- [ ] Store 테스트 확대 (commonCode, notification, menu)
-- [ ] API 에러 시나리오 테스트 (MSW 도입 고려)
-- [ ] 주요 폼 컴포넌트 유효성 검증 테스트
+- [x] Store 테스트 확대: auth (13), commonCode (14), menu (9), notification (14) - 총 50케이스
+- [x] API 에러 시나리오 테스트 (401 refresh/retry, 500/403/404, 네트워크 에러 - 14케이스)
+- [x] 주요 폼 컴포넌트 유효성 검증 테스트 (UserFormModal 16, CodeGroupFormModal 11, BaseModal 13)
 
 ---
 

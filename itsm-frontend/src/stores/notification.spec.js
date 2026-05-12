@@ -143,4 +143,40 @@ describe('notification store', () => {
     expect(store.notifications).toHaveLength(2)
     expect(store.notifications.find(n => n.id === 2)).toBeTruthy()
   })
+
+  it('fetchUnreadCount handles API error gracefully', async () => {
+    const store = useNotificationStore()
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    notificationApi.getList.mockRejectedValue(new Error('Network error'))
+
+    await store.fetchUnreadCount()
+
+    expect(consoleSpy).toHaveBeenCalled()
+  })
+
+  it('fetchNotifications supports legacy items field', async () => {
+    const store = useNotificationStore()
+    const mockData = [{ id: 5, title: 'legacy', readAt: null }]
+    notificationApi.getList.mockResolvedValue({
+      data: { data: { items: mockData } }
+    })
+
+    await store.fetchNotifications()
+
+    expect(store.notifications).toEqual(mockData)
+  })
+
+  it('markAllAsRead preserves already-read notifications timestamp', () => {
+    const store = useNotificationStore()
+    const existingDate = '2025-12-01T00:00:00Z'
+    store.setNotifications([
+      { id: 1, title: '읽음', readAt: existingDate },
+      { id: 2, title: '안읽음', readAt: null }
+    ])
+
+    store.markAllAsRead()
+
+    expect(store.notifications[0].readAt).toBe(existingDate)
+    expect(store.notifications[1].readAt).toBeTruthy()
+  })
 })

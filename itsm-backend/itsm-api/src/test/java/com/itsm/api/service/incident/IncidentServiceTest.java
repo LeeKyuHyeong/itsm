@@ -331,4 +331,231 @@ class IncidentServiceTest {
 
         assertThat(result.getSlaPercentage()).isBetween(40.0, 60.0);
     }
+
+    @Test
+    @DisplayName("장애 생성 시 회사가 존재하지 않으면 예외가 발생한다")
+    void create_companyNotFound_throwsException() {
+        IncidentCreateRequest req = new IncidentCreateRequest(
+                "서버 장애", "메인 서버 다운", "SYSTEM_DOWN", "CRITICAL",
+                LocalDateTime.of(2026, 3, 13, 10, 0), 999L, null, null);
+        given(companyRepository.findById(999L)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> incidentService.create(req, 1L))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(ErrorCode.ENTITY_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("장애 생성 시 담당자가 존재하지 않으면 예외가 발생한다")
+    void create_mainManagerNotFound_throwsException() {
+        IncidentCreateRequest req = new IncidentCreateRequest(
+                "서버 장애", "메인 서버 다운", "SYSTEM_DOWN", "CRITICAL",
+                LocalDateTime.of(2026, 3, 13, 10, 0), 1L, 999L, null);
+        given(companyRepository.findById(1L)).willReturn(Optional.of(company));
+        given(userRepository.findById(999L)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> incidentService.create(req, 1L))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(ErrorCode.ENTITY_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("회사별 SLA 정책 없으면 기본 정책으로 fallback")
+    void create_fallbackToDefaultSla() {
+        IncidentCreateRequest req = new IncidentCreateRequest(
+                "서버 장애", "내용", "SYSTEM_DOWN", "LOW",
+                LocalDateTime.of(2026, 3, 13, 10, 0), 1L, null, null);
+
+        given(companyRepository.findById(1L)).willReturn(Optional.of(company));
+        given(slaPolicyRepository.findByCompanyIdAndPriorityCd(1L, "LOW")).willReturn(Optional.empty());
+        SlaPolicy defaultPolicy = SlaPolicy.builder()
+                .priorityCd("LOW").deadlineHours(24).warningPct(80).build();
+        given(slaPolicyRepository.findByCompanyIdIsNullAndPriorityCd("LOW")).willReturn(Optional.of(defaultPolicy));
+        given(incidentRepository.save(any(Incident.class))).willAnswer(inv -> {
+            Incident saved = inv.getArgument(0);
+            ReflectionTestUtils.setField(saved, "incidentId", 2L);
+            return saved;
+        });
+
+        IncidentResponse result = incidentService.create(req, 1L);
+
+        assertThat(result.getSlaDeadlineAt()).isEqualTo(LocalDateTime.of(2026, 3, 14, 10, 0));
+    }
+
+    @Test
+    @DisplayName("상태가 REJECTED로 변경되면 SLA deadline이 연장된다")
+    void changeStatus_rejected_extendsSla() {
+        LocalDateTime originalDeadline = LocalDateTime.of(2026, 3, 13, 14, 0);
+        incident.setSlaDeadline(originalDeadline);
+        ReflectionTestUtils.setField(incident, "statusCd", "IN_PROGRESS");
+        given(incidentRepository.findById(1L)).willReturn(Optional.of(incident));
+        SlaPolicy policy = SlaPolicy.builder()
+                .priorityCd("CRITICAL").deadlineHours(4).warningPct(80).build();
+        given(slaPolicyRepository.findByCompanyIdAndPriorityCd(1L, "CRITICAL")).willReturn(Optional.of(policy));
+
+        incidentService.changeStatus(1L, "REJECTED", 1L);
+
+        assertThat(incident.getStatusCd()).isEqualTo("REJECTED");
+        assertThat(incident.getSlaDeadlineAt()).isAfter(originalDeadline);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 장애의 상태 변경 시 예외가 발생한다")
+    void changeStatus_incidentNotFound_throwsException() {
+        given(incidentRepository.findById(999L)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> incidentService.changeStatus(999L, "IN_PROGRESS", 1L))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(ErrorCode.ENTITY_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("이미 지정된 담당자 중복 지정 시 DUPLICATE_VALUE 예외가 발생한다")
+    void assignUser_duplicate_throwsException() {
+        given(incidentRepository.findById(1L)).willReturn(Optional.of(incident));
+        given(userRepository.findById(10L)).willReturn(Optional.of(manager));
+        IncidentAssignee existing = IncidentAssignee.builder()
+                .incidentId(1L).userId(10L).grantedBy(1L).build();
+        given(incidentAssigneeRepository.findById(any())).willReturn(Optional.of(existing));
+
+        assertThatThrownBy(() -> incidentService.assignUser(1L, 10L, 1L))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(ErrorCode.DUPLICATE_VALUE);
+    }
+
+    @Test
+    @DisplayName("담당자 지정 시 사용자가 존재하지 않으면 예외가 발생한다")
+    void assignUser_userNotFound_throwsException() {
+        given(incidentRepository.findById(1L)).willReturn(Optional.of(incident));
+        given(userRepository.findById(999L)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> incidentService.assignUser(1L, 999L, 1L))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(ErrorCode.ENTITY_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 담당자 해제 시 예외가 발생한다")
+    void removeAssignee_notFound_throwsException() {
+        given(incidentAssigneeRepository.findById(any())).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> incidentService.removeAssignee(1L, 10L))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(ErrorCode.ENTITY_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("본인이 작성하지 않은 댓글 삭제 시 ACCESS_DENIED 예외가 발생한다")
+    void deleteComment_notOwner_throwsAccessDenied() {
+        IncidentComment comment = IncidentComment.builder()
+                .incidentId(1L).content("내용").createdBy(10L).build();
+        ReflectionTestUtils.setField(comment, "commentId", 1L);
+        given(incidentCommentRepository.findById(1L)).willReturn(Optional.of(comment));
+
+        assertThatThrownBy(() -> incidentService.deleteComment(1L, 1L, 99L))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(ErrorCode.ACCESS_DENIED);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 댓글 수정 시 예외가 발생한다")
+    void updateComment_notFound_throwsException() {
+        given(incidentCommentRepository.findById(999L)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> incidentService.updateComment(1L, 999L, "내용", 10L))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(ErrorCode.ENTITY_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("장애보고서 중복 생성 시 DUPLICATE_VALUE 예외가 발생한다")
+    void saveReport_duplicate_throwsException() {
+        given(incidentRepository.findById(1L)).willReturn(Optional.of(incident));
+        IncidentReport existing = IncidentReport.builder()
+                .incidentId(1L).reportFormId(1L).reportContent("{}").createdBy(1L).build();
+        given(incidentReportRepository.findByIncidentId(1L)).willReturn(Optional.of(existing));
+
+        IncidentReportRequest req = new IncidentReportRequest(1L, "{}");
+        assertThatThrownBy(() -> incidentService.saveReport(1L, req, 1L))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(ErrorCode.DUPLICATE_VALUE);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 장애보고서 조회 시 예외가 발생한다")
+    void getReport_notFound_throwsException() {
+        given(incidentReportRepository.findByIncidentId(1L)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> incidentService.getReport(1L))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(ErrorCode.ENTITY_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("주담당자를 지정하면 이력이 저장된다")
+    void assignMainManager_success() {
+        given(incidentRepository.findById(1L)).willReturn(Optional.of(incident));
+        given(userRepository.findById(10L)).willReturn(Optional.of(manager));
+
+        incidentService.assignMainManager(1L, 10L, 1L);
+
+        assertThat(incident.getMainManager()).isEqualTo(manager);
+        verify(incidentHistoryRepository).save(any(IncidentHistory.class));
+    }
+
+    @Test
+    @DisplayName("주담당자 지정 시 사용자가 존재하지 않으면 예외가 발생한다")
+    void assignMainManager_userNotFound_throwsException() {
+        given(incidentRepository.findById(1L)).willReturn(Optional.of(incident));
+        given(userRepository.findById(999L)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> incidentService.assignMainManager(1L, 999L, 1L))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(ErrorCode.ENTITY_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("자산을 추가한다")
+    void addAsset_success() {
+        given(incidentRepository.findById(1L)).willReturn(Optional.of(incident));
+        given(incidentAssetRepository.save(any(IncidentAsset.class))).willAnswer(inv -> inv.getArgument(0));
+
+        IncidentAssetRequest req = new IncidentAssetRequest("HW", 5L);
+        IncidentAssetResponse result = incidentService.addAsset(1L, req, 1L);
+
+        assertThat(result.getAssetType()).isEqualTo("HW");
+        assertThat(result.getAssetId()).isEqualTo(5L);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 자산 제거 시 예외가 발생한다")
+    void removeAsset_notFound_throwsException() {
+        given(incidentAssetRepository.findById(any())).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> incidentService.removeAsset(1L, "HW", 5L))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(ErrorCode.ENTITY_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("SLA deadline이 없으면 slaPercentage는 null이다")
+    void slaPercentage_nullDeadline_returnsNull() {
+        given(incidentRepository.findById(1L)).willReturn(Optional.of(incident));
+
+        IncidentResponse result = incidentService.getDetail(1L);
+
+        assertThat(result.getSlaPercentage()).isNull();
+    }
 }

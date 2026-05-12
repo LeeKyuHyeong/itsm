@@ -3,7 +3,11 @@ package com.itsm.api.service.auth;
 import com.itsm.api.dto.auth.ChangePasswordRequest;
 import com.itsm.api.dto.auth.LoginRequest;
 import com.itsm.api.dto.auth.LoginResponse;
+import com.itsm.api.dto.auth.UserInfoResponse;
 import com.itsm.api.security.JwtTokenProvider;
+import com.itsm.core.constant.UserStatus;
+import com.itsm.core.domain.company.Company;
+import com.itsm.core.domain.company.Department;
 import com.itsm.core.domain.user.Role;
 import com.itsm.core.domain.user.User;
 import com.itsm.core.domain.user.UserRole;
@@ -213,5 +217,215 @@ class AuthServiceTest {
         // then
         assertThat(activeUser.getPassword()).isEqualTo("newEncodedPassword");
         assertThat(activeUser.getPwdChangedAt()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 사용자로 로그인 시 UNAUTHORIZED 예외가 발생한다")
+    void login_userNotFound_throwsUnauthorized() {
+        // given
+        LoginRequest request = new LoginRequest("unknown", "password123");
+        given(userRepository.findByLoginId("unknown")).willReturn(Optional.empty());
+        given(accessLogRepository.save(any())).willReturn(null);
+
+        // when & then
+        assertThatThrownBy(() -> authService.login(request, "127.0.0.1"))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(ErrorCode.UNAUTHORIZED);
+
+        verify(accessLogRepository, times(1)).save(any());
+    }
+
+    @Test
+    @DisplayName("DELETED 상태의 계정으로 로그인 시 UNAUTHORIZED 예외가 발생한다")
+    void login_deletedAccount_throwsUnauthorized() {
+        // given
+        ReflectionTestUtils.setField(activeUser, "status", UserStatus.DELETED);
+        LoginRequest request = new LoginRequest("admin", "password123");
+        given(userRepository.findByLoginId("admin")).willReturn(Optional.of(activeUser));
+        given(accessLogRepository.save(any())).willReturn(null);
+
+        // when & then
+        assertThatThrownBy(() -> authService.login(request, "127.0.0.1"))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(ErrorCode.UNAUTHORIZED);
+    }
+
+    @Test
+    @DisplayName("리프레시 토큰이 유효하면 새로운 액세스 토큰을 발급한다")
+    void refresh_validToken_returnsNewAccessToken() {
+        // given
+        String refreshToken = "valid-refresh-token";
+        given(jwtTokenProvider.validateToken(refreshToken)).willReturn(true);
+        given(jwtTokenProvider.getUserId(refreshToken)).willReturn(1L);
+        given(userRepository.findById(1L)).willReturn(Optional.of(activeUser));
+        given(userRoleRepository.findByUserIdWithRole(1L)).willReturn(List.of(userRole));
+        given(jwtTokenProvider.createAccessToken(eq(1L), eq("admin"), anyList()))
+                .willReturn("new-access-token");
+
+        // when
+        LoginResponse response = authService.refresh(refreshToken);
+
+        // then
+        assertThat(response.getAccessToken()).isEqualTo("new-access-token");
+        assertThat(response.getRefreshToken()).isEqualTo(refreshToken);
+        assertThat(response.getUserId()).isEqualTo(1L);
+        assertThat(response.getRoles()).containsExactly("ADMIN");
+    }
+
+    @Test
+    @DisplayName("유효하지 않은 리프레시 토큰이면 INVALID_TOKEN 예외가 발생한다")
+    void refresh_invalidToken_throwsInvalidToken() {
+        // given
+        String refreshToken = "invalid-token";
+        given(jwtTokenProvider.validateToken(refreshToken)).willReturn(false);
+
+        // when & then
+        assertThatThrownBy(() -> authService.refresh(refreshToken))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(ErrorCode.INVALID_TOKEN);
+    }
+
+    @Test
+    @DisplayName("리프레시 토큰의 사용자가 존재하지 않으면 UNAUTHORIZED 예외가 발생한다")
+    void refresh_userNotFound_throwsUnauthorized() {
+        // given
+        String refreshToken = "valid-refresh-token";
+        given(jwtTokenProvider.validateToken(refreshToken)).willReturn(true);
+        given(jwtTokenProvider.getUserId(refreshToken)).willReturn(999L);
+        given(userRepository.findById(999L)).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> authService.refresh(refreshToken))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(ErrorCode.UNAUTHORIZED);
+    }
+
+    @Test
+    @DisplayName("로그아웃 시 LOGOUT 액세스 로그가 기록된다")
+    void logout_success_recordsAccessLog() {
+        // given
+        given(userRepository.findById(1L)).willReturn(Optional.of(activeUser));
+        given(accessLogRepository.save(any())).willReturn(null);
+
+        // when
+        authService.logout(1L, "127.0.0.1");
+
+        // then
+        verify(accessLogRepository, times(1)).save(argThat(log ->
+                "LOGOUT".equals(log.getActionType()) && "Y".equals(log.getSuccessYn())));
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 사용자가 로그아웃 시 ENTITY_NOT_FOUND 예외가 발생한다")
+    void logout_userNotFound_throwsEntityNotFound() {
+        // given
+        given(userRepository.findById(999L)).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> authService.logout(999L, "127.0.0.1"))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(ErrorCode.ENTITY_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("getMe 호출 시 사용자 정보와 부서/회사 정보를 반환한다")
+    void getMe_withDepartment_returnsFullInfo() {
+        // given
+        Company company = Company.builder().companyNm("회사").build();
+        Department dept = Department.builder().deptNm("부서").company(company).build();
+        ReflectionTestUtils.setField(activeUser, "department", dept);
+        ReflectionTestUtils.setField(activeUser, "email", "admin@test.com");
+        ReflectionTestUtils.setField(activeUser, "pwdChangedAt", LocalDateTime.now().minusDays(10));
+
+        given(userRepository.findById(1L)).willReturn(Optional.of(activeUser));
+        given(userRoleRepository.findByUserIdWithRole(1L)).willReturn(List.of(userRole));
+
+        // when
+        UserInfoResponse response = authService.getMe(1L);
+
+        // then
+        assertThat(response.getUserId()).isEqualTo(1L);
+        assertThat(response.getLoginId()).isEqualTo("admin");
+        assertThat(response.getEmail()).isEqualTo("admin@test.com");
+        assertThat(response.getDeptName()).isEqualTo("부서");
+        assertThat(response.getCompanyName()).isEqualTo("회사");
+        assertThat(response.getRoles()).containsExactly("ADMIN");
+        assertThat(response.isMustChangePassword()).isFalse();
+    }
+
+    @Test
+    @DisplayName("getMe 호출 시 비밀번호 변경일이 null이면 mustChangePassword=true")
+    void getMe_pwdChangedAtNull_mustChangePasswordTrue() {
+        // given
+        given(userRepository.findById(1L)).willReturn(Optional.of(activeUser));
+        given(userRoleRepository.findByUserIdWithRole(1L)).willReturn(List.of(userRole));
+
+        // when
+        UserInfoResponse response = authService.getMe(1L);
+
+        // then
+        assertThat(response.isMustChangePassword()).isTrue();
+    }
+
+    @Test
+    @DisplayName("getMe 호출 시 비밀번호 변경 후 90일 경과면 mustChangePassword=true")
+    void getMe_pwdExpired90Days_mustChangePasswordTrue() {
+        // given
+        ReflectionTestUtils.setField(activeUser, "pwdChangedAt", LocalDateTime.now().minusDays(91));
+        given(userRepository.findById(1L)).willReturn(Optional.of(activeUser));
+        given(userRoleRepository.findByUserIdWithRole(1L)).willReturn(List.of(userRole));
+
+        // when
+        UserInfoResponse response = authService.getMe(1L);
+
+        // then
+        assertThat(response.isMustChangePassword()).isTrue();
+    }
+
+    @Test
+    @DisplayName("getMe 호출 시 존재하지 않는 사용자면 ENTITY_NOT_FOUND 예외가 발생한다")
+    void getMe_userNotFound_throwsEntityNotFound() {
+        // given
+        given(userRepository.findById(999L)).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> authService.getMe(999L))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(ErrorCode.ENTITY_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 시 현재 비밀번호가 일치하지 않으면 UNAUTHORIZED 예외가 발생한다")
+    void changePassword_wrongCurrentPassword_throwsUnauthorized() {
+        // given
+        given(userRepository.findById(1L)).willReturn(Optional.of(activeUser));
+        given(passwordEncoder.matches("wrongCurrent", "encodedPassword")).willReturn(false);
+        ChangePasswordRequest request = new ChangePasswordRequest("wrongCurrent", "NewPass1!");
+
+        // when & then
+        assertThatThrownBy(() -> authService.changePassword(1L, request))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(ErrorCode.UNAUTHORIZED);
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 시 사용자가 존재하지 않으면 ENTITY_NOT_FOUND 예외가 발생한다")
+    void changePassword_userNotFound_throwsEntityNotFound() {
+        // given
+        given(userRepository.findById(999L)).willReturn(Optional.empty());
+        ChangePasswordRequest request = new ChangePasswordRequest("currentPwd", "NewPass1!");
+
+        // when & then
+        assertThatThrownBy(() -> authService.changePassword(999L, request))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(ErrorCode.ENTITY_NOT_FOUND);
     }
 }

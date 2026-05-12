@@ -15,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import jakarta.servlet.http.Cookie;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -27,9 +28,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -166,5 +171,71 @@ class AuthControllerTest {
                         userId, loginId,
                         List.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
         SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+
+    @Test
+    @DisplayName("POST /login - Rate Limit 초과 시 429를 반환한다")
+    void login_rateLimited_returns429() throws Exception {
+        LoginRequest request = new LoginRequest("admin", "Password1!");
+        given(loginRateLimiter.isBlocked(anyString())).willReturn(true);
+
+        mockMvc.perform(post("/api/v1/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isTooManyRequests())
+                .andExpect(jsonPath("$.success").value(false));
+
+        verify(authService, never()).login(any(LoginRequest.class), anyString());
+    }
+
+    @Test
+    @DisplayName("POST /refresh - refreshToken 쿠키로 새 토큰을 발급한다")
+    void refresh_success_returns200() throws Exception {
+        LoginResponse response = LoginResponse.builder()
+                .accessToken("new-access")
+                .refreshToken("new-refresh")
+                .userId(1L)
+                .loginId("admin")
+                .userNm("관리자")
+                .roles(List.of("ADMIN"))
+                .build();
+        given(authService.refresh("valid-refresh")).willReturn(response);
+        given(jwtTokenProvider.getAccessTokenExpirySeconds()).willReturn(3600L);
+
+        mockMvc.perform(post("/api/v1/auth/refresh")
+                        .cookie(new Cookie("refreshToken", "valid-refresh")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.accessToken").doesNotExist())
+                .andExpect(jsonPath("$.data.userId").value(1))
+                .andExpect(header().exists("Set-Cookie"));
+    }
+
+    @Test
+    @DisplayName("POST /refresh - 쿠키가 없으면 INVALID_TOKEN 예외를 반환한다")
+    void refresh_noCookie_returnsInvalidToken() throws Exception {
+        mockMvc.perform(post("/api/v1/auth/refresh"))
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.error.code").value("E401_002"));
+    }
+
+    @Test
+    @DisplayName("POST /logout - 로그아웃 시 토큰이 블랙리스트되고 쿠키가 만료된다")
+    void logout_success_invalidatesTokensAndClearsCookies() throws Exception {
+        setAuthentication(1L, "admin");
+        doNothing().when(authService).logout(eq(1L), anyString());
+        doNothing().when(jwtTokenProvider).invalidate(anyString());
+
+        mockMvc.perform(post("/api/v1/auth/logout")
+                        .cookie(new Cookie("accessToken", "access-token"),
+                                new Cookie("refreshToken", "refresh-token"))
+                        .principal(SecurityContextHolder.getContext().getAuthentication()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(header().exists("Set-Cookie"));
+
+        verify(jwtTokenProvider).invalidate("access-token");
+        verify(jwtTokenProvider).invalidate("refresh-token");
+        verify(authService).logout(eq(1L), anyString());
     }
 }
