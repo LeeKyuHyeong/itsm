@@ -6,9 +6,7 @@
 
 ## 다음 작업 (Next Up)
 
-**Phase 25-7: Spring Boot 3.2.5 → 3.3.x 업그레이드** (보류) — 별도 작업으로 분리
-
-> 의존성 충돌/호환성 이슈 발생 가능성 있어 단독 PR로 진행 예정.
+추가 작업 없음. 모든 우선순위 항목 완료. 신규 요구사항 발생 시 추가.
 
 ---
 
@@ -28,6 +26,7 @@
 - **Phase 22**: 프론트엔드 성능 & UX 개선 ✅
 - **Phase 23**: i18n 완성 ✅
 - **Phase 24**: 테스트 커버리지 확대 ✅
+- **Phase 25**: 추가 개선 (Spring Boot 4.0 업그레이드 포함) ✅
 
 ---
 
@@ -212,7 +211,7 @@
 - [x] chart.js 사용 여부 확인 후 미사용 시 제거 (의존성 제거)
 - [x] `.env.example` 파일 추가 (필수 환경변수 목록 문서화)
 - [x] ESLint + Prettier 프론트엔드 도입 (eslint 9, prettier 3, lint/format 스크립트)
-- [ ] Spring Boot 3.2.5 → 3.3.x 업그레이드 (별도 작업으로 분리)
+- [x] **Spring Boot 3.2.5 → 4.0.6 업그레이드** (Security 7, Hibernate 7, Jackson 3, Tomcat 11, Gradle 8.14.3, OSS 지원 2026-12-31까지)
 
 ---
 

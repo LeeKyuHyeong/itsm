@@ -17,4 +17,6 @@ dependencies {
     // H2 (test)
     testImplementation 'com.h2database:h2'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    // Spring Boot 4.0: @DataJpaTest는 별도 starter로 분리됨
+    testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
 }
