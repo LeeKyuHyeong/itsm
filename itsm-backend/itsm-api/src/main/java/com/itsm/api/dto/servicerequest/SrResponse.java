@@ -20,6 +20,11 @@ public class SrResponse {
     private String priorityCd;
     private String statusCd;
     private LocalDateTime occurredAt;
+    private LocalDateTime receivedAt;
+    private LocalDateTime scheduledAt;
+    private LocalDateTime revisedScheduledAt;
+    private String scheduleChangeReason;
+    private LocalDateTime processedAt;
     private LocalDateTime completedAt;
     private LocalDateTime closedAt;
     private LocalDateTime slaDeadlineAt;

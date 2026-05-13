@@ -50,6 +50,17 @@
       <template #occurredAt="{ row }">
         {{ formatDate(row.occurredAt) }}
       </template>
+      <template #scheduledAt="{ row }">
+        <span v-if="row.revisedScheduledAt" :title="row.scheduleChangeReason || ''">
+          {{ formatDate(row.revisedScheduledAt) }}<span class="revised-tag">*</span>
+        </span>
+        <span v-else-if="row.scheduledAt">{{ formatDate(row.scheduledAt) }}</span>
+        <span v-else class="text-muted">-</span>
+      </template>
+      <template #processedAt="{ row }">
+        <span v-if="row.processedAt">{{ formatDate(row.processedAt) }}</span>
+        <span v-else class="text-muted">-</span>
+      </template>
     </BaseTable>
 
     <BasePagination v-if="totalPages > 1" :current-page="page" :total-pages="totalPages"
@@ -95,7 +106,9 @@ const columns = computed(() => [
   { key: 'statusCd', label: t('incident.status'), width: '120px', align: 'center' },
   { key: 'companyNm', label: t('incident.company'), width: '120px' },
   { key: 'slaPercentage', label: 'SLA', width: '140px' },
-  { key: 'occurredAt', label: t('incident.occurredAt'), width: '150px' }
+  { key: 'occurredAt', label: t('incident.occurredAt'), width: '140px' },
+  { key: 'scheduledAt', label: t('serviceRequest.scheduledAt'), width: '140px' },
+  { key: 'processedAt', label: t('serviceRequest.processedAt'), width: '140px' }
 ])
 
 const fetchList = async () => {
@@ -194,6 +207,11 @@ onMounted(async () => {
 .priority-MEDIUM { background: var(--color-priority-medium-bg); color: var(--color-priority-medium); }
 .priority-LOW { background: var(--color-priority-low-bg); color: var(--color-priority-low); }
 .text-muted { color: var(--color-text-muted); }
+.revised-tag {
+  color: var(--color-priority-high);
+  font-weight: 700;
+  margin-left: 2px;
+}
 .btn {
   padding: 6px 16px;
   border: none;

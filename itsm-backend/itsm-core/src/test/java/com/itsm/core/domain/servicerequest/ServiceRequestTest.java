@@ -134,6 +134,68 @@ class ServiceRequestTest {
     }
 
     @Test
+    @DisplayName("Builder 생성 시 receivedAt이 자동 설정된다")
+    void builder_setsReceivedAtAutomatically() {
+        ServiceRequest sr = createReceived();
+        assertThat(sr.getReceivedAt()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("PENDING_COMPLETE 전환 시 processedAt이 자동 설정된다")
+    void changeStatus_toPendingComplete_setsProcessedAt() {
+        ServiceRequest sr = createReceived();
+        sr.changeStatus("ASSIGNED");
+        sr.changeStatus("IN_PROGRESS");
+        sr.changeStatus("PENDING_COMPLETE");
+        assertThat(sr.getProcessedAt()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("setSchedule으로 처리예정일을 설정한다 (최초)")
+    void setSchedule_setsScheduledAt() {
+        ServiceRequest sr = createReceived();
+        LocalDateTime scheduled = LocalDateTime.of(2026, 6, 1, 18, 0);
+        sr.setSchedule(scheduled);
+        assertThat(sr.getScheduledAt()).isEqualTo(scheduled);
+        assertThat(sr.getRevisedScheduledAt()).isNull();
+        assertThat(sr.getScheduleChangeReason()).isNull();
+    }
+
+    @Test
+    @DisplayName("reviseSchedule로 처리예정일을 변경하고 사유를 기록한다")
+    void reviseSchedule_setsRevisedAndReason() {
+        ServiceRequest sr = createReceived();
+        LocalDateTime initial = LocalDateTime.of(2026, 6, 1, 18, 0);
+        sr.setSchedule(initial);
+
+        LocalDateTime revised = LocalDateTime.of(2026, 6, 3, 18, 0);
+        sr.reviseSchedule(revised, "고객사 요청으로 일정 조정");
+
+        assertThat(sr.getScheduledAt()).isEqualTo(initial);
+        assertThat(sr.getRevisedScheduledAt()).isEqualTo(revised);
+        assertThat(sr.getScheduleChangeReason()).isEqualTo("고객사 요청으로 일정 조정");
+    }
+
+    @Test
+    @DisplayName("scheduledAt 미설정 상태에서 reviseSchedule 호출 시 예외가 발생한다")
+    void reviseSchedule_withoutScheduledAt_throws() {
+        ServiceRequest sr = createReceived();
+        assertThatThrownBy(() -> sr.reviseSchedule(LocalDateTime.now(), "사유"))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("처리예정일이 설정되지 않은");
+    }
+
+    @Test
+    @DisplayName("reviseSchedule 호출 시 사유가 비어있으면 예외가 발생한다")
+    void reviseSchedule_blankReason_throws() {
+        ServiceRequest sr = createReceived();
+        sr.setSchedule(LocalDateTime.of(2026, 6, 1, 18, 0));
+        assertThatThrownBy(() -> sr.reviseSchedule(LocalDateTime.now(), "  "))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("변경 사유");
+    }
+
+    @Test
     @DisplayName("SLA 기한을 설정하고 연장한다")
     void slaDeadline_setAndExtend() {
         ServiceRequest sr = createReceived();

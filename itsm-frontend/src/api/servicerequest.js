@@ -37,6 +37,9 @@ export const serviceRequestApi = {
   submitSatisfaction(id, data) {
     return api.post(`/service-requests/${id}/satisfaction`, data)
   },
+  setSchedule(id, data) {
+    return api.patch(`/service-requests/${id}/schedule`, data)
+  },
   getHistory(id) {
     return api.get(`/service-requests/${id}/history`)
   }

@@ -58,6 +58,11 @@ public class ServiceRequestService {
                 .priorityCd(sr.getPriorityCd())
                 .statusCd(sr.getStatusCd())
                 .occurredAt(sr.getOccurredAt())
+                .receivedAt(sr.getReceivedAt())
+                .scheduledAt(sr.getScheduledAt())
+                .revisedScheduledAt(sr.getRevisedScheduledAt())
+                .scheduleChangeReason(sr.getScheduleChangeReason())
+                .processedAt(sr.getProcessedAt())
                 .completedAt(sr.getCompletedAt())
                 .closedAt(sr.getClosedAt())
                 .slaDeadlineAt(sr.getSlaDeadlineAt())
@@ -204,6 +209,44 @@ public class ServiceRequestService {
                 .toList();
     }
 
+    public SrResponse setSchedule(Long requestId, LocalDateTime scheduledAt, String reason, Long currentUserId) {
+        ServiceRequest sr = findById(requestId);
+        boolean isInitial = sr.getScheduledAt() == null;
+        String beforeValue;
+        String afterValue;
+
+        if (isInitial) {
+            beforeValue = null;
+            sr.setSchedule(scheduledAt);
+            afterValue = scheduledAt.toString();
+        } else {
+            if (reason == null || reason.trim().isEmpty()) {
+                throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE, "처리예정일 변경 사유는 필수입니다.");
+            }
+            beforeValue = sr.getRevisedScheduledAt() != null
+                    ? sr.getRevisedScheduledAt().toString()
+                    : sr.getScheduledAt().toString();
+            try {
+                sr.reviseSchedule(scheduledAt, reason);
+            } catch (IllegalArgumentException | IllegalStateException e) {
+                throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE, e.getMessage());
+            }
+            afterValue = scheduledAt.toString();
+        }
+        sr.setUpdatedBy(currentUserId);
+
+        ServiceRequestHistory history = ServiceRequestHistory.builder()
+                .requestId(requestId)
+                .changedField(isInitial ? "scheduledAt" : "revisedScheduledAt")
+                .beforeValue(beforeValue)
+                .afterValue(afterValue)
+                .createdBy(currentUserId)
+                .build();
+        historyRepository.save(history);
+
+        return toResponse(sr);
+    }
+
     public void submitSatisfaction(Long requestId, int score, String comment) {
         ServiceRequest sr = findById(requestId);
         if (!ServiceRequestStatus.CLOSED.equals(sr.getStatusCd())) {
@@ -315,6 +358,11 @@ public class ServiceRequestService {
                 .priorityCd(sr.getPriorityCd())
                 .statusCd(sr.getStatusCd())
                 .occurredAt(sr.getOccurredAt())
+                .receivedAt(sr.getReceivedAt())
+                .scheduledAt(sr.getScheduledAt())
+                .revisedScheduledAt(sr.getRevisedScheduledAt())
+                .scheduleChangeReason(sr.getScheduleChangeReason())
+                .processedAt(sr.getProcessedAt())
                 .completedAt(sr.getCompletedAt())
                 .closedAt(sr.getClosedAt())
                 .slaDeadlineAt(sr.getSlaDeadlineAt())

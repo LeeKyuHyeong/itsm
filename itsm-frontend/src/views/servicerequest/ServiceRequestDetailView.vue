@@ -55,6 +55,29 @@
           <span>{{ formatDate(sr.occurredAt) }}</span>
         </div>
         <div class="info-item">
+          <label>{{ t('serviceRequest.receivedAt') }}</label>
+          <span>{{ formatDate(sr.receivedAt) }}</span>
+        </div>
+        <div class="info-item">
+          <label>{{ t('serviceRequest.scheduledAt') }}</label>
+          <span v-if="sr.scheduledAt">{{ formatDate(sr.scheduledAt) }}</span>
+          <span v-else class="text-muted">-</span>
+        </div>
+        <div class="info-item">
+          <label>{{ t('serviceRequest.revisedScheduledAt') }}</label>
+          <span v-if="sr.revisedScheduledAt">{{ formatDate(sr.revisedScheduledAt) }}</span>
+          <span v-else class="text-muted">-</span>
+        </div>
+        <div class="info-item full-width" v-if="sr.scheduleChangeReason">
+          <label>{{ t('serviceRequest.scheduleChangeReason') }}</label>
+          <div class="content-box">{{ sr.scheduleChangeReason }}</div>
+        </div>
+        <div class="info-item">
+          <label>{{ t('serviceRequest.processedAt') }}</label>
+          <span v-if="sr.processedAt">{{ formatDate(sr.processedAt) }}</span>
+          <span v-else class="text-muted">-</span>
+        </div>
+        <div class="info-item">
           <label>{{ t('serviceRequest.rejectCount') }}</label>
           <span>{{ sr.rejectCnt }}{{ t('serviceRequest.countUnit') }}</span>
         </div>
@@ -62,6 +85,11 @@
           <label>{{ t('serviceRequest.content') }}</label>
           <div class="content-box">{{ sr.content }}</div>
         </div>
+      </div>
+      <div class="schedule-actions" v-if="canManageSchedule">
+        <button class="btn btn-sm btn-secondary" @click="openScheduleModal">
+          {{ sr.scheduledAt ? t('serviceRequest.changeSchedule') : t('serviceRequest.setSchedule') }}
+        </button>
       </div>
     </div>
 
@@ -158,9 +186,30 @@
         <label>ID</label>
         <input v-model.number="assigneeUserId" type="number" />
       </div>
+      <div class="form-group" v-if="!sr?.scheduledAt">
+        <label>{{ t('serviceRequest.scheduledAt') }}</label>
+        <input v-model="assigneeScheduledAt" type="datetime-local" />
+        <small class="hint">{{ t('serviceRequest.scheduleRequired') }}</small>
+      </div>
       <template #footer>
         <button class="btn btn-secondary" @click="showAssigneeModal = false">{{ t('common.cancel') }}</button>
         <button class="btn btn-primary" @click="handleAssignUser">{{ t('common.add') }}</button>
+      </template>
+    </BaseModal>
+
+    <!-- 처리예정일 설정/변경 모달 -->
+    <BaseModal :show="showScheduleModal" :title="sr?.scheduledAt ? t('serviceRequest.changeSchedule') : t('serviceRequest.setSchedule')" @close="showScheduleModal = false">
+      <div class="form-group">
+        <label>{{ t('serviceRequest.scheduledAt') }}</label>
+        <input v-model="scheduleInput" type="datetime-local" />
+      </div>
+      <div class="form-group" v-if="sr?.scheduledAt">
+        <label>{{ t('serviceRequest.scheduleChangeReason') }}</label>
+        <textarea v-model="scheduleReason" rows="3" :placeholder="t('serviceRequest.scheduleChangeReasonRequired')"></textarea>
+      </div>
+      <template #footer>
+        <button class="btn btn-secondary" @click="showScheduleModal = false">{{ t('common.cancel') }}</button>
+        <button class="btn btn-primary" @click="handleSetSchedule">{{ t('common.save') }}</button>
       </template>
     </BaseModal>
   </div>
@@ -192,11 +241,15 @@ const assignees = ref([])
 const processes = ref([])
 const histories = ref([])
 const assigneeUserId = ref(null)
+const assigneeScheduledAt = ref('')
 const processUserId = ref(null)
 const processContent = ref('')
 const satisfactionScore = ref(0)
 const satisfactionComment = ref('')
 const showAssigneeModal = ref(false)
+const showScheduleModal = ref(false)
+const scheduleInput = ref('')
+const scheduleReason = ref('')
 
 const STATUS_TRANSITIONS = {
   RECEIVED: [
@@ -230,6 +283,11 @@ const availableTransitions = computed(() => {
 const canEdit = computed(() => {
   if (!sr.value) return false
   return ['RECEIVED', 'ASSIGNED', 'IN_PROGRESS'].includes(sr.value.statusCd)
+})
+
+const canManageSchedule = computed(() => {
+  if (!sr.value) return false
+  return !['CLOSED', 'CANCELLED'].includes(sr.value.statusCd)
 })
 
 const slaCountdown = computed(() => {
@@ -306,12 +364,56 @@ const handleChangeStatus = async (status) => {
 
 const handleAssignUser = async () => {
   if (!assigneeUserId.value) return
+  const needsSchedule = !sr.value?.scheduledAt
+  if (needsSchedule && !assigneeScheduledAt.value) {
+    toast.error(t('serviceRequest.scheduleRequired'))
+    return
+  }
   try {
     await serviceRequestApi.assignUser(requestId.value, { userId: assigneeUserId.value })
+    if (needsSchedule) {
+      await serviceRequestApi.setSchedule(requestId.value, {
+        scheduledAt: assigneeScheduledAt.value
+      })
+    }
     showAssigneeModal.value = false
     assigneeUserId.value = null
+    assigneeScheduledAt.value = ''
     await loadAssignees()
     await loadDetail()
+    await loadHistory()
+  } catch (e) {
+    toast.error(e.response?.data?.error?.message || t('message.saveFail'))
+  }
+}
+
+const openScheduleModal = () => {
+  scheduleInput.value = sr.value?.revisedScheduledAt || sr.value?.scheduledAt || ''
+  if (scheduleInput.value) {
+    scheduleInput.value = String(scheduleInput.value).slice(0, 16)
+  }
+  scheduleReason.value = ''
+  showScheduleModal.value = true
+}
+
+const handleSetSchedule = async () => {
+  if (!scheduleInput.value) {
+    toast.error(t('serviceRequest.scheduleRequired'))
+    return
+  }
+  if (sr.value?.scheduledAt && !scheduleReason.value.trim()) {
+    toast.error(t('serviceRequest.scheduleChangeReasonRequired'))
+    return
+  }
+  if (sr.value?.scheduledAt && !await confirm({ message: t('serviceRequest.confirmChangeSchedule') })) return
+  try {
+    await serviceRequestApi.setSchedule(requestId.value, {
+      scheduledAt: scheduleInput.value,
+      reason: scheduleReason.value || null
+    })
+    showScheduleModal.value = false
+    await loadDetail()
+    await loadHistory()
   } catch (e) {
     toast.error(e.response?.data?.error?.message || t('message.saveFail'))
   }
@@ -650,6 +752,27 @@ onMounted(async () => {
   padding: var(--spacing-md);
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
+}
+.text-muted { color: var(--color-text-muted); }
+.schedule-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--spacing-sm);
+}
+.form-group textarea {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  font-size: var(--font-size-sm);
+  box-sizing: border-box;
+  resize: vertical;
+}
+.hint {
+  display: block;
+  margin-top: 4px;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
 }
 .form-group {
   margin-bottom: var(--spacing-md);

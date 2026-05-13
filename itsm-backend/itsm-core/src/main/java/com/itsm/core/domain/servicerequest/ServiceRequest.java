@@ -55,6 +55,21 @@ public class ServiceRequest extends BaseEntity {
     @Column(name = "occurred_at", nullable = false)
     private LocalDateTime occurredAt;
 
+    @Column(name = "received_at")
+    private LocalDateTime receivedAt;
+
+    @Column(name = "scheduled_at")
+    private LocalDateTime scheduledAt;
+
+    @Column(name = "revised_scheduled_at")
+    private LocalDateTime revisedScheduledAt;
+
+    @Column(name = "schedule_change_reason", length = 500)
+    private String scheduleChangeReason;
+
+    @Column(name = "processed_at")
+    private LocalDateTime processedAt;
+
     @Column(name = "completed_at")
     private LocalDateTime completedAt;
 
@@ -91,6 +106,7 @@ public class ServiceRequest extends BaseEntity {
         this.occurredAt = occurredAt;
         this.company = company;
         this.rejectCnt = 0;
+        this.receivedAt = LocalDateTime.now();
     }
 
     public void changeStatus(String newStatus) {
@@ -103,7 +119,9 @@ public class ServiceRequest extends BaseEntity {
             this.rejectCnt++;
         }
         if (ServiceRequestStatus.PENDING_COMPLETE.equals(newStatus)) {
-            this.completedAt = LocalDateTime.now();
+            LocalDateTime now = LocalDateTime.now();
+            this.completedAt = now;
+            this.processedAt = now;
         }
         if (ServiceRequestStatus.CLOSED.equals(newStatus)) {
             this.closedAt = LocalDateTime.now();
@@ -134,5 +152,20 @@ public class ServiceRequest extends BaseEntity {
         if (this.slaDeadlineAt != null) {
             this.slaDeadlineAt = this.slaDeadlineAt.plusHours(hours);
         }
+    }
+
+    public void setSchedule(LocalDateTime scheduledAt) {
+        this.scheduledAt = scheduledAt;
+    }
+
+    public void reviseSchedule(LocalDateTime revisedAt, String reason) {
+        if (this.scheduledAt == null) {
+            throw new IllegalStateException("처리예정일이 설정되지 않은 상태에서는 변경할 수 없습니다.");
+        }
+        if (reason == null || reason.trim().isEmpty()) {
+            throw new IllegalArgumentException("처리예정일 변경 사유는 필수입니다.");
+        }
+        this.revisedScheduledAt = revisedAt;
+        this.scheduleChangeReason = reason;
     }
 }

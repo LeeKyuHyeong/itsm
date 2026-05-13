@@ -6,212 +6,30 @@
 
 ## 다음 작업 (Next Up)
 
-추가 작업 없음. 모든 우선순위 항목 완료. 신규 요구사항 발생 시 추가.
+추가 작업 없음. Phase 26 적용 후 운영 DB 마이그레이션 필요.
 
 ---
 
 ## 완료된 Phase
 
-- **Phase 11**: UI 테마 (라이트/다크 모드) ✅
-- **Phase 12**: 자산관리 재구조화 ✅
-- **Phase 13**: 데모/시뮬레이션 배치 ✅
-- **Phase 14**: 전체 i18n (ko/en) 대응 ✅
-- **Phase 15**: CI/CD + 운영 배포 ✅
-- **Phase 16**: 운영 이슈 & OA 자산 분리 ✅
-- **Phase 17**: 소스 위험도 분석 및 품질 개선 ✅
-- **Phase 18**: 보안 강화 2차 (OWASP Top 10 기반 전 항목) ✅
-- **Phase 19**: 인프라 보안 & Docker 강화 ✅
-- **Phase 20**: 백엔드 성능 최적화 ✅
-- **Phase 21**: 백엔드 코드 품질 개선 ✅
-- **Phase 22**: 프론트엔드 성능 & UX 개선 ✅
-- **Phase 23**: i18n 완성 ✅
-- **Phase 24**: 테스트 커버리지 확대 ✅
-- **Phase 25**: 추가 개선 (Spring Boot 4.0 업그레이드 포함) ✅
-
----
-
-## Phase 16 잔여 (운영 환경)
-
-- [x] 운영 로그인 무반응 조사 (CORS / Cookie Secure / 브라우저 Network 탭 확인 필요)
-- [x] SSL "주의 요함" 경고 확인 필요 (Mixed Content 또는 브라우저 캐시 문제 추정)
-- [x] 운영 DB에 tb_asset_oa, tb_asset_oa_history 테이블 생성 (ddl-auto: update로 자동생성 예상) → `sql/phase16_prod_migration.sql`
-- [x] 운영 DB에 OA 메뉴, OA 공통코드 시드데이터 INSERT → `sql/phase16_prod_migration.sql`
-
----
-
-## Phase 19: 인프라 보안 & Docker 강화 (CRITICAL)
-
-> 2026-04-03 소스 재분석 결과. 운영 환경 직접 영향 항목 우선.
-
-### 1단계: 설정 보안 (CRITICAL)
-
-- [x] application.yml: JWT 기본 시크릿 제거 — 환경변수 필수화, 개발용 시크릿은 application-local.yml로 분리
-- [x] application.yml: 기본 CORS 설정에서 `localhost:5173` 제거 — 환경변수 필수화, 개발용은 application-local.yml로 분리
-- [x] application-local.yml: 기본 DB 비밀번호 `1234` 제거 — `${DB_PASSWORD}` 환경변수 필수화
-- [x] CORS origin 파싱 시 `trim()` 누락 수정 (SecurityConfig, WebConfig)
-
-### 2단계: Docker 이미지 버전 고정 (HIGH)
-
-- [x] docker-compose.yml: `mariadb:11` → `mariadb:11.7.2` 버전 고정
-- [x] docker-compose.yml: 커스텀 이미지 `latest` → `${IMAGE_TAG:-latest}` (Git SHA 태그)
-- [x] itsm-backend/Dockerfile: `eclipse-temurin:17.0.13_11-jre-alpine` 버전 고정
-- [x] itsm-frontend/Dockerfile: `node:20.18-alpine`, `nginx:1.27-alpine` 버전 고정
-- [x] CI/CD: 이미지 빌드 시 `${{ github.sha }}` 태그 적용 + .env에 IMAGE_TAG 전달
-
-### 3단계: 컨테이너 보안 강화 (HIGH)
-
-- [x] itsm-backend/Dockerfile: `USER appuser` 디렉티브 추가 (non-root 실행)
-- [x] itsm-backend/Dockerfile: JVM 메모리 제한 설정 (`-Xmx512m -Xms256m -XX:+UseG1GC`)
-- [x] docker-compose.yml: 서비스별 리소스 제한 추가 (db:1CPU/1G, api:1CPU/768M, batch:0.5CPU/512M, frontend:0.5CPU/256M)
-- [x] docker-compose.yml: 커스텀 네트워크 정의 (backend: db↔api↔batch, frontend: api↔frontend)
-
-### 4단계: CI/CD 파이프라인 강화 (MEDIUM)
-
-- [x] 배포 후 헬스체크 검증 단계 추가 (최대 60초 대기, `/actuator/health` 확인)
-- [x] 배포 실패 시 자동 롤백 메커니즘 구현 (이전 IMAGE_TAG로 복원)
-- [x] 배포 전 DB 백업 단계 추가 (mariadb-dump + gzip, 최근 7개 보관)
-- [x] 컨테이너 이미지 스캐닝 추가 (Trivy — CRITICAL/HIGH)
-- [x] appleboy/scp-action v0.1.7 → v1.0.0, ssh-action v1.0.3 → v1.2.5 업데이트
-- [x] deploy.yml: 하드코딩된 이메일/도메인 → `secrets.DOMAIN`, `secrets.CERTBOT_EMAIL`로 분리
-
-### 5단계: Nginx SSL 강화 (MEDIUM)
-
-- [x] nginx-itsm.conf: SSL 암호화 스위트 강화 (ECDHE-ECDSA/RSA-AES-GCM + CHACHA20 명시)
-- [x] nginx-itsm.conf: `ssl_prefer_server_ciphers on` 추가
-- [x] nginx-itsm.conf: `ssl_session_cache shared:SSL:10m`, `ssl_session_timeout 10m`, `ssl_session_tickets off` 추가
-- [x] nginx-itsm.conf: OCSP Stapling 추가
-- [x] nginx-itsm.conf: HSTS `preload` 플래그 추가
-- [x] nginx-itsm.conf + nginx.conf: 프로덕션에서 Swagger UI 접근 차단 (404 반환)
-
----
-
-## Phase 20: 백엔드 성능 최적화 (HIGH)
-
-> N+1 쿼리, 누락된 인덱스, 비효율적 연산 개선.
-
-### 1단계: 데이터베이스 인덱스 추가 (HIGH)
-
-- [x] User 엔티티: `login_id`, `status`, `dept_id` 인덱스 추가 (`@Table(indexes = ...)`)
-- [x] Incident 엔티티: `status_cd`, `sla_deadline_at`, `created_at` 인덱스 추가
-- [x] ServiceRequest 엔티티: `status_cd`, `created_at` 인덱스 추가
-- [x] Asset 엔티티: 검색 대상 컬럼 인덱스 추가 (AssetHw, AssetSw, AssetOa + Change, Inspection)
-
-### 2단계: DashboardService 쿼리 최적화 (HIGH)
-
-- [x] `countByStatusCd` 다건 호출 → `countGroupByStatusCd` 집계 쿼리로 변경 (25회 → 4회)
-- [x] SLA 초과 건수를 Java 스트림 필터 → DB 집계 쿼리(`countSlaOverdue`, `countSlaWarning`)로 전환
-- [x] 대시보드 통계 전용 Repository 메서드 작성 (`countGroupByStatusCd`, `countActivePriorityGrouped`)
-
-### 3단계: JPA 페치 전략 정리 (MEDIUM)
-
-- [x] DTO 변환 시 접근하는 연관 엔티티에 대해 JOIN FETCH 일괄 정리 (`findRecentWithCompany`)
-- [x] `saveAll()` 배치 저장으로 전환 (IncidentAsset 등 반복 save 제거)
-- [x] 댓글, 이력 등 하위 목록 API에 페이징 적용 (IncidentComment, IncidentHistory)
-
----
-
-## Phase 21: 백엔드 코드 품질 개선 (HIGH)
-
-> 중복 코드 제거, 상수 관리, 일관된 에러 처리.
-
-### 1단계: 중복 코드 통합 (HIGH)
-
-- [x] `getCurrentUserId()` — 16개 Controller에 중복 → `AuthUtils` 유틸 추출
-- [x] `extractAccessTokenFromCookie()` — AuthController, JwtAuthFilter 중복 → `CookieUtils` 유틸 추출
-- [x] CORS origin 파싱 시 `trim()` 누락 수정 (SecurityConfig) — Phase 19에서 완료
-
-### 2단계: 매직 스트링 상수화 (MEDIUM)
-
-- [x] 사용자 상태(`ACTIVE`, `LOCKED`, `DELETED`) → `UserStatus` 상수 클래스 추출
-- [x] 인시던트 상태(`RECEIVED`, `IN_PROGRESS`, `COMPLETED` 등) → `IncidentStatus` 상수화
-- [x] 서비스요청 상태 → `ServiceRequestStatus` 상수화
-- [x] 역할 코드(`SUPER_ADMIN`, `ITSM_ADMIN` 등) → `RoleCode` 상수화 (`@PreAuthorize` 14건 통합)
-
-### 3단계: 에러 처리 표준화 (MEDIUM)
-
-- [x] AuditLogAspect: silent catch → `log.warn`/`log.debug` 추가
-- [x] 인증 null 체크 일관성 확보 — `AuthUtils`로 통합하여 모든 Controller 일관 검증
-- [x] 입력 검증 강화: 자산 IP/MAC 주소 `@Pattern` 검증, 텍스트 필드 `@Size(max)` 추가 (HW/OA 4개 DTO)
-
----
-
-## Phase 22: 프론트엔드 성능 & UX 개선 (HIGH)
-
-> 번들 최적화, 로딩/에러 상태, 접근성 개선.
-
-### 1단계: 라우트 지연 로딩 (HIGH)
-
-- [x] router/index.js: 모든 뷰 컴포넌트가 이미 `() => import()` 동적 임포트 사용 중 (기존 완료)
-
-### 2단계: UX 개선 (HIGH)
-
-- [x] `alert()` 53건 + `confirm()` 21건 → `useToast`/`useConfirm` 컴포저블 + `AppToast`/`AppConfirm` 글로벌 컴포넌트로 전체 교체
-- [x] API 실패 시 사용자 피드백 표준화 (toast.error로 통일)
-- [x] 날짜 포맷 `toLocaleString('ko-KR')` 하드코딩 → 이미 0건 (기존 해결)
-
-### 3단계: 대형 컴포넌트 분할 (MEDIUM)
-
-- [x] AccountManageView.vue → UserFormModal, RoleManageModal 분리
-- [x] IncidentDetailView.vue → IncidentCommentCard, IncidentHistoryCard, IncidentReportCard 분리
-- [x] CommonCodeView.vue → CodeGroupFormModal, CodeDetailFormModal 분리
-
-### 4단계: 접근성 (MEDIUM)
-
-- [x] 모달 ESC 키 닫기 (BaseModal에 keydown 이벤트 리스너 추가)
-- [x] SVG 아이콘에 `aria-hidden="true"` + 부모 버튼에 `aria-label` 추가
-- [x] 테이블 행 키보드 내비게이션 (BaseTable: tabindex, 화살표/Home/End/Enter/Space + 16개 테스트)
-
----
-
-## Phase 23: i18n 완성 (MEDIUM)
-
-> 하드코딩된 한국어 문자열 제거, 번역 누락 보완.
-
-- [x] `constants/roles.js`: `ROLE_LABEL` 한국어 제거 → `getRoleLabel(t, code)` i18n 함수로 전환
-- [x] `constants/status.js`: 전체 `*_LABEL` 객체 제거 → `getStatusLabel(t, code)` i18n 함수로 전환
-- [x] `i18n/locales/en.js` 번역 누락 보완 (630줄, ko.js 645줄과 동등 수준 확인)
-- [x] console.error 한국어 메시지 33건 → 영어로 통일 (17개 파일)
-- [x] 날짜 포맷 `toLocaleString('ko-KR')` 하드코딩 16건 → `formatDate()` locale 기반 유틸 추출
-
----
-
-## Phase 24: 테스트 커버리지 확대 (MEDIUM)
-
-> 백엔드 455 테스트 / 프론트엔드 148 테스트. 핵심 비즈니스 로직 + 보안 + UI 모두 보강 완료.
-
-### 1단계: 백엔드 서비스 레이어 (HIGH)
-
-- [x] AuthService 테스트 (로그인, 토큰 갱신, 비밀번호 변경, getMe, logout 등 20케이스)
-- [x] IncidentService 테스트 (생성, 상태 변경, SLA 계산, 담당자/댓글/보고서/자산 등 34케이스)
-- [x] DashboardService 테스트 (통계 집계, 빈 데이터, 최근 인시던트 매핑 등 12케이스)
-- [x] UserService 테스트 (CRUD, 권한 검증, 이력, 부서/역할 미존재 등 25케이스)
-
-### 2단계: 백엔드 통합/보안 테스트 (MEDIUM)
-
-- [x] MockMvc 기반 Controller 통합 테스트 (AuthControllerTest: refresh, logout, rate-limit 시나리오 추가)
-- [x] JWT 만료/갱신 시나리오 테스트 (JwtTokenProviderTest: blacklist, 토큰 변조 케이스 추가, 12케이스)
-- [x] 역할 기반 접근 제어 검증 테스트 (MethodSecurityTest 기존 활용)
-- [x] Rate Limiting 동작 테스트 (LoginRateLimiterTest 신규 5케이스)
-
-### 3단계: 프론트엔드 테스트 (MEDIUM)
-
-- [x] Store 테스트 확대: auth (13), commonCode (14), menu (9), notification (14) - 총 50케이스
-- [x] API 에러 시나리오 테스트 (401 refresh/retry, 500/403/404, 네트워크 에러 - 14케이스)
-- [x] 주요 폼 컴포넌트 유효성 검증 테스트 (UserFormModal 16, CodeGroupFormModal 11, BaseModal 13)
-
----
-
-## Phase 25: 추가 개선 (LOW)
-
-> 안정화 후 선택적 진행.
-
-- [x] 비밀번호 만료(90일) 시 강제 변경 인터셉터 구현 (PasswordExpiryInterceptor + 9 테스트)
-- [x] 요청 추적용 Request ID 필터 추가 (RequestIdFilter, MDC 기반 + logging 패턴 통합)
-- [x] 프로덕션 Swagger UI 접근 차단 (application-prod.yml `springdoc.*.enabled: false`)
-- [x] chart.js 사용 여부 확인 후 미사용 시 제거 (의존성 제거)
-- [x] `.env.example` 파일 추가 (필수 환경변수 목록 문서화)
-- [x] ESLint + Prettier 프론트엔드 도입 (eslint 9, prettier 3, lint/format 스크립트)
-- [x] **Spring Boot 3.2.5 → 4.0.6 업그레이드** (Security 7, Hibernate 7, Jackson 3, Tomcat 11, Gradle 8.14.3, OSS 지원 2026-12-31까지)
+| Phase | 내용 |
+|-------|------|
+| 11 | UI 테마 (라이트/다크 모드) |
+| 12 | 자산관리 재구조화 |
+| 13 | 데모/시뮬레이션 배치 |
+| 14 | 전체 i18n (ko/en) 대응 |
+| 15 | CI/CD + 운영 배포 |
+| 16 | 운영 이슈 & OA 자산 분리 |
+| 17 | 소스 위험도 분석 및 품질 개선 |
+| 18 | 보안 강화 2차 (OWASP Top 10 기반 전 항목) |
+| 19 | 인프라 보안 & Docker 강화 (설정 보안, 이미지 버전 고정, 컨테이너 강화, CI/CD 파이프라인, Nginx SSL) |
+| 20 | 백엔드 성능 최적화 (DB 인덱스, DashboardService 쿼리 집계화, JPA 페치 전략 정리) |
+| 21 | 백엔드 코드 품질 개선 (중복 코드 통합, 매직 스트링 상수화, 에러 처리 표준화) |
+| 22 | 프론트엔드 성능 & UX 개선 (toast/confirm 컴포저블, 대형 컴포넌트 분할, 접근성) |
+| 23 | i18n 완성 (상수 파일 i18n 전환, console.error 영어화, 날짜 포맷 유틸 추출) |
+| 24 | 테스트 커버리지 확대 (백엔드 455 / 프론트엔드 148) |
+| 25 | 추가 개선 (Spring Boot 4.0.6 업그레이드, 비밀번호 만료 인터셉터, Request ID 필터, ESLint/Prettier 도입) |
+| 26 | SR 일정 관리 컬럼 추가 (접수일/처리예정일/처리변경예정일/변경사유/처리일 + 일정 설정/변경 API) |
 
 ---
 

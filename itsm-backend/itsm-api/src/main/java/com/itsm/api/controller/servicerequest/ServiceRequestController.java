@@ -114,6 +114,16 @@ public class ServiceRequestController {
         return ApiResponse.success(serviceRequestService.getProcesses(requestId));
     }
 
+    @PatchMapping("/{requestId}/schedule")
+    public ApiResponse<SrResponse> setSchedule(
+            @PathVariable Long requestId,
+            @Valid @RequestBody SrScheduleRequest req,
+            Authentication authentication) {
+        Long currentUserId = AuthUtils.getCurrentUserId(authentication);
+        return ApiResponse.success(serviceRequestService.setSchedule(
+                requestId, req.getScheduledAt(), req.getReason(), currentUserId));
+    }
+
     @PostMapping("/{requestId}/satisfaction")
     public ApiResponse<Void> submitSatisfaction(
             @PathVariable Long requestId,
