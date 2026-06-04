@@ -21,6 +21,8 @@ describe('commonCode store', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
     mockLocale.value = 'ko'
+    // vitest 4부터 restoreAllMocks 는 spyOn 스파이만 복원 — vi.fn() 호출 기록은 clearAllMocks 로 초기화
+    vi.clearAllMocks()
     vi.restoreAllMocks()
   })
 
