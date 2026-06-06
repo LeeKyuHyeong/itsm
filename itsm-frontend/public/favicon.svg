@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4a90d9"/>
+      <stop offset="1" stop-color="#1557b0"/>
+    </linearGradient>
+  </defs>
+  <!-- 배경: 둥근 사각형, ITSM primary 그라데이션 -->
+  <rect width="64" height="64" rx="14" fill="url(#bg)"/>
+  <!-- 기어 (IT 서비스 관리 상징) -->
+  <g fill="#ffffff">
+    <g>
+      <rect x="28.5" y="9" width="7" height="12" rx="2"/>
+      <rect x="28.5" y="9" width="7" height="12" rx="2" transform="rotate(45 32 32)"/>
+      <rect x="28.5" y="9" width="7" height="12" rx="2" transform="rotate(90 32 32)"/>
+      <rect x="28.5" y="9" width="7" height="12" rx="2" transform="rotate(135 32 32)"/>
+      <rect x="28.5" y="9" width="7" height="12" rx="2" transform="rotate(180 32 32)"/>
+      <rect x="28.5" y="9" width="7" height="12" rx="2" transform="rotate(225 32 32)"/>
+      <rect x="28.5" y="9" width="7" height="12" rx="2" transform="rotate(270 32 32)"/>
+      <rect x="28.5" y="9" width="7" height="12" rx="2" transform="rotate(315 32 32)"/>
+    </g>
+    <circle cx="32" cy="32" r="15.5"/>
+  </g>
+  <!-- 체크마크 (서비스 처리 완료 상징) -->
+  <path d="M25.5 32.5 L30 37 L39 27.5" fill="none" stroke="#1557b0" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
