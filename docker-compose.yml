@@ -79,7 +79,7 @@ services:
     depends_on:
       - itsm-api
     ports:
-      - "8084:80"
+      - "127.0.0.1:8084:80"  # 앱 포트는 localhost 전용(호스트 nginx 프록시만 접근, SSOT §0)
     volumes:
       - nginx-logs:/var/log/nginx
     networks:

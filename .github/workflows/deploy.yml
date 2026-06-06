@@ -154,6 +154,7 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_PORT }}
           script: |
+            set -e  # 중간 실패가 초록불에 묻히지 않도록 (SSOT §5-8)
             cd ~/itsm
 
             # .env 파일 생성/갱신
@@ -201,7 +202,9 @@ jobs:
             for i in $(seq 1 18); do
               sleep 5
               # 호스트에서 프론트엔드(8084) 경유 API 호출
-              HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8084/api/v1/auth/health 2>/dev/null || echo "000")
+              # -A: frontend nginx 봇필터가 curl/ UA 를 444 차단 → 식별용 UA 지정
+              # || true: curl 은 실패해도 -w 로 000 을 출력 — 기존 || echo "000" 은 000 이 두 번 찍혀 != "000" 비교가 늘 참(헬스체크 영구 통과 버그)
+              HTTP_CODE=$(curl -s -o /dev/null -A "deploy-healthcheck" -w "%{http_code}" http://localhost:8084/api/v1/auth/health 2>/dev/null || true)
               if [ "$HTTP_CODE" != "000" ] && [ "$HTTP_CODE" != "502" ] && [ "$HTTP_CODE" != "503" ]; then
                 echo "==> API is healthy! (HTTP $HTTP_CODE)"
                 HEALTHY=true
