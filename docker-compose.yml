@@ -7,8 +7,14 @@ services:
       MARIADB_ROOT_PASSWORD: ${DB_PASSWORD}
       MARIADB_DATABASE: ITSM
       TZ: Asia/Seoul
+    # localhost 전용 (2026-07-24, DB 포트 전면 노출 사고 예방) — 외부는 SSH 터널로. 0.0.0.0 금지.
     ports:
-      - "3310:3306"
+      - "127.0.0.1:3310:3306"
+    # 메모리 튜닝 (2026-07-24, 4GB VPS 공유 환경): 실사용 대비 과한 기본값 축소
+    command:
+      - --innodb-buffer-pool-size=96M
+      - --max-connections=50
+      - --performance-schema=OFF
     volumes:
       - itsm-db-data:/var/lib/mysql
     healthcheck:
@@ -24,6 +30,11 @@ services:
         limits:
           cpus: "1.0"
           memory: 1024M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   itsm-api:
     image: ${DOCKERHUB_USERNAME}/itsm-api:${IMAGE_TAG:-latest}
@@ -49,6 +60,11 @@ services:
         limits:
           cpus: "1.0"
           memory: 768M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   itsm-batch:
     image: ${DOCKERHUB_USERNAME}/itsm-batch:${IMAGE_TAG:-latest}
@@ -69,6 +85,11 @@ services:
         limits:
           cpus: "0.5"
           memory: 512M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   itsm-frontend:
     image: ${DOCKERHUB_USERNAME}/itsm-frontend:${IMAGE_TAG:-latest}
@@ -89,6 +110,11 @@ services:
         limits:
           cpus: "0.5"
           memory: 256M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   fail2ban:
     image: crazymax/fail2ban:latest
@@ -112,6 +138,11 @@ services:
         limits:
           cpus: "0.25"
           memory: 128M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 networks:
   backend:
