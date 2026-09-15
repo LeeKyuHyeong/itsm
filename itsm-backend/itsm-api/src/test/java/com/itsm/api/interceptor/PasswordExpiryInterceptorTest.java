@@ -35,6 +35,9 @@ class PasswordExpiryInterceptorTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private com.itsm.api.service.common.SystemConfigReader systemConfigReader;
+
     @InjectMocks
     private PasswordExpiryInterceptor interceptor;
 
@@ -46,6 +49,24 @@ class PasswordExpiryInterceptorTest {
         request = mock(HttpServletRequest.class);
         response = mock(HttpServletResponse.class);
         SecurityContextHolder.clearContext();
+        // 시스템 설정 미지정 = 기본 90일 (2026-09-16 P3: password.expire.days 를 tb_system_config 에서 읽는다)
+        org.mockito.Mockito.lenient()
+                .when(systemConfigReader.getInt(org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.anyInt()))
+                .thenAnswer(inv -> inv.getArgument(1));
+    }
+
+    @Test
+    @DisplayName("password.expire.days 시스템 설정이 30이면 31일 전 변경 비밀번호는 만료다")
+    void expiryDaysFromSystemConfig() {
+        given(request.getRequestURI()).willReturn("/api/v1/users");
+        setAuthentication(1L);
+        given(userRepository.findById(1L)).willReturn(Optional.of(makeUser(LocalDateTime.now().minusDays(31))));
+        given(systemConfigReader.getInt("password.expire.days", 90)).willReturn(30);
+
+        assertThatThrownBy(() -> interceptor.preHandle(request, response, new Object()))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(ErrorCode.PASSWORD_EXPIRED);
     }
 
     @AfterEach

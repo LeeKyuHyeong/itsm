@@ -62,4 +62,14 @@ public class Menu extends BaseEntity {
         this.isVisible = isVisible != null ? isVisible : "Y";
         this.status = status != null ? status : "ACTIVE";
     }
+
+    /** 관리자 메뉴 수정 (2026-09-16 P3). 순환 참조 검사는 서비스에서 한다. */
+    public void update(Menu parent, String menuNm, String menuNmEn, String menuUrl, String icon, int sortOrder) {
+        this.parent = parent;
+        this.menuNm = menuNm;
+        this.menuNmEn = menuNmEn;
+        this.menuUrl = menuUrl;
+        this.icon = icon;
+        this.sortOrder = sortOrder;
+    }
 }

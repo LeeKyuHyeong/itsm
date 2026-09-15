@@ -101,7 +101,8 @@
     <!-- 장애보고서 -->
     <IncidentReportCard
       :report="report"
-      v-model="reportContent"
+      :form-schema="reportSchema"
+      v-model="reportValues"
       @save-report="handleSaveReport"
     />
 
@@ -137,6 +138,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { incidentApi } from '@/api/incident.js'
+import { reportApi } from '@/api/report.js'
 import { formatDate } from '@/utils/date.js'
 import { useToast } from '@/composables/useToast.js'
 import { useConfirm } from '@/composables/useConfirm.js'
@@ -164,7 +166,10 @@ const report = ref(null)
 const newComment = ref('')
 const assigneeUserId = ref(null)
 const mainManagerId = ref(null)
-const reportContent = ref('')
+// 장애보고서 동적 폼 (2026-09-16 P3): 활성 INCIDENT 양식의 form_schema 로 렌더링, 값은 JSON 으로 저장
+const reportForm = ref(null)
+const reportSchema = ref([])
+const reportValues = ref({})
 const showAssigneeModal = ref(false)
 const showAssignManagerModal = ref(false)
 
@@ -263,6 +268,34 @@ const loadReport = async () => {
   } catch (e) {
     report.value = null
   }
+  reportValues.value = parseReportContent(report.value?.reportContent)
+}
+
+/** 저장된 report_content(JSON 문자열) → 객체. 과거 자유 텍스트는 빈 객체 */
+function parseReportContent(raw) {
+  if (!raw) return {}
+  if (typeof raw === 'object') return { ...raw }
+  try {
+    const parsed = JSON.parse(raw)
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {}
+  } catch {
+    return {}
+  }
+}
+
+/** 활성 INCIDENT 보고서 양식 1개를 읽어 스키마(JSON 문자열 → 배열)를 준비한다 */
+const loadReportForm = async () => {
+  try {
+    const res = await reportApi.getForms({ formTypeCd: 'INCIDENT', isActive: 'Y', page: 0, size: 1 })
+    const page = res.data.data || {}
+    const form = (page.content || [])[0] || null
+    reportForm.value = form
+    const schema = typeof form?.formSchema === 'string' ? JSON.parse(form.formSchema) : form?.formSchema
+    reportSchema.value = Array.isArray(schema) ? schema : []
+  } catch (e) {
+    reportForm.value = null
+    reportSchema.value = []
+  }
 }
 
 const handleChangeStatus = async (status) => {
@@ -332,8 +365,15 @@ const handleDeleteComment = async (commentId) => {
 }
 
 const handleSaveReport = async () => {
+  if (!reportForm.value) {
+    toast.error(t('incident.reportFormMissing'))
+    return
+  }
   try {
-    const payload = { reportFormId: 1, reportContent: reportContent.value }
+    const payload = {
+      reportFormId: reportForm.value.formId,
+      reportContent: JSON.stringify(reportValues.value || {})
+    }
     if (report.value) {
       await incidentApi.updateReport(incidentId.value, payload)
     } else {
@@ -347,10 +387,7 @@ const handleSaveReport = async () => {
 
 onMounted(async () => {
   await commonCodeStore.fetchCodes('INCIDENT_TYPE')
-  await Promise.all([loadDetail(), loadAssignees(), loadComments(), loadHistory(), loadReport()])
-  if (report.value) {
-    reportContent.value = report.value.reportContent
-  }
+  await Promise.all([loadDetail(), loadAssignees(), loadComments(), loadHistory(), loadReport(), loadReportForm()])
 })
 </script>
 

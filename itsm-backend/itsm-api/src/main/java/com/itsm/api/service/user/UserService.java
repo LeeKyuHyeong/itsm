@@ -35,6 +35,7 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final DepartmentRepository departmentRepository;
     private final PasswordEncoder passwordEncoder;
+    private final com.itsm.api.service.common.SystemConfigReader systemConfigReader;
 
     private static final Pattern PASSWORD_PATTERN = Pattern.compile(
             "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?]).{8,}$"
@@ -70,6 +71,10 @@ public class UserService {
         if (!PASSWORD_PATTERN.matcher(req.getPassword()).matches()) {
             throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE,
                     "비밀번호는 8자 이상이며 대문자, 소문자, 숫자, 특수문자를 포함해야 합니다.");
+        }
+        int minLength = systemConfigReader.getInt(com.itsm.api.service.common.SystemConfigReader.KEY_PASSWORD_MIN_LENGTH, 8);
+        if (req.getPassword().length() < minLength) {
+            throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE, "비밀번호는 " + minLength + "자 이상이어야 합니다.");
         }
 
         // Find department if deptId provided

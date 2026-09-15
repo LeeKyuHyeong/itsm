@@ -27,8 +27,72 @@ class SlaWarningJobTest {
     @Mock
     private NotificationService notificationService;
 
+    @Mock
+    private com.itsm.core.repository.common.SlaPolicyRepository slaPolicyRepository;
+
     @InjectMocks
     private SlaWarningJob slaWarningJob;
+
+    // ── 2026-09-16 전수조사 P3: 관리자 SLA 화면의 warning_pct 를 배치가 읽지 않고 0.8 을 하드코딩하고 있었다 ──
+
+    private Incident incidentAt(double elapsedRate, Long companyId, String priorityCd) {
+        User manager = mock(User.class);
+        lenient().when(manager.getUserId()).thenReturn(10L); // 경고 미발송 케이스에선 안 읽힘
+        com.itsm.core.domain.company.Company company = mock(com.itsm.core.domain.company.Company.class);
+        when(company.getCompanyId()).thenReturn(companyId);
+        Incident incident = mock(Incident.class);
+        lenient().when(incident.getIncidentId()).thenReturn(1L);
+        when(incident.getMainManager()).thenReturn(manager);
+        when(incident.getCompany()).thenReturn(company);
+        when(incident.getPriorityCd()).thenReturn(priorityCd);
+        // 총 100분 SLA 중 elapsedRate 만큼 지난 시점
+        LocalDateTime occurred = LocalDateTime.now().minusMinutes((long) (elapsedRate * 100));
+        when(incident.getOccurredAt()).thenReturn(occurred);
+        when(incident.getSlaDeadlineAt()).thenReturn(occurred.plusMinutes(100));
+        when(incidentRepository.findByStatusCdIn(List.of("RECEIVED", "IN_PROGRESS")))
+                .thenReturn(List.of(incident));
+        return incident;
+    }
+
+    @Test
+    @DisplayName("회사별 SLA 정책 warning_pct=50 이면 경과율 60% 에도 경고를 보낸다")
+    void execute_usesCompanyWarningPctFromSlaPolicy() {
+        incidentAt(0.6, 7L, "HIGH");
+        when(slaPolicyRepository.findByCompanyIdAndPriorityCd(7L, "HIGH"))
+                .thenReturn(java.util.Optional.of(com.itsm.core.domain.common.SlaPolicy.builder()
+                        .companyId(7L).priorityCd("HIGH").deadlineHours(8).warningPct(50).build()));
+
+        slaWarningJob.execute();
+
+        verify(notificationService).sendNotification(eq(10L), eq("SLA_WARNING"), contains("SLA 경고"),
+                anyString(), eq("INCIDENT"), eq(1L));
+    }
+
+    @Test
+    @DisplayName("회사 정책이 없으면 전사 기본 정책(warning_pct=90)을 쓴다 → 85% 는 경고 아님")
+    void execute_fallsBackToGlobalPolicy() {
+        incidentAt(0.85, 7L, "HIGH");
+        when(slaPolicyRepository.findByCompanyIdAndPriorityCd(7L, "HIGH")).thenReturn(java.util.Optional.empty());
+        when(slaPolicyRepository.findByCompanyIdIsNullAndPriorityCd("HIGH"))
+                .thenReturn(java.util.Optional.of(com.itsm.core.domain.common.SlaPolicy.builder()
+                        .priorityCd("HIGH").deadlineHours(8).warningPct(90).build()));
+
+        slaWarningJob.execute();
+
+        verify(notificationService, never()).sendNotification(
+                anyLong(), anyString(), anyString(), anyString(), anyString(), anyLong());
+    }
+
+    @Test
+    @DisplayName("정책이 아예 없으면 기존 기본값 80% 를 유지한다")
+    void execute_defaultsTo80WhenNoPolicy() {
+        incidentAt(0.85, 7L, "HIGH");
+
+        slaWarningJob.execute();
+
+        verify(notificationService).sendNotification(eq(10L), eq("SLA_WARNING"), anyString(),
+                anyString(), eq("INCIDENT"), eq(1L));
+    }
 
     @Test
     @DisplayName("SLA 경과율 80% 이상인 장애에 대해 경고 알림을 발송한다")

@@ -56,6 +56,9 @@ class AuthServiceTest {
     @Mock
     private JwtTokenProvider jwtTokenProvider;
 
+    @Mock
+    private com.itsm.api.service.common.SystemConfigReader systemConfigReader;
+
     @InjectMocks
     private AuthService authService;
 
@@ -81,6 +84,41 @@ class AuthServiceTest {
 
         userRole = new UserRole(1L, 1L, 1L);
         ReflectionTestUtils.setField(userRole, "role", role);
+
+        // 시스템 설정 미지정 = 코드 기본값 (2026-09-16 P3: 잠금 횟수·최소 길이를 tb_system_config 에서 읽는다)
+        org.mockito.Mockito.lenient()
+                .when(systemConfigReader.getInt(org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.anyInt()))
+                .thenAnswer(inv -> inv.getArgument(1));
+    }
+
+    @Test
+    @DisplayName("login.fail.lock.count 시스템 설정이 3이면 3회 실패에 계정이 잠긴다")
+    void login_lockCountFromSystemConfig() {
+        ReflectionTestUtils.setField(activeUser, "loginFailCnt", 2);
+        given(systemConfigReader.getInt("login.fail.lock.count", 5)).willReturn(3);
+        LoginRequest request = new LoginRequest("admin", "wrongPassword");
+        given(userRepository.findByLoginId("admin")).willReturn(Optional.of(activeUser));
+        given(passwordEncoder.matches("wrongPassword", "encodedPassword")).willReturn(false);
+        given(accessLogRepository.save(any())).willReturn(null);
+
+        assertThatThrownBy(() -> authService.login(request, "127.0.0.1"))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(ErrorCode.ACCOUNT_LOCKED);
+        assertThat(activeUser.isLocked()).isTrue();
+    }
+
+    @Test
+    @DisplayName("password.min.length 시스템 설정이 12면 패턴을 만족해도 10자 비밀번호는 거부한다")
+    void changePassword_minLengthFromSystemConfig() {
+        given(userRepository.findById(1L)).willReturn(Optional.of(activeUser));
+        given(passwordEncoder.matches("Current1!", "encodedPassword")).willReturn(true);
+        given(systemConfigReader.getInt("password.min.length", 8)).willReturn(12);
+
+        assertThatThrownBy(() -> authService.changePassword(1L, new ChangePasswordRequest("Current1!", "Abcdef1!23")))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(ErrorCode.INVALID_INPUT_VALUE);
     }
 
     @Test

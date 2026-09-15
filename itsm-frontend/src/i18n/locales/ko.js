@@ -152,6 +152,7 @@ export default {
     report: '장애보고서',
     writeReport: '보고서 작성',
     noReport: '작성된 보고서가 없습니다.',
+    reportFormMissing: '활성화된 장애보고서 양식이 없습니다. 관리자에게 양식 등록을 요청하세요.',
     reportContent: '보고서 내용',
     createdAt: '등록일시',
     updatedAt: '수정일시',

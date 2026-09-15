@@ -50,6 +50,7 @@ class IncidentServiceTest {
     @Mock private CompanyRepository companyRepository;
     @Mock private UserRepository userRepository;
     @Mock private SlaPolicyRepository slaPolicyRepository;
+    @Mock private com.itsm.core.repository.report.ReportFormRepository reportFormRepository;
 
     @InjectMocks
     private IncidentService incidentService;
@@ -291,6 +292,8 @@ class IncidentServiceTest {
     void saveReport_success() {
         given(incidentRepository.findById(1L)).willReturn(Optional.of(incident));
         given(incidentReportRepository.findByIncidentId(1L)).willReturn(Optional.empty());
+        given(reportFormRepository.findById(1L))
+                .willReturn(Optional.of(org.mockito.Mockito.mock(com.itsm.core.domain.report.ReportForm.class)));
         given(incidentReportRepository.save(any(IncidentReport.class))).willAnswer(inv -> {
             IncidentReport r = inv.getArgument(0);
             ReflectionTestUtils.setField(r, "reportId", 1L);
@@ -301,6 +304,48 @@ class IncidentServiceTest {
         IncidentReportResponse result = incidentService.saveReport(1L, req, 1L);
 
         assertThat(result.getReportContent()).isEqualTo("{\"summary\":\"장애 요약\"}");
+    }
+
+    // ── 2026-09-16 전수조사 P3: 보고서는 JSON 컬럼 + tb_report_form FK 인데 검증이 없어
+    //    프론트가 보낸 자유 텍스트/존재하지 않는 양식ID(1, 시드 없음)가 DB 제약 위반 500 으로 터졌다 ──
+
+    @Test
+    @DisplayName("장애보고서 내용이 JSON 객체가 아니면 INVALID_INPUT_VALUE")
+    void saveReport_nonJsonContent_throwsInvalidInput() {
+        IncidentReportRequest req = new IncidentReportRequest(1L, "서버가 다운되어 재기동함");
+
+        assertThatThrownBy(() -> incidentService.saveReport(1L, req, 1L))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(ErrorCode.INVALID_INPUT_VALUE);
+        verify(incidentReportRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("장애보고서 양식ID가 존재하지 않으면 ENTITY_NOT_FOUND (FK 위반 500 대신)")
+    void saveReport_unknownForm_throwsNotFound() {
+        given(incidentRepository.findById(1L)).willReturn(Optional.of(incident));
+        given(incidentReportRepository.findByIncidentId(1L)).willReturn(Optional.empty());
+        given(reportFormRepository.findById(99L)).willReturn(Optional.empty());
+
+        IncidentReportRequest req = new IncidentReportRequest(99L, "{\"summary\":\"x\"}");
+
+        assertThatThrownBy(() -> incidentService.saveReport(1L, req, 1L))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(ErrorCode.ENTITY_NOT_FOUND);
+        verify(incidentReportRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("장애보고서 수정 내용이 JSON 객체가 아니면 INVALID_INPUT_VALUE")
+    void updateReport_nonJsonContent_throwsInvalidInput() {
+        IncidentReportRequest req = new IncidentReportRequest(1L, "[1,2,3]");
+
+        assertThatThrownBy(() -> incidentService.updateReport(1L, req, 1L))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(ErrorCode.INVALID_INPUT_VALUE);
     }
 
     @Test

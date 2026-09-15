@@ -2,24 +2,30 @@
   <div class="detail-card">
     <div class="card-header">
       <h3>{{ t('incident.report') }}</h3>
-      <button v-if="!report" class="btn btn-sm" @click="showModal = true">{{ t('incident.writeReport') }}</button>
-      <button v-else class="btn btn-sm" @click="showModal = true">{{ t('common.edit') }}</button>
+      <button class="btn btn-sm" :disabled="!hasForm" @click="showModal = true">
+        {{ report ? t('common.edit') : t('incident.writeReport') }}
+      </button>
     </div>
-    <div v-if="!report" class="empty-state">{{ t('incident.noReport') }}</div>
+
+    <!-- 2026-09-16 P3: 양식(tb_report_form, INCIDENT 유형·활성)이 없으면 작성할 수 없다 -->
+    <div v-if="!hasForm" class="empty-state">{{ t('incident.reportFormMissing') }}</div>
+    <div v-else-if="!report" class="empty-state">{{ t('incident.noReport') }}</div>
     <div v-else class="report-content">
-      <pre>{{ report.reportContent }}</pre>
+      <dl class="report-fields">
+        <div v-for="field in formSchema" :key="field.key" class="report-field">
+          <dt>{{ field.label }}</dt>
+          <dd>{{ displayValue(savedValues[field.key]) }}</dd>
+        </div>
+      </dl>
       <div class="report-meta">
         {{ t('incident.createdAt') }}: {{ formatDate(report.createdAt) }}
         <span v-if="report.updatedAt"> | {{ t('incident.updatedAt') }}: {{ formatDate(report.updatedAt) }}</span>
       </div>
     </div>
 
-    <!-- 장애보고서 모달 -->
+    <!-- 장애보고서 모달: 양식 스키마(JSON) 기반 동적 폼 -->
     <BaseModal :show="showModal" :title="t('incident.writeReport')" width="640px" @close="showModal = false">
-      <div class="form-group">
-        <label>{{ t('incident.reportContent') }}</label>
-        <textarea :value="modelValue" @input="$emit('update:modelValue', $event.target.value)" rows="10" :placeholder="t('incident.reportPlaceholder')"></textarea>
-      </div>
+      <DynamicForm :schema="formSchema" :modelValue="modelValue" @update:modelValue="$emit('update:modelValue', $event)" />
       <template #footer>
         <button class="btn btn-secondary" @click="showModal = false">{{ t('common.cancel') }}</button>
         <button class="btn btn-primary" @click="handleSave">{{ t('common.save') }}</button>
@@ -29,20 +35,27 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { formatDate } from '@/utils/date.js'
 import BaseModal from '@/components/common/BaseModal.vue'
+import DynamicForm from '@/components/common/DynamicForm.vue'
 
 const { t } = useI18n()
 
-defineProps({
+const props = defineProps({
   report: {
     type: Object,
     default: null
   },
+  /** tb_report_form.form_schema 를 파싱한 필드 배열 ([{ key, label, type, required, ... }]) */
+  formSchema: {
+    type: Array,
+    default: () => []
+  },
+  /** 작성 중인 값 (필드 key → 값) */
   modelValue: {
-    type: String,
+    type: Object,
     required: true
   }
 })
@@ -50,6 +63,27 @@ defineProps({
 const emit = defineEmits(['update:modelValue', 'save-report'])
 
 const showModal = ref(false)
+
+const hasForm = computed(() => Array.isArray(props.formSchema) && props.formSchema.length > 0)
+
+/** 저장된 report_content(JSON 문자열)를 객체로. 과거 자유 텍스트 데이터는 빈 객체로 취급 */
+const savedValues = computed(() => {
+  const raw = props.report?.reportContent
+  if (!raw) return {}
+  if (typeof raw === 'object') return raw
+  try {
+    const parsed = JSON.parse(raw)
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {}
+  } catch {
+    return {}
+  }
+})
+
+function displayValue(v) {
+  if (v === null || v === undefined || v === '') return '-'
+  if (typeof v === 'boolean') return v ? 'Y' : 'N'
+  return String(v)
+}
 
 const handleSave = () => {
   emit('save-report')
@@ -61,67 +95,64 @@ const handleSave = () => {
 .detail-card {
   background: var(--color-bg-white);
   border: 1px solid var(--color-border);
-  border-radius: 8px;
-  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
   margin-bottom: var(--spacing-md);
 }
-.detail-card h3 {
-  margin: 0 0 var(--spacing-md) 0;
-  font-size: var(--font-size-lg);
-}
+
 .card-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--spacing-md);
+  justify-content: space-between;
+  margin-bottom: var(--spacing-sm);
 }
+
 .card-header h3 {
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.empty-state {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  padding: var(--spacing-sm) 0;
+}
+
+.report-fields {
   margin: 0;
 }
-.empty-state {
-  text-align: center;
-  padding: var(--spacing-md);
-  color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
+
+.report-field {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: var(--spacing-sm);
+  padding: 6px 0;
+  border-bottom: 1px solid var(--color-border);
 }
-.report-content pre {
-  background: var(--color-bg-secondary);
-  padding: var(--spacing-md);
-  border-radius: 4px;
+
+.report-field dt {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.report-field dd {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
   white-space: pre-wrap;
-  font-size: var(--font-size-sm);
+  word-break: break-word;
 }
+
 .report-meta {
+  margin-top: var(--spacing-sm);
   font-size: var(--font-size-xs);
-  color: var(--color-text-muted);
-  margin-top: var(--spacing-xs);
+  color: var(--color-text-secondary);
 }
-.form-group {
-  margin-bottom: var(--spacing-md);
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
-.form-group label {
-  display: block;
-  margin-bottom: var(--spacing-xs);
-  font-weight: 600;
-  font-size: var(--font-size-sm);
-}
-.form-group input,
-.form-group textarea {
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
-  font-size: var(--font-size-sm);
-  box-sizing: border-box;
-}
-.btn {
-  padding: 6px 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: var(--font-size-sm);
-}
-.btn-primary { background: var(--color-primary); color: var(--color-text-inverse); }
-.btn-secondary { background: var(--color-bg-secondary); border: 1px solid var(--color-border); }
-.btn-sm { padding: 4px 12px; font-size: var(--font-size-xs); }
 </style>

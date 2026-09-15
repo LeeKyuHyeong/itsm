@@ -22,8 +22,50 @@ class NotificationServiceTest {
     @Mock
     private NotificationRepository notificationRepository;
 
+    @Mock
+    private com.itsm.core.repository.common.NotificationPolicyRepository notificationPolicyRepository;
+
     @InjectMocks
     private NotificationService notificationService;
+
+    // ── 2026-09-16 전수조사 P3: tb_notification_policy 는 관리자 화면에서 CRUD 만 되고 읽는 코드가 0 이었다 ──
+
+    @Test
+    @DisplayName("해당 유형의 알림 정책이 있고 전부 비활성이면 알림을 만들지 않는다")
+    void sendNotification_policyInactive_skips() {
+        when(notificationPolicyRepository.findByNotiTypeCd("SLA_WARNING"))
+                .thenReturn(java.util.List.of(com.itsm.core.domain.common.NotificationPolicy.builder()
+                        .notiTypeCd("SLA_WARNING").triggerCondition("elapsed>=warning_pct")
+                        .targetRoleCd("MAINTENANCE").isActive("N").build()));
+
+        notificationService.sendNotification(1L, "SLA_WARNING", "t", "c", "INCIDENT", 100L);
+
+        verify(notificationRepository, never()).save(any(Notification.class));
+    }
+
+    @Test
+    @DisplayName("해당 유형의 알림 정책이 활성이면 알림을 만든다")
+    void sendNotification_policyActive_saves() {
+        when(notificationPolicyRepository.findByNotiTypeCd("SLA_WARNING"))
+                .thenReturn(java.util.List.of(com.itsm.core.domain.common.NotificationPolicy.builder()
+                        .notiTypeCd("SLA_WARNING").triggerCondition("x").targetRoleCd("MAINTENANCE").isActive("Y").build()));
+        when(notificationRepository.save(any(Notification.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        notificationService.sendNotification(1L, "SLA_WARNING", "t", "c", "INCIDENT", 100L);
+
+        verify(notificationRepository).save(any(Notification.class));
+    }
+
+    @Test
+    @DisplayName("정책 행이 없는 유형은 기존처럼 그대로 만든다 (정책 미설정 = 발송)")
+    void sendNotification_noPolicyRows_saves() {
+        when(notificationPolicyRepository.findByNotiTypeCd("SLA_OVERDUE")).thenReturn(java.util.List.of());
+        when(notificationRepository.save(any(Notification.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        notificationService.sendNotification(1L, "SLA_OVERDUE", "t", "c", "INCIDENT", 100L);
+
+        verify(notificationRepository).save(any(Notification.class));
+    }
 
     @Test
     @DisplayName("알림 생성 시 올바른 필드가 설정된다")

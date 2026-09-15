@@ -309,3 +309,14 @@ INSERT INTO tb_system_config (config_key, config_val, description, updated_at, u
 ('password.min.length',      '8',                     '비밀번호 최소 길이',           NOW(), 1),
 ('password.expire.days',     '90',                    '비밀번호 만료 기간 (일)',      NOW(), 1),
 ('login.fail.lock.count',    '5',                     '로그인 실패 잠금 횟수',        NOW(), 1);
+
+-- ============================================================
+-- 9. 보고서 양식 (동적 폼) — 2026-09-16 전수조사 P3
+--    장애보고서(IncidentDetailView)가 report_form_id=1 을 참조하는데 시드가 없어 FK 위반으로 저장이 불가능했다.
+--    form_schema 는 프론트 DynamicForm.vue 가 읽는 필드 배열: key/label/type(text|textarea|number|date|select|checkbox)/required/placeholder/options
+-- ============================================================
+
+INSERT INTO tb_report_form (form_id, form_nm, form_type_cd, form_schema, is_active, created_at, created_by) VALUES
+(1, '장애보고서 기본 양식', 'INCIDENT',
+ '[{"key":"summary","label":"장애 요약","type":"text","required":true,"placeholder":"현상을 한 줄로"},{"key":"impact","label":"영향 범위","type":"textarea","required":true},{"key":"cause","label":"원인","type":"textarea","required":true},{"key":"solution","label":"조치 내용","type":"textarea","required":true},{"key":"prevention","label":"재발 방지 대책","type":"textarea"},{"key":"resolvedAt","label":"복구 완료 일시","type":"date"}]',
+ 'Y', NOW(), 1);

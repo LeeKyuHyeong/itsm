@@ -28,10 +28,13 @@ public class AuthService {
     private final UserRepository userRepository;
     private final UserRoleRepository userRoleRepository;
     private final AccessLogRepository accessLogRepository;
+    private final com.itsm.api.service.common.SystemConfigReader systemConfigReader;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
-    private static final int MAX_LOGIN_FAIL_COUNT = 5;
+    /** 기본값. 실제 임계값은 tb_system_config login.fail.lock.count (2026-09-16 P3) */
+    private static final int DEFAULT_MAX_LOGIN_FAIL_COUNT = 5;
+    private static final int DEFAULT_PASSWORD_MIN_LENGTH = 8;
     private static final int AUTO_UNLOCK_MINUTES = 30;
     private static final Pattern PASSWORD_PATTERN = Pattern.compile(
             "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?]).{8,}$"
@@ -64,7 +67,9 @@ public class AuthService {
         // Verify password
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             user.recordLoginFailure();
-            if (user.getLoginFailCnt() >= MAX_LOGIN_FAIL_COUNT) {
+            int maxFailCount = systemConfigReader.getInt(
+                    com.itsm.api.service.common.SystemConfigReader.KEY_LOGIN_FAIL_LOCK_COUNT, DEFAULT_MAX_LOGIN_FAIL_COUNT);
+            if (user.getLoginFailCnt() >= maxFailCount) {
                 user.lock();
                 logAccess(user.getUserId(), user.getLoginId(), "LOGIN", ipAddress, false, "비밀번호 오류 - 계정 잠금");
                 throw new BusinessException(ErrorCode.ACCOUNT_LOCKED, "로그인 실패 횟수 초과로 계정이 잠겼습니다.");
@@ -165,6 +170,12 @@ public class AuthService {
         if (!PASSWORD_PATTERN.matcher(request.getNewPassword()).matches()) {
             throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE,
                     "비밀번호는 8자 이상이며 대문자, 소문자, 숫자, 특수문자를 포함해야 합니다.");
+        }
+        int minLength = systemConfigReader.getInt(
+                com.itsm.api.service.common.SystemConfigReader.KEY_PASSWORD_MIN_LENGTH, DEFAULT_PASSWORD_MIN_LENGTH);
+        if (request.getNewPassword().length() < minLength) {
+            throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE,
+                    "비밀번호는 " + minLength + "자 이상이어야 합니다.");
         }
 
         user.changePassword(passwordEncoder.encode(request.getNewPassword()));

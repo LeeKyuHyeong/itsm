@@ -19,6 +19,10 @@ public class SlaWarningJob {
 
     private final IncidentRepository incidentRepository;
     private final NotificationService notificationService;
+    private final com.itsm.core.repository.common.SlaPolicyRepository slaPolicyRepository;
+
+    /** 정책이 없을 때의 경고 임계값 (tb_sla_policy.warning_pct 기본 80 과 동일) */
+    private static final double DEFAULT_WARNING_RATE = 0.8;
 
     @Transactional
     public void execute() {
@@ -40,7 +44,9 @@ public class SlaWarningJob {
             double elapsedRate = calculateElapsedRate(incident.getOccurredAt(),
                     incident.getSlaDeadlineAt(), now);
 
-            if (elapsedRate >= 0.8 && elapsedRate < 1.0) {
+            // 2026-09-16 P3: 관리자 SLA 화면의 warning_pct 를 읽는다 (회사별 → 전사 기본 → 0.8)
+            double warningRate = resolveWarningRate(incident);
+            if (elapsedRate >= warningRate && elapsedRate < 1.0) {
                 notificationService.sendNotification(
                         incident.getMainManager().getUserId(),
                         "SLA_WARNING",
@@ -55,6 +61,15 @@ public class SlaWarningJob {
             }
         }
         log.info("[SlaWarningJob] 완료 - {}건 알림 발송", count);
+    }
+
+    double resolveWarningRate(Incident incident) {
+        Long companyId = incident.getCompany() != null ? incident.getCompany().getCompanyId() : null;
+        String priorityCd = incident.getPriorityCd();
+        return slaPolicyRepository.findByCompanyIdAndPriorityCd(companyId, priorityCd)
+                .or(() -> slaPolicyRepository.findByCompanyIdIsNullAndPriorityCd(priorityCd))
+                .map(policy -> policy.getWarningPct() != null ? policy.getWarningPct() / 100.0 : DEFAULT_WARNING_RATE)
+                .orElse(DEFAULT_WARNING_RATE);
     }
 
     double calculateElapsedRate(LocalDateTime occurredAt, LocalDateTime deadlineAt,

@@ -38,6 +38,10 @@ public class IncidentService {
     private final CompanyRepository companyRepository;
     private final UserRepository userRepository;
     private final SlaPolicyRepository slaPolicyRepository;
+    private final com.itsm.core.repository.report.ReportFormRepository reportFormRepository;
+
+    /** 보고서 JSON 검증용 (2026-09-16 P3) */
+    private static final com.fasterxml.jackson.databind.ObjectMapper REPORT_JSON = new com.fasterxml.jackson.databind.ObjectMapper();
 
     @Transactional(readOnly = true)
     public Page<IncidentResponse> search(String keyword, Long companyId, String statusCd,
@@ -253,10 +257,15 @@ public class IncidentService {
     }
 
     public IncidentReportResponse saveReport(Long incidentId, IncidentReportRequest req, Long currentUserId) {
+        // 2026-09-16 P3: report_content 는 JSON 컬럼, report_form_id 는 tb_report_form FK.
+        // 검증 없이 넘기면 DB 제약 위반 500 이 났다(운영 tb_report_form 이 비어 있어 한 번도 저장된 적 없음).
+        validateReportContent(req.getReportContent());
         findById(incidentId);
         incidentReportRepository.findByIncidentId(incidentId).ifPresent(existing -> {
             throw new BusinessException(ErrorCode.DUPLICATE_VALUE, "이미 장애보고서가 존재합니다.");
         });
+        reportFormRepository.findById(req.getReportFormId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND, "보고서 양식을 찾을 수 없습니다."));
 
         IncidentReport report = IncidentReport.builder()
                 .incidentId(incidentId)
@@ -269,10 +278,25 @@ public class IncidentService {
     }
 
     public IncidentReportResponse updateReport(Long incidentId, IncidentReportRequest req, Long currentUserId) {
+        validateReportContent(req.getReportContent());
         IncidentReport report = incidentReportRepository.findByIncidentId(incidentId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND, "장애보고서를 찾을 수 없습니다."));
         report.update(req.getReportContent(), currentUserId);
         return toReportResponse(report);
+    }
+
+    /** 보고서 내용은 동적 폼 값의 JSON 객체여야 한다 (MariaDB JSON 컬럼의 JSON_VALID 제약과 동일 조건 + 객체 한정) */
+    private void validateReportContent(String content) {
+        if (content == null || content.isBlank()) {
+            throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE, "보고서 내용이 비어 있습니다.");
+        }
+        try {
+            if (!REPORT_JSON.readTree(content).isObject()) {
+                throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE, "보고서 내용은 JSON 객체여야 합니다.");
+            }
+        } catch (com.fasterxml.jackson.core.JacksonException e) {
+            throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE, "보고서 내용이 올바른 JSON 이 아닙니다.");
+        }
     }
 
     public void assignMainManager(Long incidentId, Long managerId, Long currentUserId) {

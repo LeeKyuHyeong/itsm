@@ -56,6 +56,9 @@ class UserServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private com.itsm.api.service.common.SystemConfigReader systemConfigReader;
+
     @InjectMocks
     private UserService userService;
 
@@ -67,6 +70,9 @@ class UserServiceTest {
 
     @BeforeEach
     void setUp() {
+        // 시스템 설정 미지정 = 코드 기본값 (2026-09-16 P3)
+        lenient().when(systemConfigReader.getInt(anyString(), anyInt())).thenAnswer(inv -> inv.getArgument(1));
+
         company = Company.builder()
                 .companyNm("테스트회사")
                 .bizNo("123-45-67890")
@@ -230,6 +236,20 @@ class UserServiceTest {
                 .isInstanceOf(BusinessException.class)
                 .extracting(e -> ((BusinessException) e).getErrorCode())
                 .isEqualTo(ErrorCode.DUPLICATE_VALUE);
+    }
+
+    @Test
+    @DisplayName("password.min.length 시스템 설정이 12면 패턴을 만족하는 10자 비밀번호도 거부한다 (2026-09-16 P3)")
+    void createUser_minLengthFromSystemConfig_throwsException() {
+        UserCreateRequest req = new UserCreateRequest(
+                "newuser", "Abcdef1!23", "신규사용자", null, null, null, null);
+        given(userRepository.existsByLoginId("newuser")).willReturn(false);
+        given(systemConfigReader.getInt("password.min.length", 8)).willReturn(12);
+
+        assertThatThrownBy(() -> userService.createUser(req, 1L))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(ErrorCode.INVALID_INPUT_VALUE);
     }
 
     @Test

@@ -21,9 +21,11 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class PasswordExpiryInterceptor implements HandlerInterceptor {
 
-    private static final int PASSWORD_EXPIRY_DAYS = 90;
+    /** 기본값. 실제 값은 tb_system_config password.expire.days (2026-09-16 P3) */
+    private static final int DEFAULT_PASSWORD_EXPIRY_DAYS = 90;
 
     private final UserRepository userRepository;
+    private final com.itsm.api.service.common.SystemConfigReader systemConfigReader;
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     private static final String[] SKIP_PATTERNS = {
@@ -69,7 +71,9 @@ public class PasswordExpiryInterceptor implements HandlerInterceptor {
         if (pwdChangedAt == null) {
             return true;
         }
-        return pwdChangedAt.plusDays(PASSWORD_EXPIRY_DAYS).isBefore(LocalDateTime.now());
+        int expiryDays = systemConfigReader.getInt(
+                com.itsm.api.service.common.SystemConfigReader.KEY_PASSWORD_EXPIRE_DAYS, DEFAULT_PASSWORD_EXPIRY_DAYS);
+        return pwdChangedAt.plusDays(expiryDays).isBefore(LocalDateTime.now());
     }
 
     private boolean shouldSkip(String requestUri) {

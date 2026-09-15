@@ -148,6 +148,7 @@ export default {
     report: 'Incident Report',
     writeReport: 'Write Report',
     noReport: 'No report written.',
+    reportFormMissing: 'No active incident report form. Ask an administrator to register one.',
     reportContent: 'Report Content',
     createdAt: 'Created At',
     updatedAt: 'Updated At',

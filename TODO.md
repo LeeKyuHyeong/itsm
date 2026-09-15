@@ -17,7 +17,10 @@ Part 별 1커밋. 조사 기록·근거는 `D:\dev\checklist-itsm-source-audit.m
 - [x] P5 추적성 — `@Auditable` 사용처 0 → 도메인 컨트롤러 변경 엔드포인트 51곳에 부착 + 어스펙트가 `ApiResponse` 를 벗겨 targetType 에 맞는 id 를 고르도록 수정(`AuditableWiringTest` 가 컨텍스트에서 발동 검증) / 알림 드롭다운이 어디에도 마운트되지 않음(헤더 종 = 장식) + `noti.id`(실제 `notiId`) 로 읽음 처리 불가 + 배지 갱신 호출처 0 → 헤더에 마운트, 필드 계약 정정, `/unread-count` 60초 폴링
   - 운영 반영 후 확인: 장애 등록 1건 → `SELECT * FROM tb_audit_log ORDER BY log_id DESC LIMIT 3`, 헤더 종에 배지 표시
   - 미수정(다음 Part): 메뉴 접근 로그·메뉴 기반 인가가 `menu_url`(프론트 경로) ↔ API URI 불일치로 무효 → P1 / `tb_login_history`·`tb_sim_menu_access_log` DDL 부재 → P6 / 이력 미기록 경로(담당자 배정·승인자 추가·역할 부여 등) 목록은 체크리스트 §5
-- [ ] P3 설정 화면 → 소비 코드 (동적 폼 미연결, SLA/알림 정책 소비처)
+- [x] P3 설정 화면 → 소비 코드 — 메뉴 관리 화면이 부르던 POST/PATCH `/admin/menus` 가 백엔드에 없음 → 신설 / 장애보고서 "동적 폼": `DynamicForm.vue` 미사용·양식 시드 없음·`reportFormId=1` 하드코딩·자유 텍스트를 JSON 컬럼에 저장 → 양식 시드(`sql/phase27_p3_report_form_seed.sql`) + 카드가 `form_schema` 로 렌더링 + 서버 JSON/양식 검증 / `tb_system_config` 읽는 코드 0 → `SystemConfigReader`(잠금 횟수·만료일·최소 길이) / SLA `warning_pct` 를 배치가 안 읽고 0.8 고정 → 정책 조회 / 알림 정책 소비처 0 → 배치 발송 시 비활성 정책 게이트
+  - **운영 DB 반영 필요**: `sql/phase27_p3_report_form_seed.sql` (INSERT IGNORE 1행, 스키마 변경 없음)
+  - 운영 반영 후 확인: 장애 상세 → 보고서 작성 버튼 활성 → 저장 → `SELECT JSON_VALID(report_content) FROM tb_incident_report`; 메뉴 관리에서 메뉴 1건 수정 저장 → 사이드바 반영
+  - 미수정(설계 범위, 체크리스트 §6): 게시판 빌더로 만든 게시판에 도달하는 메뉴가 없음 / `system.maintenance.*` 미소비 / 알림 정책의 `target_role_cd`·`trigger_condition` 미소비 / SR 에는 SLA 배치 없음
 - [ ] P4 배치·스케줄러
 - [ ] P1 인증·인가 체인 (로그인 레이트리밋 `getRemoteAddr` 이 프록시 IP — P7 에서 발견, 여기서 수정)
 - [ ] P2 프론트↔백엔드 API 계약

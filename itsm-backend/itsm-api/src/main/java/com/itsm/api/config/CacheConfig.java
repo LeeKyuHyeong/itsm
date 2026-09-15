@@ -15,7 +15,8 @@ public class CacheConfig {
 
     @Bean
     public CacheManager cacheManager() {
-        CaffeineCacheManager cacheManager = new CaffeineCacheManager("menus");
+        // systemConfig: SystemConfigReader 가 읽고 SystemConfigService.updateConfig 가 비운다 (2026-09-16 P3)
+        CaffeineCacheManager cacheManager = new CaffeineCacheManager("menus", "systemConfig");
         cacheManager.setCaffeine(Caffeine.newBuilder()
                 .expireAfterWrite(5, TimeUnit.MINUTES)
                 .maximumSize(100));
