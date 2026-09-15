@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -27,6 +28,45 @@ class NotificationServiceTest {
 
     @InjectMocks
     private NotificationService notificationService;
+
+    // ── 2026-09-16 전수조사 P4: 같은 대상에 대한 같은 유형 알림이 배치가 돌 때마다(매시간) 다시 쌓였다 — 중복 억제 ──
+
+    @Test
+    @DisplayName("같은 사용자·유형·대상에 24시간 안에 이미 보낸 알림이 있으면 다시 만들지 않는다")
+    void sendNotification_duplicateWithin24h_skips() {
+        when(notificationRepository.existsByUserIdAndNotiTypeCdAndRefTypeAndRefIdAndCreatedAtAfter(
+                eq(1L), eq("SLA_OVERDUE"), eq("INCIDENT"), eq(100L), any(java.time.LocalDateTime.class)))
+                .thenReturn(true);
+
+        notificationService.sendNotification(1L, "SLA_OVERDUE", "t", "c", "INCIDENT", 100L);
+
+        verify(notificationRepository, never()).save(any(Notification.class));
+    }
+
+    @Test
+    @DisplayName("24시간 안에 같은 알림이 없으면 만든다")
+    void sendNotification_noRecentDuplicate_saves() {
+        when(notificationRepository.existsByUserIdAndNotiTypeCdAndRefTypeAndRefIdAndCreatedAtAfter(
+                eq(1L), eq("SLA_OVERDUE"), eq("INCIDENT"), eq(100L), any(java.time.LocalDateTime.class)))
+                .thenReturn(false);
+        when(notificationRepository.save(any(Notification.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        notificationService.sendNotification(1L, "SLA_OVERDUE", "t", "c", "INCIDENT", 100L);
+
+        verify(notificationRepository).save(any(Notification.class));
+    }
+
+    @Test
+    @DisplayName("대상(refType/refId)이 없는 알림은 중복 검사 없이 만든다")
+    void sendNotification_withoutRef_skipsDedupeCheck() {
+        when(notificationRepository.save(any(Notification.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        notificationService.sendNotification(2L, "SYSTEM", "t", "c", null, null);
+
+        verify(notificationRepository, never())
+                .existsByUserIdAndNotiTypeCdAndRefTypeAndRefIdAndCreatedAtAfter(any(), any(), any(), any(), any());
+        verify(notificationRepository).save(any(Notification.class));
+    }
 
     // ── 2026-09-16 전수조사 P3: tb_notification_policy 는 관리자 화면에서 CRUD 만 되고 읽는 코드가 0 이었다 ──
 

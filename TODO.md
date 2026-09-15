@@ -21,7 +21,10 @@ Part 별 1커밋. 조사 기록·근거는 `D:\dev\checklist-itsm-source-audit.m
   - **운영 DB 반영 필요**: `sql/phase27_p3_report_form_seed.sql` (INSERT IGNORE 1행, 스키마 변경 없음)
   - 운영 반영 후 확인: 장애 상세 → 보고서 작성 버튼 활성 → 저장 → `SELECT JSON_VALID(report_content) FROM tb_incident_report`; 메뉴 관리에서 메뉴 1건 수정 저장 → 사이드바 반영
   - 미수정(설계 범위, 체크리스트 §6): 게시판 빌더로 만든 게시판에 도달하는 메뉴가 없음 / `system.maintenance.*` 미소비 / 알림 정책의 `target_role_cd`·`trigger_condition` 미소비 / SR 에는 SLA 배치 없음
-- [ ] P4 배치·스케줄러
+- [x] P4 배치·스케줄러 — `tb_batch_job` DDL·시드가 리포에 없음(T-17) → DDL + 잡 15종 시드(`BatchJobSeedTest` 가 job_name↔클래스 1:1 검증, 시뮬레이션 6종은 기본 비활성) / 배치 알림이 매 실행마다 같은 대상에 재발송(dedupe 없음) → 24시간 중복 억제 / 잘못된 CRON 이 저장되면 스케줄러가 로그만 남기고 조용히 멈춤 → 저장 시 검증 / Spring Batch 스타터 + `initialize-schema: always` 잔재(Job/Step 미사용, `BATCH_*` 메타 테이블만 생성) → 제거
+  - **운영 DB 반영**: `sql/phase28_p4_batch_job_ddl_seed.sql` (CREATE IF NOT EXISTS + INSERT IGNORE — 운영에 이미 있으면 무변경). `BATCH_*` 테이블 DROP 은 선택(주석)
+  - 운영 확인: `SELECT job_name, is_active, last_result FROM tb_batch_job` 의 job_name 이 잡 클래스명과 같은지 · 시뮬레이션 잡 6종의 is_active(운영에 가짜 데이터가 섞이는 중인지) · `SHOW TABLES LIKE 'BATCH_%'`
+  - 미수정(체크리스트 §7): `StatisticsAggregationJob` 이 쓰는 `tb_daily_statistics` 를 읽는 코드 0(대시보드는 실시간 집계) / 크론 실행과 수동 실행이 같은 잡에 겹칠 수 있음 / `tb_daily_statistics`·`tb_login_history`·`tb_sim_menu_access_log` DDL 부재 → P6
 - [ ] P1 인증·인가 체인 (로그인 레이트리밋 `getRemoteAddr` 이 프록시 IP — P7 에서 발견, 여기서 수정)
 - [ ] P2 프론트↔백엔드 API 계약
 - [ ] P6 데이터 계층

@@ -20,6 +20,9 @@ public class NotificationService {
     );
 
     private final NotificationRepository notificationRepository;
+
+    /** 같은 (사용자, 유형, 대상) 알림의 재발송 억제 시간 */
+    static final int DEDUPE_WINDOW_HOURS = 24;
     private final com.itsm.core.repository.common.NotificationPolicyRepository notificationPolicyRepository;
 
     @Transactional
@@ -35,6 +38,14 @@ public class NotificationService {
             log.warn("[Batch Notification] 허용되지 않은 refType 무시: {}", refType);
             refType = null;
             refId = null;
+        }
+
+        // 2026-09-16 P4: 배치는 매 실행마다 같은 대상에 같은 알림을 다시 만들었다(매시간 SLA 초과 알림 등) → 24시간 안에 같은 알림이 있으면 건너뜀
+        if (refType != null && refId != null
+                && notificationRepository.existsByUserIdAndNotiTypeCdAndRefTypeAndRefIdAndCreatedAtAfter(
+                        userId, notiTypeCd, refType, refId, java.time.LocalDateTime.now().minusHours(DEDUPE_WINDOW_HOURS))) {
+            log.debug("[Batch Notification] 24시간 내 중복으로 미발송: type={}, userId={}, ref={}#{}", notiTypeCd, userId, refType, refId);
+            return;
         }
 
         Notification notification = Notification.builder()

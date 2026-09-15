@@ -35,6 +35,11 @@ public class BatchJobService {
     @PreAuthorize(RoleCode.HAS_ADMIN_ROLE)
     public BatchJobResponse updateJob(Long batchJobId, BatchJobUpdateRequest req, Long currentUserId) {
         BatchJob job = findById(batchJobId);
+        // 2026-09-16 P4: 잘못된 CRON 은 DynamicScheduler 가 "배치 등록 실패" 로그만 남기고 조용히 멈춘다 → 저장 전에 거른다
+        if (!org.springframework.scheduling.support.CronExpression.isValidExpression(req.getCronExpression())) {
+            throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE,
+                    "CRON 표현식이 올바르지 않습니다 (초 분 시 일 월 요일, 예: 0 0 * * * *).");
+        }
         job.update(req.getCronExpression(), req.getIsActive(), req.getJobDescription(), req.getJobNameEn());
         job.setUpdatedBy(currentUserId);
         return toResponse(job);

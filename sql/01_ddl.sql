@@ -977,3 +977,27 @@ CREATE TABLE IF NOT EXISTS tb_menu_access_log (
     CONSTRAINT fk_menu_access_log_user FOREIGN KEY (user_id) REFERENCES tb_user (user_id),
     CONSTRAINT fk_menu_access_log_menu FOREIGN KEY (menu_id) REFERENCES tb_menu (menu_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='메뉴 접근 로그';
+
+-- ============================================================
+-- 배치 작업 정의 (2026-09-16 전수조사 P4 — 엔티티 com.itsm.core.domain.batch.BatchJob 는 있었으나 DDL 이 sql/ 에 없었다)
+-- job_name 은 잡 클래스 단순명(예: SlaWarningJob). DynamicScheduler 가 첫 글자를 소문자로 바꿔 빈을 찾는다.
+-- ============================================================
+CREATE TABLE IF NOT EXISTS tb_batch_job (
+    batch_job_id        BIGINT          NOT NULL AUTO_INCREMENT  COMMENT '배치작업ID',
+    job_name            VARCHAR(100)    NOT NULL                 COMMENT '잡 클래스명 (스케줄러 빈 조회 키)',
+    job_name_en         VARCHAR(100)    NULL                     COMMENT '영문 표시명',
+    job_description     VARCHAR(300)    NULL                     COMMENT '설명',
+    cron_expression     VARCHAR(50)     NOT NULL                 COMMENT 'Spring CRON (초 분 시 일 월 요일)',
+    is_active           CHAR(1)         NOT NULL DEFAULT 'Y'     COMMENT '활성 여부',
+    last_executed_at    DATETIME        NULL                     COMMENT '마지막 실행 일시',
+    last_result         VARCHAR(20)     NULL                     COMMENT '마지막 결과 (SUCCESS/FAILURE)',
+    last_result_message TEXT            NULL                     COMMENT '마지막 결과 메시지',
+    trigger_now         CHAR(1)         NOT NULL DEFAULT 'N'     COMMENT '수동 실행 요청 플래그 (5초 폴링)',
+    created_at          DATETIME        NOT NULL                 COMMENT '등록일시',
+    created_by          BIGINT          NULL                     COMMENT '등록자ID',
+    updated_at          DATETIME        NULL                     COMMENT '수정일시',
+    updated_by          BIGINT          NULL                     COMMENT '수정자ID',
+    PRIMARY KEY (batch_job_id),
+    UNIQUE KEY uk_batch_job_name (job_name),
+    INDEX idx_batch_job_trigger_now (trigger_now)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='배치 작업 정의';

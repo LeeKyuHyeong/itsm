@@ -4,6 +4,7 @@ import com.itsm.api.dto.batch.BatchJobResponse;
 import com.itsm.api.dto.batch.BatchJobUpdateRequest;
 import com.itsm.core.domain.batch.BatchJob;
 import com.itsm.core.exception.BusinessException;
+import com.itsm.core.exception.ErrorCode;
 import com.itsm.core.repository.batch.BatchJobRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -83,6 +84,19 @@ class BatchJobServiceTest {
 
         assertThat(result.getCronExpression()).isEqualTo("0 30 * * * *");
         assertThat(result.getIsActive()).isEqualTo("N");
+    }
+
+    @Test
+    @DisplayName("잘못된 CRON 표현식으로 수정하면 INVALID_INPUT_VALUE (2026-09-16 P4: 스케줄러가 등록 실패 로그만 남기고 조용히 멈추던 것)")
+    void updateJob_invalidCron_throws() {
+        BatchJobUpdateRequest req = new BatchJobUpdateRequest("every hour", "Y", "d", "e");
+        given(batchJobRepository.findById(1L)).willReturn(Optional.of(batchJob));
+
+        assertThatThrownBy(() -> batchJobService.updateJob(1L, req, 1L))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(ErrorCode.INVALID_INPUT_VALUE);
+        assertThat(batchJob.getCronExpression()).isEqualTo("0 0 * * * *");
     }
 
     @Test

@@ -320,3 +320,25 @@ INSERT INTO tb_report_form (form_id, form_nm, form_type_cd, form_schema, is_acti
 (1, '장애보고서 기본 양식', 'INCIDENT',
  '[{"key":"summary","label":"장애 요약","type":"text","required":true,"placeholder":"현상을 한 줄로"},{"key":"impact","label":"영향 범위","type":"textarea","required":true},{"key":"cause","label":"원인","type":"textarea","required":true},{"key":"solution","label":"조치 내용","type":"textarea","required":true},{"key":"prevention","label":"재발 방지 대책","type":"textarea"},{"key":"resolvedAt","label":"복구 완료 일시","type":"date"}]',
  'Y', NOW(), 1);
+
+-- ============================================================
+-- 10. 배치 작업 시드 (2026-09-16 전수조사 P4) — job_name 은 잡 클래스명과 1:1 (BatchJobSeedTest 가 검증)
+--     시뮬레이션 잡 6종은 운영 데이터에 가짜 행을 섞으므로 기본 비활성. 관리자 화면에서 켠다.
+-- ============================================================
+
+INSERT INTO tb_batch_job (job_name, job_name_en, job_description, cron_expression, is_active, trigger_now, created_at, created_by) VALUES
+('SlaWarningJob', 'SLA Warning', 'SLA 경과율이 정책 warning_pct 이상인 장애의 주담당자에게 경고 알림', '0 0 * * * *', 'Y', 'N', NOW(), 1),
+('SlaOverdueJob', 'SLA Overdue', 'SLA 기한을 넘긴 장애의 주담당자에게 초과 알림', '0 30 * * * *', 'Y', 'N', NOW(), 1),
+('UnassignedIncidentJob', 'Unassigned Incidents', '주담당자가 없는 접수/처리중 장애를 시스템 사용자에게 알림', '0 0 9 * * *', 'Y', 'N', NOW(), 1),
+('RepeatIncidentJob', 'Repeat Incidents', '최근 30일 같은 자산에서 반복 발생한 장애 알림', '0 0 8 * * MON', 'Y', 'N', NOW(), 1),
+('LongPendingSrJob', 'Long-pending Service Requests', '완료대기 상태로 2일 이상 머문 서비스요청 알림', '0 0 9 * * *', 'Y', 'N', NOW(), 1),
+('InspectionAlertJob', 'Inspection Reminder', '7일 내 예정된 정기점검을 담당자에게 알림', '0 0 8 * * *', 'Y', 'N', NOW(), 1),
+('MissedInspectionJob', 'Missed Inspections', '예정일이 지났는데 미실시된 정기점검 알림', '0 5 8 * * *', 'Y', 'N', NOW(), 1),
+('AssetExpiryJob', 'Asset Warranty Expiry', '30일 내 보증 만료 HW 자산 알림', '0 10 8 * * *', 'Y', 'N', NOW(), 1),
+('StatisticsAggregationJob', 'Daily Statistics', '전일 장애/SR/변경/자산/접속 통계를 tb_daily_statistics 에 집계', '0 10 0 * * *', 'Y', 'N', NOW(), 1),
+('IncidentSimulationJob', '[Demo] Incident Simulation', '데모용 장애 자동 생성/진행 (운영 데이터에 가짜 장애가 섞이므로 기본 비활성)', '0 0 9-18/3 * * MON-FRI', 'N', 'N', NOW(), 1),
+('ServiceRequestSimulationJob', '[Demo] SR Simulation', '데모용 서비스요청 자동 생성/배정 (기본 비활성)', '0 15 9-18/3 * * MON-FRI', 'N', 'N', NOW(), 1),
+('ChangeSimulationJob', '[Demo] Change Simulation', '데모용 변경요청 자동 생성/승인 (기본 비활성)', '0 30 10 * * MON-FRI', 'N', 'N', NOW(), 1),
+('InspectionSimulationJob', '[Demo] Inspection Simulation', '데모용 정기점검 자동 생성/결과 입력 (기본 비활성)', '0 45 9 * * MON-FRI', 'N', 'N', NOW(), 1),
+('TrafficSimulationJob', '[Demo] Traffic Simulation', '데모용 로그인/메뉴 접근 이력 생성 (기본 비활성)', '0 */10 8-20 * * *', 'N', 'N', NOW(), 1),
+('AssetAutoRegisterJob', '[Demo] Asset Auto-register', '데모용 자산 자동 등록 (기본 비활성)', '0 0 7 * * MON', 'N', 'N', NOW(), 1);
