@@ -1,5 +1,6 @@
 package com.itsm.api.controller.servicerequest;
 
+import com.itsm.api.aop.Auditable;
 import com.itsm.api.dto.common.ContentRequest;
 import com.itsm.api.dto.common.StatusChangeRequest;
 import com.itsm.api.dto.common.UserIdRequest;
@@ -40,6 +41,7 @@ public class ServiceRequestController {
     }
 
     @PostMapping
+    @Auditable(actionType = "CREATE", targetType = "SERVICE_REQUEST")
     public ApiResponse<SrResponse> create(
             @Valid @RequestBody SrCreateRequest req,
             Authentication authentication) {
@@ -48,6 +50,7 @@ public class ServiceRequestController {
     }
 
     @PatchMapping("/{requestId}")
+    @Auditable(actionType = "UPDATE", targetType = "SERVICE_REQUEST")
     public ApiResponse<SrResponse> update(
             @PathVariable Long requestId,
             @Valid @RequestBody SrUpdateRequest req,
@@ -57,6 +60,7 @@ public class ServiceRequestController {
     }
 
     @PatchMapping("/{requestId}/status")
+    @Auditable(actionType = "STATUS_CHANGE", targetType = "SERVICE_REQUEST")
     public ApiResponse<Void> changeStatus(
             @PathVariable Long requestId,
             @Valid @RequestBody StatusChangeRequest req,
@@ -67,6 +71,7 @@ public class ServiceRequestController {
     }
 
     @PostMapping("/{requestId}/assignees")
+    @Auditable(actionType = "ASSIGN", targetType = "SERVICE_REQUEST")
     public ApiResponse<SrAssigneeResponse> assignUser(
             @PathVariable Long requestId,
             @Valid @RequestBody UserIdRequest req,
@@ -76,6 +81,7 @@ public class ServiceRequestController {
     }
 
     @DeleteMapping("/{requestId}/assignees/{userId}")
+    @Auditable(actionType = "UNASSIGN", targetType = "SERVICE_REQUEST")
     public ApiResponse<Void> removeAssignee(
             @PathVariable Long requestId,
             @PathVariable Long userId,
@@ -91,6 +97,7 @@ public class ServiceRequestController {
     }
 
     @PostMapping("/{requestId}/processes")
+    @Auditable(actionType = "PROCESS_ADD", targetType = "SERVICE_REQUEST")
     public ApiResponse<SrProcessResponse> addProcess(
             @PathVariable Long requestId,
             @Valid @RequestBody SrProcessRequest req,
@@ -99,6 +106,7 @@ public class ServiceRequestController {
     }
 
     @PatchMapping("/{requestId}/processes/{processId}/complete")
+    @Auditable(actionType = "PROCESS_COMPLETE", targetType = "SERVICE_REQUEST")
     public ApiResponse<Void> completeProcess(
             @PathVariable Long requestId,
             @PathVariable Long processId,
@@ -115,6 +123,7 @@ public class ServiceRequestController {
     }
 
     @PatchMapping("/{requestId}/schedule")
+    @Auditable(actionType = "SCHEDULE_SET", targetType = "SERVICE_REQUEST")
     public ApiResponse<SrResponse> setSchedule(
             @PathVariable Long requestId,
             @Valid @RequestBody SrScheduleRequest req,
@@ -125,6 +134,7 @@ public class ServiceRequestController {
     }
 
     @PostMapping("/{requestId}/satisfaction")
+    @Auditable(actionType = "SATISFACTION", targetType = "SERVICE_REQUEST")
     public ApiResponse<Void> submitSatisfaction(
             @PathVariable Long requestId,
             @Valid @RequestBody SrSatisfactionRequest req,

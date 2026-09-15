@@ -1,5 +1,6 @@
 package com.itsm.api.controller.inspection;
 
+import com.itsm.api.aop.Auditable;
 import com.itsm.api.dto.common.StatusChangeRequest;
 import com.itsm.api.dto.inspection.*;
 import com.itsm.api.service.inspection.InspectionService;
@@ -37,6 +38,7 @@ public class InspectionController {
     }
 
     @PostMapping
+    @Auditable(actionType = "CREATE", targetType = "INSPECTION")
     public ApiResponse<InspectionResponse> create(
             @Valid @RequestBody InspectionCreateRequest req,
             Authentication authentication) {
@@ -45,6 +47,7 @@ public class InspectionController {
     }
 
     @PatchMapping("/{inspectionId}")
+    @Auditable(actionType = "UPDATE", targetType = "INSPECTION")
     public ApiResponse<InspectionResponse> update(
             @PathVariable Long inspectionId,
             @Valid @RequestBody InspectionUpdateRequest req,
@@ -54,6 +57,7 @@ public class InspectionController {
     }
 
     @PatchMapping("/{inspectionId}/status")
+    @Auditable(actionType = "STATUS_CHANGE", targetType = "INSPECTION")
     public ApiResponse<Void> changeStatus(
             @PathVariable Long inspectionId,
             @Valid @RequestBody StatusChangeRequest req,
@@ -69,6 +73,7 @@ public class InspectionController {
     }
 
     @PostMapping("/{inspectionId}/items")
+    @Auditable(actionType = "ITEM_ADD", targetType = "INSPECTION")
     public ApiResponse<InspectionItemResponse> addItem(
             @PathVariable Long inspectionId,
             @Valid @RequestBody InspectionItemRequest req,
@@ -78,6 +83,7 @@ public class InspectionController {
     }
 
     @DeleteMapping("/{inspectionId}/items/{itemId}")
+    @Auditable(actionType = "ITEM_DELETE", targetType = "INSPECTION")
     public ApiResponse<Void> deleteItem(
             @PathVariable Long inspectionId,
             @PathVariable Long itemId) {
@@ -86,6 +92,7 @@ public class InspectionController {
     }
 
     @PostMapping("/{inspectionId}/results")
+    @Auditable(actionType = "RESULT_ADD", targetType = "INSPECTION")
     public ApiResponse<InspectionResultResponse> addResult(
             @PathVariable Long inspectionId,
             @Valid @RequestBody InspectionResultRequest req,

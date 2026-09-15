@@ -1,5 +1,6 @@
 package com.itsm.api.controller.change;
 
+import com.itsm.api.aop.Auditable;
 import com.itsm.api.dto.change.*;
 import com.itsm.api.dto.common.ContentRequest;
 import com.itsm.api.dto.common.StatusChangeRequest;
@@ -40,6 +41,7 @@ public class ChangeController {
     }
 
     @PostMapping
+    @Auditable(actionType = "CREATE", targetType = "CHANGE")
     public ApiResponse<ChangeResponse> create(
             @Valid @RequestBody ChangeCreateRequest req,
             Authentication authentication) {
@@ -48,6 +50,7 @@ public class ChangeController {
     }
 
     @PatchMapping("/{changeId}")
+    @Auditable(actionType = "UPDATE", targetType = "CHANGE")
     public ApiResponse<ChangeResponse> update(
             @PathVariable Long changeId,
             @Valid @RequestBody ChangeUpdateRequest req,
@@ -57,6 +60,7 @@ public class ChangeController {
     }
 
     @PatchMapping("/{changeId}/status")
+    @Auditable(actionType = "STATUS_CHANGE", targetType = "CHANGE")
     public ApiResponse<Void> changeStatus(
             @PathVariable Long changeId,
             @Valid @RequestBody StatusChangeRequest req,
@@ -67,6 +71,7 @@ public class ChangeController {
     }
 
     @PostMapping("/{changeId}/approvers")
+    @Auditable(actionType = "APPROVER_ADD", targetType = "CHANGE")
     public ApiResponse<ChangeApproverResponse> addApprover(
             @PathVariable Long changeId,
             @Valid @RequestBody UserIdRequest req,
@@ -76,6 +81,7 @@ public class ChangeController {
     }
 
     @DeleteMapping("/{changeId}/approvers/{userId}")
+    @Auditable(actionType = "APPROVER_REMOVE", targetType = "CHANGE")
     public ApiResponse<Void> removeApprover(
             @PathVariable Long changeId,
             @PathVariable Long userId,
@@ -91,6 +97,7 @@ public class ChangeController {
     }
 
     @PatchMapping("/{changeId}/approvers/{userId}")
+    @Auditable(actionType = "APPROVE", targetType = "CHANGE")
     public ApiResponse<Void> approveChange(
             @PathVariable Long changeId,
             @PathVariable Long userId,

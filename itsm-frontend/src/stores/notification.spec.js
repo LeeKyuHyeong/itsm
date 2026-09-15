@@ -5,6 +5,7 @@ import { useNotificationStore } from './notification.js'
 vi.mock('@/api/notification.js', () => ({
   notificationApi: {
     getList: vi.fn(),
+    getUnreadCount: vi.fn(),
     markAsRead: vi.fn(),
     markAllAsRead: vi.fn()
   }
@@ -12,10 +13,13 @@ vi.mock('@/api/notification.js', () => ({
 
 import { notificationApi } from '@/api/notification.js'
 
+// 백엔드 NotificationResponse 의 식별자는 `notiId` 다 (`id` 아님).
+// 2026-09-16 전수조사 P5: 프론트가 `id` 를 읽어 markAsRead(undefined) 를 호출하던 것을 계약대로 고침.
+
 describe('notification store', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
-    vi.restoreAllMocks()
+    vi.clearAllMocks() // vi.fn() 호출 이력 초기화 (restoreAllMocks 는 spy 만 되돌린다)
   })
 
   it('initial state has empty notifications', () => {
@@ -27,19 +31,19 @@ describe('notification store', () => {
   it('setNotifications updates list', () => {
     const store = useNotificationStore()
     const list = [
-      { id: 1, title: '알림1', readAt: null },
-      { id: 2, title: '알림2', readAt: '2026-01-01T00:00:00Z' }
+      { notiId: 1, title: '알림1', readAt: null },
+      { notiId: 2, title: '알림2', readAt: '2026-01-01T00:00:00Z' }
     ]
     store.setNotifications(list)
     expect(store.notifications).toEqual(list)
   })
 
-  it('unreadCount computed correctly', () => {
+  it('unreadCount computed from list', () => {
     const store = useNotificationStore()
     store.setNotifications([
-      { id: 1, title: '알림1', readAt: null },
-      { id: 2, title: '알림2', readAt: null },
-      { id: 3, title: '알림3', readAt: '2026-01-01T00:00:00Z' }
+      { notiId: 1, title: '알림1', readAt: null },
+      { notiId: 2, title: '알림2', readAt: null },
+      { notiId: 3, title: '알림3', readAt: '2026-01-01T00:00:00Z' }
     ])
     expect(store.unreadCount).toBe(2)
   })
@@ -47,17 +51,17 @@ describe('notification store', () => {
   it('unreadCount is 0 when all are read', () => {
     const store = useNotificationStore()
     store.setNotifications([
-      { id: 1, title: '알림1', readAt: '2026-01-01T00:00:00Z' },
-      { id: 2, title: '알림2', readAt: '2026-01-01T00:00:00Z' }
+      { notiId: 1, title: '알림1', readAt: '2026-01-01T00:00:00Z' },
+      { notiId: 2, title: '알림2', readAt: '2026-01-01T00:00:00Z' }
     ])
     expect(store.unreadCount).toBe(0)
   })
 
-  it('markAsRead updates single notification', () => {
+  it('markAsRead updates single notification by notiId', () => {
     const store = useNotificationStore()
     store.setNotifications([
-      { id: 1, title: '알림1', readAt: null },
-      { id: 2, title: '알림2', readAt: null }
+      { notiId: 1, title: '알림1', readAt: null },
+      { notiId: 2, title: '알림2', readAt: null }
     ])
 
     store.markAsRead(1)
@@ -69,7 +73,7 @@ describe('notification store', () => {
 
   it('markAsRead does nothing for unknown id', () => {
     const store = useNotificationStore()
-    store.setNotifications([{ id: 1, title: '알림1', readAt: null }])
+    store.setNotifications([{ notiId: 1, title: '알림1', readAt: null }])
 
     store.markAsRead(999)
 
@@ -80,41 +84,40 @@ describe('notification store', () => {
   it('markAllAsRead updates all notifications', () => {
     const store = useNotificationStore()
     store.setNotifications([
-      { id: 1, title: '알림1', readAt: null },
-      { id: 2, title: '알림2', readAt: null },
-      { id: 3, title: '알림3', readAt: '2026-01-01T00:00:00Z' }
+      { notiId: 1, title: '알림1', readAt: null },
+      { notiId: 2, title: '알림2', readAt: null },
+      { notiId: 3, title: '알림3', readAt: '2026-01-01T00:00:00Z' }
     ])
 
     store.markAllAsRead()
 
     expect(store.unreadCount).toBe(0)
-    store.notifications.forEach(n => {
+    store.notifications.forEach((n) => {
       expect(n.readAt).toBeTruthy()
     })
   })
 
-  it('clearNotifications resets list', () => {
+  it('clearNotifications resets list and count', () => {
     const store = useNotificationStore()
-    store.setNotifications([{ id: 1, title: '알림1', readAt: null }])
+    store.setNotifications([{ notiId: 1, title: '알림1', readAt: null }])
     store.clearNotifications()
     expect(store.notifications).toEqual([])
     expect(store.unreadCount).toBe(0)
   })
 
-  it('fetchNotifications calls API and sets data', async () => {
+  it('fetchNotifications calls API (no params — backend ignores them) and sets data from a plain array', async () => {
     const store = useNotificationStore()
     const mockData = [
-      { id: 1, title: '알림1', readAt: null },
-      { id: 2, title: '알림2', readAt: '2026-01-01T00:00:00Z' }
+      { notiId: 1, title: '알림1', readAt: null },
+      { notiId: 2, title: '알림2', readAt: '2026-01-01T00:00:00Z' }
     ]
-    notificationApi.getList.mockResolvedValue({
-      data: { data: { content: mockData } }
-    })
+    notificationApi.getList.mockResolvedValue({ data: { data: mockData } })
 
     await store.fetchNotifications()
 
-    expect(notificationApi.getList).toHaveBeenCalledWith({ size: 20 })
+    expect(notificationApi.getList).toHaveBeenCalledWith()
     expect(store.notifications).toEqual(mockData)
+    expect(store.unreadCount).toBe(1)
   })
 
   it('fetchNotifications handles API error gracefully', async () => {
@@ -127,39 +130,32 @@ describe('notification store', () => {
     expect(consoleSpy).toHaveBeenCalled()
   })
 
-  it('fetchUnreadCount merges new unread notifications', async () => {
+  it('fetchUnreadCount uses GET /notifications/unread-count and sets unreadCount without loading the list', async () => {
     const store = useNotificationStore()
-    store.setNotifications([{ id: 1, title: '기존', readAt: null }])
-
-    notificationApi.getList.mockResolvedValue({
-      data: { data: { content: [
-        { id: 1, title: '기존', readAt: null },
-        { id: 2, title: '신규', readAt: null }
-      ] } }
-    })
+    notificationApi.getUnreadCount.mockResolvedValue({ data: { data: 4 } })
 
     await store.fetchUnreadCount()
 
-    expect(store.notifications).toHaveLength(2)
-    expect(store.notifications.find(n => n.id === 2)).toBeTruthy()
+    expect(notificationApi.getUnreadCount).toHaveBeenCalled()
+    expect(notificationApi.getList).not.toHaveBeenCalled()
+    expect(store.unreadCount).toBe(4)
+    expect(store.notifications).toEqual([])
   })
 
   it('fetchUnreadCount handles API error gracefully', async () => {
     const store = useNotificationStore()
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
-    notificationApi.getList.mockRejectedValue(new Error('Network error'))
+    notificationApi.getUnreadCount.mockRejectedValue(new Error('Network error'))
 
     await store.fetchUnreadCount()
 
     expect(consoleSpy).toHaveBeenCalled()
   })
 
-  it('fetchNotifications supports legacy items field', async () => {
+  it('fetchNotifications still tolerates a paged shape (content)', async () => {
     const store = useNotificationStore()
-    const mockData = [{ id: 5, title: 'legacy', readAt: null }]
-    notificationApi.getList.mockResolvedValue({
-      data: { data: { items: mockData } }
-    })
+    const mockData = [{ notiId: 5, title: 'paged', readAt: null }]
+    notificationApi.getList.mockResolvedValue({ data: { data: { content: mockData } } })
 
     await store.fetchNotifications()
 
@@ -170,8 +166,8 @@ describe('notification store', () => {
     const store = useNotificationStore()
     const existingDate = '2025-12-01T00:00:00Z'
     store.setNotifications([
-      { id: 1, title: '읽음', readAt: existingDate },
-      { id: 2, title: '안읽음', readAt: null }
+      { notiId: 1, title: '읽음', readAt: existingDate },
+      { notiId: 2, title: '안읽음', readAt: null }
     ])
 
     store.markAllAsRead()

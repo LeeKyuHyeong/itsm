@@ -1,5 +1,6 @@
 package com.itsm.api.controller.asset;
 
+import com.itsm.api.aop.Auditable;
 import com.itsm.api.dto.asset.*;
 import com.itsm.api.dto.common.StatusChangeRequest;
 import com.itsm.api.service.asset.AssetSwService;
@@ -40,6 +41,7 @@ public class AssetSwController {
     }
 
     @PostMapping
+    @Auditable(actionType = "CREATE", targetType = "ASSET_SW")
     public ApiResponse<AssetSwResponse> create(
             @Valid @RequestBody AssetSwCreateRequest req,
             Authentication authentication) {
@@ -48,6 +50,7 @@ public class AssetSwController {
     }
 
     @PatchMapping("/{assetSwId}")
+    @Auditable(actionType = "UPDATE", targetType = "ASSET_SW")
     public ApiResponse<AssetSwResponse> update(
             @PathVariable Long assetSwId,
             @Valid @RequestBody AssetSwUpdateRequest req,
@@ -57,6 +60,7 @@ public class AssetSwController {
     }
 
     @PatchMapping("/{assetSwId}/status")
+    @Auditable(actionType = "STATUS_CHANGE", targetType = "ASSET_SW")
     public ApiResponse<Void> changeStatus(
             @PathVariable Long assetSwId,
             @Valid @RequestBody StatusChangeRequest req,

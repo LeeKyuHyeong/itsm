@@ -1,5 +1,6 @@
 package com.itsm.api.controller.asset;
 
+import com.itsm.api.aop.Auditable;
 import com.itsm.api.dto.asset.*;
 import com.itsm.api.dto.common.StatusChangeRequest;
 import com.itsm.api.service.asset.AssetOaService;
@@ -37,6 +38,7 @@ public class AssetOaController {
     }
 
     @PostMapping
+    @Auditable(actionType = "CREATE", targetType = "ASSET_OA")
     public ApiResponse<AssetOaResponse> create(
             @Valid @RequestBody AssetOaCreateRequest req,
             Authentication authentication) {
@@ -45,6 +47,7 @@ public class AssetOaController {
     }
 
     @PatchMapping("/{assetOaId}")
+    @Auditable(actionType = "UPDATE", targetType = "ASSET_OA")
     public ApiResponse<AssetOaResponse> update(
             @PathVariable Long assetOaId,
             @Valid @RequestBody AssetOaUpdateRequest req,
@@ -54,6 +57,7 @@ public class AssetOaController {
     }
 
     @PatchMapping("/{assetOaId}/status")
+    @Auditable(actionType = "STATUS_CHANGE", targetType = "ASSET_OA")
     public ApiResponse<Void> changeStatus(
             @PathVariable Long assetOaId,
             @Valid @RequestBody StatusChangeRequest req,

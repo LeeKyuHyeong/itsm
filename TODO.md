@@ -14,7 +14,9 @@ Part 별 1커밋. 조사 기록·근거는 `D:\dev\checklist-itsm-source-audit.m
 
 - [x] P7 인프라·CI/CD — 헬스체크 엔드포인트 부재(401 을 healthy 로 오판) → `/api/v1/auth/health` 신설 + 200 만 통과 / nginx `admin` 차단어가 `/admin/*` 화면을 444 로 끊음 → 제거 + 회귀 테스트 / 컨테이너 nginx 에 realip 없어 rate limit 공용·fail2ban 무력 → `X-Real-IP` 복원 / fail2ban 필터 3개 중 2개 정규식이 로그와 불일치 → 재작성 / CLAUDE.md·.env.example 드리프트
   - 운영 반영 후 확인: `/admin/menus` F5 → 200, `fail2ban-client status nginx-scanner` 에 실제 원격 IP, `docker compose logs itsm-api | grep health`
-- [ ] P5 추적성 (감사 로그 AOP 미사용, LoginHistory 미기록, 알림 배지 갱신 경로)
+- [x] P5 추적성 — `@Auditable` 사용처 0 → 도메인 컨트롤러 변경 엔드포인트 51곳에 부착 + 어스펙트가 `ApiResponse` 를 벗겨 targetType 에 맞는 id 를 고르도록 수정(`AuditableWiringTest` 가 컨텍스트에서 발동 검증) / 알림 드롭다운이 어디에도 마운트되지 않음(헤더 종 = 장식) + `noti.id`(실제 `notiId`) 로 읽음 처리 불가 + 배지 갱신 호출처 0 → 헤더에 마운트, 필드 계약 정정, `/unread-count` 60초 폴링
+  - 운영 반영 후 확인: 장애 등록 1건 → `SELECT * FROM tb_audit_log ORDER BY log_id DESC LIMIT 3`, 헤더 종에 배지 표시
+  - 미수정(다음 Part): 메뉴 접근 로그·메뉴 기반 인가가 `menu_url`(프론트 경로) ↔ API URI 불일치로 무효 → P1 / `tb_login_history`·`tb_sim_menu_access_log` DDL 부재 → P6 / 이력 미기록 경로(담당자 배정·승인자 추가·역할 부여 등) 목록은 체크리스트 §5
 - [ ] P3 설정 화면 → 소비 코드 (동적 폼 미연결, SLA/알림 정책 소비처)
 - [ ] P4 배치·스케줄러
 - [ ] P1 인증·인가 체인 (로그인 레이트리밋 `getRemoteAddr` 이 프록시 IP — P7 에서 발견, 여기서 수정)

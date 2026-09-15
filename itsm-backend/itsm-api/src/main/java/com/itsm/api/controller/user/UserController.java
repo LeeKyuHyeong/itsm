@@ -1,5 +1,6 @@
 package com.itsm.api.controller.user;
 
+import com.itsm.api.aop.Auditable;
 import com.itsm.api.dto.user.*;
 import com.itsm.api.service.user.UserService;
 import com.itsm.api.util.AuthUtils;
@@ -32,6 +33,7 @@ public class UserController {
     }
 
     @PostMapping
+    @Auditable(actionType = "CREATE", targetType = "USER")
     public ApiResponse<UserDetailResponse> createUser(
             @Valid @RequestBody UserCreateRequest req,
             Authentication authentication) {
@@ -45,6 +47,7 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}")
+    @Auditable(actionType = "UPDATE", targetType = "USER")
     public ApiResponse<UserDetailResponse> updateUser(
             @PathVariable Long userId,
             @Valid @RequestBody UserUpdateRequest req,
@@ -54,6 +57,7 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}/status")
+    @Auditable(actionType = "STATUS_CHANGE", targetType = "USER")
     public ApiResponse<Void> changeStatus(
             @PathVariable Long userId,
             @Valid @RequestBody UserStatusRequest req,
@@ -69,6 +73,7 @@ public class UserController {
     }
 
     @PostMapping("/{userId}/roles")
+    @Auditable(actionType = "ROLE_GRANT", targetType = "USER")
     public ApiResponse<Void> grantRole(
             @PathVariable Long userId,
             @Valid @RequestBody RoleGrantRequest req,
@@ -79,6 +84,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}/roles/{roleId}")
+    @Auditable(actionType = "ROLE_REVOKE", targetType = "USER")
     public ApiResponse<Void> revokeRole(
             @PathVariable Long userId,
             @PathVariable Long roleId,

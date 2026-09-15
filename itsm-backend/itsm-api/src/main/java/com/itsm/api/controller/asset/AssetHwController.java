@@ -1,5 +1,6 @@
 package com.itsm.api.controller.asset;
 
+import com.itsm.api.aop.Auditable;
 import com.itsm.api.dto.asset.*;
 import com.itsm.api.dto.common.StatusChangeRequest;
 import com.itsm.api.service.asset.AssetHwService;
@@ -40,6 +41,7 @@ public class AssetHwController {
     }
 
     @PostMapping
+    @Auditable(actionType = "CREATE", targetType = "ASSET_HW")
     public ApiResponse<AssetHwResponse> create(
             @Valid @RequestBody AssetHwCreateRequest req,
             Authentication authentication) {
@@ -48,6 +50,7 @@ public class AssetHwController {
     }
 
     @PatchMapping("/{assetHwId}")
+    @Auditable(actionType = "UPDATE", targetType = "ASSET_HW")
     public ApiResponse<AssetHwResponse> update(
             @PathVariable Long assetHwId,
             @Valid @RequestBody AssetHwUpdateRequest req,
@@ -57,6 +60,7 @@ public class AssetHwController {
     }
 
     @PatchMapping("/{assetHwId}/status")
+    @Auditable(actionType = "STATUS_CHANGE", targetType = "ASSET_HW")
     public ApiResponse<Void> changeStatus(
             @PathVariable Long assetHwId,
             @Valid @RequestBody StatusChangeRequest req,
@@ -72,6 +76,7 @@ public class AssetHwController {
     }
 
     @PostMapping("/relations")
+    @Auditable(actionType = "RELATION_ADD", targetType = "ASSET_HW")
     public ApiResponse<AssetRelationResponse> addRelation(
             @Valid @RequestBody AssetRelationRequest req,
             Authentication authentication) {
@@ -80,6 +85,7 @@ public class AssetHwController {
     }
 
     @DeleteMapping("/{assetHwId}/relations/{assetSwId}")
+    @Auditable(actionType = "RELATION_REMOVE", targetType = "ASSET_HW")
     public ApiResponse<Void> removeRelation(
             @PathVariable Long assetHwId,
             @PathVariable Long assetSwId) {

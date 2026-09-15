@@ -1,5 +1,6 @@
 package com.itsm.api.controller.incident;
 
+import com.itsm.api.aop.Auditable;
 import com.itsm.api.dto.common.ContentRequest;
 import com.itsm.api.dto.common.StatusChangeRequest;
 import com.itsm.api.dto.common.UserIdRequest;
@@ -40,6 +41,7 @@ public class IncidentController {
     }
 
     @PostMapping
+    @Auditable(actionType = "CREATE", targetType = "INCIDENT")
     public ApiResponse<IncidentResponse> create(
             @Valid @RequestBody IncidentCreateRequest req,
             Authentication authentication) {
@@ -48,6 +50,7 @@ public class IncidentController {
     }
 
     @PatchMapping("/{incidentId}")
+    @Auditable(actionType = "UPDATE", targetType = "INCIDENT")
     public ApiResponse<IncidentResponse> update(
             @PathVariable Long incidentId,
             @Valid @RequestBody IncidentUpdateRequest req,
@@ -57,6 +60,7 @@ public class IncidentController {
     }
 
     @PatchMapping("/{incidentId}/status")
+    @Auditable(actionType = "STATUS_CHANGE", targetType = "INCIDENT")
     public ApiResponse<Void> changeStatus(
             @PathVariable Long incidentId,
             @Valid @RequestBody StatusChangeRequest req,
@@ -67,6 +71,7 @@ public class IncidentController {
     }
 
     @PostMapping("/{incidentId}/assignees")
+    @Auditable(actionType = "ASSIGN", targetType = "INCIDENT")
     public ApiResponse<IncidentAssigneeResponse> assignUser(
             @PathVariable Long incidentId,
             @Valid @RequestBody UserIdRequest req,
@@ -76,6 +81,7 @@ public class IncidentController {
     }
 
     @DeleteMapping("/{incidentId}/assignees/{userId}")
+    @Auditable(actionType = "UNASSIGN", targetType = "INCIDENT")
     public ApiResponse<Void> removeAssignee(
             @PathVariable Long incidentId,
             @PathVariable Long userId,
@@ -147,6 +153,7 @@ public class IncidentController {
     }
 
     @PostMapping("/{incidentId}/report")
+    @Auditable(actionType = "REPORT_CREATE", targetType = "INCIDENT")
     public ApiResponse<IncidentReportResponse> saveReport(
             @PathVariable Long incidentId,
             @Valid @RequestBody IncidentReportRequest req,
@@ -156,6 +163,7 @@ public class IncidentController {
     }
 
     @PatchMapping("/{incidentId}/report")
+    @Auditable(actionType = "REPORT_UPDATE", targetType = "INCIDENT")
     public ApiResponse<IncidentReportResponse> updateReport(
             @PathVariable Long incidentId,
             @Valid @RequestBody IncidentReportRequest req,
@@ -165,6 +173,7 @@ public class IncidentController {
     }
 
     @PostMapping("/{incidentId}/assets")
+    @Auditable(actionType = "ASSET_LINK", targetType = "INCIDENT")
     public ApiResponse<IncidentAssetResponse> addAsset(
             @PathVariable Long incidentId,
             @Valid @RequestBody IncidentAssetRequest req,
@@ -174,6 +183,7 @@ public class IncidentController {
     }
 
     @DeleteMapping("/{incidentId}/assets/{assetType}/{assetId}")
+    @Auditable(actionType = "ASSET_UNLINK", targetType = "INCIDENT")
     public ApiResponse<Void> removeAsset(
             @PathVariable Long incidentId,
             @PathVariable String assetType,
@@ -188,6 +198,7 @@ public class IncidentController {
     }
 
     @PatchMapping("/{incidentId}/main-manager")
+    @Auditable(actionType = "ASSIGN_MAIN_MANAGER", targetType = "INCIDENT")
     public ApiResponse<Void> assignMainManager(
             @PathVariable Long incidentId,
             @Valid @RequestBody UserIdRequest req,

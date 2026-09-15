@@ -28,7 +28,7 @@
         </div>
         <div
           v-for="noti in notificationStore.notifications"
-          :key="noti.id"
+          :key="noti.notiId"
           class="noti-item"
           :class="{ unread: !noti.readAt }"
           @click="handleClickNotification(noti)"
@@ -56,12 +56,18 @@ const notificationStore = useNotificationStore()
 const isOpen = ref(false)
 const dropdownRef = ref(null)
 
+// 배지 갱신 주기. 배치(SLA 경고 등)가 만든 알림이 사용자가 종을 열기 전에도 보이도록 한다 (2026-09-16 P5).
+const UNREAD_POLL_MS = 60_000
+let pollTimer = null
+
 onMounted(() => {
-  notificationStore.fetchNotifications()
+  notificationStore.fetchUnreadCount()
+  pollTimer = setInterval(() => notificationStore.fetchUnreadCount(), UNREAD_POLL_MS)
   document.addEventListener('click', handleOutsideClick)
 })
 
 onBeforeUnmount(() => {
+  if (pollTimer) clearInterval(pollTimer)
   document.removeEventListener('click', handleOutsideClick)
 })
 
@@ -81,8 +87,8 @@ function toggleDropdown() {
 async function handleClickNotification(noti) {
   if (!noti.readAt) {
     try {
-      await notificationApi.markAsRead(noti.id)
-      notificationStore.markAsRead(noti.id)
+      await notificationApi.markAsRead(noti.notiId)
+      notificationStore.markAsRead(noti.notiId)
     } catch (e) {
       console.error('Failed to mark notification as read:', e)
     }

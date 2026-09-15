@@ -35,12 +35,8 @@
         >{{ loc.label }}</button>
       </div>
 
-      <button class="notification-btn" :title="t('notification.title')" :aria-label="t('notification.title')">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-          <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-        </svg>
-      </button>
+      <!-- 2026-09-16 P5: 핸들러 없는 장식용 종 버튼을 실제 알림 드롭다운으로 교체 -->
+      <NotificationDropdown />
 
       <div class="user-info">
         <span class="user-name">{{ user?.userNm || t('common.noData') }}</span>
@@ -65,6 +61,7 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth.js'
 import { setLocale } from '@/i18n/index.js'
+import NotificationDropdown from '@/components/notification/NotificationDropdown.vue'
 
 const { t, te, locale: currentLocale } = useI18n()
 
@@ -164,23 +161,6 @@ async function handleLogout() {
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
-}
-
-.notification-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border: none;
-  background: none;
-  border-radius: var(--radius-sm);
-  color: var(--color-text-secondary);
-  transition: background-color 0.2s;
-}
-
-.notification-btn:hover {
-  background-color: var(--color-bg);
 }
 
 .user-info {

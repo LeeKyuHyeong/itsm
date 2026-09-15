@@ -1,5 +1,6 @@
 package com.itsm.api.controller.company;
 
+import com.itsm.api.aop.Auditable;
 import com.itsm.api.dto.company.*;
 import com.itsm.api.service.company.CompanyService;
 import com.itsm.api.util.AuthUtils;
@@ -28,6 +29,7 @@ public class CompanyController {
     }
 
     @PostMapping
+    @Auditable(actionType = "CREATE", targetType = "COMPANY")
     public ApiResponse<CompanyResponse> createCompany(
             @Valid @RequestBody CompanyCreateRequest req,
             Authentication authentication) {
@@ -41,6 +43,7 @@ public class CompanyController {
     }
 
     @PatchMapping("/{companyId}")
+    @Auditable(actionType = "UPDATE", targetType = "COMPANY")
     public ApiResponse<CompanyResponse> updateCompany(
             @PathVariable Long companyId,
             @Valid @RequestBody CompanyUpdateRequest req,
@@ -55,6 +58,7 @@ public class CompanyController {
     }
 
     @PostMapping("/{companyId}/departments")
+    @Auditable(actionType = "CREATE", targetType = "DEPARTMENT", targetIdProperty = "deptId")
     public ApiResponse<DepartmentResponse> createDepartment(
             @PathVariable Long companyId,
             @Valid @RequestBody DepartmentCreateRequest req,
@@ -64,6 +68,7 @@ public class CompanyController {
     }
 
     @PatchMapping("/departments/{deptId}")
+    @Auditable(actionType = "UPDATE", targetType = "DEPARTMENT", targetIdProperty = "deptId")
     public ApiResponse<DepartmentResponse> updateDepartment(
             @PathVariable Long deptId,
             @Valid @RequestBody DepartmentUpdateRequest req,
