@@ -53,6 +53,9 @@ class AuditLogAspectTest {
     @Mock
     private HttpServletRequest httpServletRequest;
 
+    @Mock
+    private com.itsm.api.security.ClientIpResolver clientIpResolver;
+
     @BeforeEach
     void setUp() {
         SecurityContextHolder.setContext(securityContext);
@@ -74,7 +77,7 @@ class AuditLogAspectTest {
         given(securityContext.getAuthentication()).willReturn(authentication);
         given(authentication.getPrincipal()).willReturn(1L);
         given(requestAttributes.getRequest()).willReturn(httpServletRequest);
-        given(httpServletRequest.getRemoteAddr()).willReturn("127.0.0.1");
+        given(clientIpResolver.resolve(httpServletRequest)).willReturn("127.0.0.1");
         given(joinPoint.getArgs()).willReturn(new Object[]{});
 
         // when
@@ -100,7 +103,7 @@ class AuditLogAspectTest {
         given(securityContext.getAuthentication()).willReturn(authentication);
         given(authentication.getPrincipal()).willReturn(2L);
         given(requestAttributes.getRequest()).willReturn(httpServletRequest);
-        given(httpServletRequest.getRemoteAddr()).willReturn("192.168.1.1");
+        given(clientIpResolver.resolve(httpServletRequest)).willReturn("192.168.1.1");
         given(joinPoint.getArgs()).willReturn(new Object[]{100L, "someOtherArg"});
 
         // when
@@ -126,7 +129,7 @@ class AuditLogAspectTest {
         given(auditable.targetType()).willReturn("CHANGE");
         given(securityContext.getAuthentication()).willReturn(null);
         given(requestAttributes.getRequest()).willReturn(httpServletRequest);
-        given(httpServletRequest.getRemoteAddr()).willReturn("10.0.0.1");
+        given(clientIpResolver.resolve(httpServletRequest)).willReturn("10.0.0.1");
         given(joinPoint.getArgs()).willReturn(new Object[]{});
 
         // when
@@ -174,7 +177,7 @@ class AuditLogAspectTest {
         given(securityContext.getAuthentication()).willReturn(authentication);
         given(authentication.getPrincipal()).willReturn(1L);
         given(requestAttributes.getRequest()).willReturn(httpServletRequest);
-        given(httpServletRequest.getRemoteAddr()).willReturn("127.0.0.1");
+        given(clientIpResolver.resolve(httpServletRequest)).willReturn("127.0.0.1");
         // targetIdProperty 로 먼저 찾으면 인자를 보지 않으므로 lenient
         lenient().when(joinPoint.getArgs()).thenReturn(new Object[]{});
     }

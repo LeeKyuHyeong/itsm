@@ -1,5 +1,7 @@
 package com.itsm.api.service.report;
 
+import com.itsm.core.constant.RoleCode;
+import org.springframework.security.access.prepost.PreAuthorize;
 import com.itsm.api.dto.report.*;
 import com.itsm.core.domain.report.Report;
 import com.itsm.core.domain.report.ReportForm;
@@ -37,6 +39,7 @@ public class ReportService {
         return toFormResponse(form);
     }
 
+    @PreAuthorize(RoleCode.HAS_ADMIN_ROLE) // 2026-09-16 P1: 양식/게시판 설정은 관리자 전용(ITSM.md 설정관리 표)
     public ReportFormResponse createForm(ReportFormRequest req, Long currentUserId) {
         ReportForm form = ReportForm.builder()
                 .formNm(req.getFormNm())
@@ -50,6 +53,7 @@ public class ReportService {
         return toFormResponse(saved);
     }
 
+    @PreAuthorize(RoleCode.HAS_ADMIN_ROLE) // 2026-09-16 P1: 양식/게시판 설정은 관리자 전용(ITSM.md 설정관리 표)
     public ReportFormResponse updateForm(Long formId, ReportFormRequest req, Long currentUserId) {
         ReportForm form = findFormById(formId);
         form.update(req.getFormNm(), req.getFormTypeCd(), req.getFormSchema(),
@@ -58,6 +62,7 @@ public class ReportService {
         return toFormResponse(form);
     }
 
+    @PreAuthorize(RoleCode.HAS_ADMIN_ROLE) // 2026-09-16 P1: 양식/게시판 설정은 관리자 전용(ITSM.md 설정관리 표)
     public void deleteForm(Long formId) {
         ReportForm form = findFormById(formId);
         reportFormRepository.delete(form);

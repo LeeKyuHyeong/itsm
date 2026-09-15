@@ -1,5 +1,6 @@
 package com.itsm.api.interceptor;
 
+import com.itsm.api.security.ClientIpResolver;
 import com.itsm.api.service.MenuCacheService;
 import com.itsm.core.domain.user.Menu;
 import com.itsm.core.domain.user.MenuAccessLog;
@@ -8,20 +9,21 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.util.AntPathMatcher;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * 메뉴 접근 로그(tb_menu_access_log).
+ * 2026-09-16 P1 이전에는 menu_url(프론트 라우트) 과 API URI 를 대조해 한 번도 저장되지 않았다.
+ * 판정은 {@link ApiMenuMapper}(권한 대상 요청만 기록), IP 는 {@link ClientIpResolver}.
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -29,11 +31,8 @@ public class MenuAccessInterceptor implements HandlerInterceptor {
 
     private final MenuCacheService menuCacheService;
     private final MenuAccessLogRepository menuAccessLogRepository;
-
-    private final AntPathMatcher pathMatcher = new AntPathMatcher();
-
-    @Value("${security.trusted-proxies:127.0.0.1,::1}")
-    private List<String> trustedProxies;
+    private final ApiMenuMapper apiMenuMapper;
+    private final ClientIpResolver clientIpResolver;
 
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response,
@@ -44,13 +43,15 @@ public class MenuAccessInterceptor implements HandlerInterceptor {
         }
 
         String requestUri = request.getRequestURI();
+        Optional<String> menuUrl = apiMenuMapper.resolveMenuUrl(requestUri, request.getMethod());
+        if (menuUrl.isEmpty()) {
+            return;
+        }
 
-        List<Menu> allMenus = menuCacheService.getAllMenus();
-        Menu matchedMenu = allMenus.stream()
-                .filter(menu -> menu.getMenuUrl() != null && pathMatcher.match(menu.getMenuUrl(), requestUri))
+        Menu matchedMenu = menuCacheService.getAllMenus().stream()
+                .filter(menu -> menuUrl.get().equals(menu.getMenuUrl()))
                 .findFirst()
                 .orElse(null);
-
         if (matchedMenu == null) {
             return;
         }
@@ -62,91 +63,15 @@ public class MenuAccessInterceptor implements HandlerInterceptor {
                     .map(role -> role.startsWith("ROLE_") ? role.substring(5) : role)
                     .collect(Collectors.joining(","));
 
-            String ipAddress = getClientIpAddress(request);
-
             MenuAccessLog accessLog = MenuAccessLog.builder()
                     .userId(userId)
                     .menuId(matchedMenu.getMenuId())
                     .roleCd(roleCd)
-                    .ipAddress(ipAddress)
+                    .ipAddress(clientIpResolver.resolve(request))
                     .build();
-
             menuAccessLogRepository.save(accessLog);
         } catch (Exception e) {
             log.warn("Failed to save menu access log for URI: {}", requestUri, e);
-        }
-    }
-
-    private String getClientIpAddress(HttpServletRequest request) {
-        String xForwardedFor = request.getHeader("X-Forwarded-For");
-        if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
-            String remoteAddr = request.getRemoteAddr();
-            if (isTrustedProxy(remoteAddr)) {
-                String[] ips = xForwardedFor.split(",");
-                // 오른쪽에서 왼쪽으로 신뢰할 수 있는 프록시를 건너뛰고 첫 번째 비신뢰 IP 반환
-                for (int i = ips.length - 1; i >= 0; i--) {
-                    String ip = ips[i].trim();
-                    if (!isTrustedProxy(ip)) {
-                        return ip;
-                    }
-                }
-                return ips[0].trim();
-            }
-            // remoteAddr이 신뢰할 수 없는 프록시라면 X-Forwarded-For를 무시
-            log.warn("Untrusted proxy {} attempted X-Forwarded-For spoofing: {}", remoteAddr, xForwardedFor);
-            return remoteAddr;
-        }
-        return request.getRemoteAddr();
-    }
-
-    private boolean isTrustedProxy(String ip) {
-        if (ip == null) {
-            return false;
-        }
-        for (String trusted : trustedProxies) {
-            if (trusted.contains("/")) {
-                // CIDR 표기법 지원 (예: 10.0.0.0/8)
-                if (isInCidrRange(ip, trusted)) {
-                    return true;
-                }
-            } else if (trusted.equals(ip)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean isInCidrRange(String ip, String cidr) {
-        try {
-            String[] parts = cidr.split("/");
-            InetAddress network = InetAddress.getByName(parts[0]);
-            int prefixLength = Integer.parseInt(parts[1]);
-
-            byte[] networkBytes = network.getAddress();
-            byte[] ipBytes = InetAddress.getByName(ip).getAddress();
-
-            if (networkBytes.length != ipBytes.length) {
-                return false;
-            }
-
-            int fullBytes = prefixLength / 8;
-            int remainBits = prefixLength % 8;
-
-            for (int i = 0; i < fullBytes; i++) {
-                if (networkBytes[i] != ipBytes[i]) {
-                    return false;
-                }
-            }
-
-            if (remainBits > 0 && fullBytes < networkBytes.length) {
-                int mask = 0xFF << (8 - remainBits);
-                return (networkBytes[fullBytes] & mask) == (ipBytes[fullBytes] & mask);
-            }
-
-            return true;
-        } catch (UnknownHostException | NumberFormatException e) {
-            log.warn("Invalid CIDR notation: {}", cidr, e);
-            return false;
         }
     }
 }

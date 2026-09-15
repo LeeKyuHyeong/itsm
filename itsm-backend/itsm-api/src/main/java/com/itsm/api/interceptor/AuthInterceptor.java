@@ -20,7 +20,15 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.util.List;
+import java.util.Optional;
 
+/**
+ * 메뉴 기반 인가 (tb_role_menu.can_read / can_write).
+ * <p>
+ * 2026-09-16 전수조사 P1 이전: menu_url(프론트 라우트) 과 API URI 를 직접 대조해 매칭이 0 → matchedMenu null → 무조건 통과.
+ * 즉 "3중 RBAC" 의 이 층은 통과 전용이었고, 감사자(읽기 전용)도 장애를 생성·수정할 수 있었다.
+ * 지금은 {@link ApiMenuMapper} 가 URI+메서드를 메뉴 URL 로 바꾸고, GET 계열은 can_read, 나머지는 can_write 를 요구한다.
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -29,6 +37,7 @@ public class AuthInterceptor implements HandlerInterceptor {
     private final RoleMenuRepository roleMenuRepository;
     private final MenuCacheService menuCacheService;
     private final UserRoleRepository userRoleRepository;
+    private final ApiMenuMapper apiMenuMapper;
 
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
@@ -55,34 +64,42 @@ public class AuthInterceptor implements HandlerInterceptor {
         boolean isSuperAdmin = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .anyMatch("ROLE_SUPER_ADMIN"::equals);
-
         if (isSuperAdmin) {
             return true;
         }
 
-        List<Menu> allMenus = menuCacheService.getAllMenus();
-        Menu matchedMenu = allMenus.stream()
-                .filter(menu -> menu.getMenuUrl() != null && pathMatcher.match(menu.getMenuUrl(), requestUri))
+        String method = request.getMethod();
+        Optional<String> menuUrl = apiMenuMapper.resolveMenuUrl(requestUri, method);
+        if (menuUrl.isEmpty()) {
+            return true; // 메뉴 권한 대상이 아닌 요청 (알림, 게시판, 공통 조회 등)
+        }
+
+        Menu matchedMenu = menuCacheService.getAllMenus().stream()
+                .filter(menu -> menuUrl.get().equals(menu.getMenuUrl()))
                 .findFirst()
                 .orElse(null);
-
         if (matchedMenu == null) {
+            // 관리자가 메뉴 행을 지웠거나 URL 을 바꾼 경우. 서비스를 막는 대신 통과시키되 반드시 흔적을 남긴다.
+            log.warn("[AuthInterceptor] 매핑된 메뉴 {} 가 tb_menu 에 없어 권한 검사를 건너뜀: {} {}", menuUrl.get(), method, requestUri);
             return true;
         }
 
+        boolean write = apiMenuMapper.isWrite(method);
         Long userId = (Long) authentication.getPrincipal();
         List<UserRole> userRoles = userRoleRepository.findByUserIdWithRole(userId);
-
         for (UserRole userRole : userRoles) {
-            List<RoleMenu> roleMenus = roleMenuRepository.findByRoleId(userRole.getRoleId());
-            for (RoleMenu roleMenu : roleMenus) {
-                if (roleMenu.getMenuId().equals(matchedMenu.getMenuId())
-                        && "Y".equals(roleMenu.getCanRead())) {
+            for (RoleMenu roleMenu : roleMenuRepository.findByRoleId(userRole.getRoleId())) {
+                if (!roleMenu.getMenuId().equals(matchedMenu.getMenuId())) {
+                    continue;
+                }
+                if (write ? "Y".equals(roleMenu.getCanWrite()) : "Y".equals(roleMenu.getCanRead())) {
                     return true;
                 }
             }
         }
 
+        log.info("[AuthInterceptor] 접근 거부: userId={} {} {} → 메뉴 {}({})", userId, method, requestUri,
+                matchedMenu.getMenuNm(), write ? "can_write" : "can_read");
         throw new BusinessException(ErrorCode.ACCESS_DENIED);
     }
 

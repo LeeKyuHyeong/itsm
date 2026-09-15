@@ -54,6 +54,9 @@ class AuthControllerTest {
     @Mock
     private LoginRateLimiter loginRateLimiter;
 
+    @Mock
+    private com.itsm.api.security.ClientIpResolver clientIpResolver;
+
     @InjectMocks
     private AuthController authController;
 
@@ -63,6 +66,28 @@ class AuthControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(authController)
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
+        // 2026-09-16 P1: IP 는 getRemoteAddr 이 아니라 프록시 헤더를 해석하는 ClientIpResolver 에서 온다
+        org.mockito.Mockito.lenient().when(clientIpResolver.resolve(any())).thenReturn("127.0.0.1");
+    }
+
+    @Test
+    @DisplayName("POST /login - 레이트리밋 키와 접근 로그 IP 는 프록시 헤더를 해석한 실제 클라이언트 IP 다 (getRemoteAddr 아님)")
+    void login_usesResolvedClientIp() throws Exception {
+        given(clientIpResolver.resolve(any())).willReturn("203.0.113.9");
+        given(loginRateLimiter.isBlocked("203.0.113.9")).willReturn(false);
+        given(authService.login(any(LoginRequest.class), eq("203.0.113.9")))
+                .willReturn(LoginResponse.builder().accessToken("a").refreshToken("r").userId(1L)
+                        .loginId("admin").userNm("관리자").roles(List.of("ADMIN")).build());
+        given(jwtTokenProvider.getAccessTokenExpirySeconds()).willReturn(3600L);
+
+        mockMvc.perform(post("/api/v1/auth/login")
+                        .header("X-Forwarded-For", "203.0.113.9, 172.19.0.1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new LoginRequest("admin", "Password1!"))))
+                .andExpect(status().isOk());
+
+        verify(loginRateLimiter).recordAttempt("203.0.113.9");
+        verify(authService).login(any(LoginRequest.class), eq("203.0.113.9"));
     }
 
     @Test

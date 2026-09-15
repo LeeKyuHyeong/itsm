@@ -187,11 +187,38 @@ public class UserService {
 
         UserRole userRole = new UserRole(userId, req.getRoleId(), currentUserId);
         userRoleRepository.save(userRole);
+        recordRoleHistory(userId, "+" + req.getRoleId(), currentUserId);
     }
 
     @PreAuthorize(RoleCode.HAS_ADMIN_ROLE)
     public void revokeRole(Long userId, Long roleId, Long currentUserId) {
         userRoleRepository.deleteByUserIdAndRoleId(userId, roleId);
+        recordRoleHistory(userId, "-" + roleId, currentUserId);
+    }
+
+    /** 역할 부여/회수 이력 (2026-09-16 P1: 이전엔 회수만 남기고 부여는 안 남기던 비대칭 — 실제로는 둘 다 안 남았다) */
+    private void recordRoleHistory(Long userId, String delta, Long currentUserId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return;
+        }
+        UserHistory history = UserHistory.builder()
+                .userId(user.getUserId())
+                .loginId(user.getLoginId())
+                .userNm(user.getUserNm())
+                .employeeNo(user.getEmployeeNo())
+                .deptId(user.getDepartment() != null ? user.getDepartment().getDeptId() : null)
+                .email(user.getEmail())
+                .tel(user.getTel())
+                .status(user.getStatus())
+                .changedField("role")
+                .beforeValue(null)
+                .afterValue(delta)
+                .validFrom(user.getValidFrom())
+                .validTo(user.getValidTo())
+                .createdBy(currentUserId)
+                .build();
+        userHistoryRepository.save(history);
     }
 
     private void createUserHistoryForChanges(User user, UserUpdateRequest req, Long currentUserId) {

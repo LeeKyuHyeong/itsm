@@ -28,6 +28,7 @@ public class AuthController {
     private final AuthService authService;
     private final JwtTokenProvider jwtTokenProvider;
     private final LoginRateLimiter loginRateLimiter;
+    private final com.itsm.api.security.ClientIpResolver clientIpResolver; // 2026-09-16 P1: 프록시 뒤 실제 IP
 
     @Value("${cookie.secure:false}")
     private boolean cookieSecure;
@@ -49,7 +50,7 @@ public class AuthController {
     public ApiResponse<LoginResponse> login(@Valid @RequestBody LoginRequest request,
                                             HttpServletRequest httpRequest,
                                             HttpServletResponse httpResponse) {
-        String ipAddress = httpRequest.getRemoteAddr();
+        String ipAddress = clientIpResolver.resolve(httpRequest);
 
         if (loginRateLimiter.isBlocked(ipAddress)) {
             throw new BusinessException(ErrorCode.TOO_MANY_REQUESTS, "로그인 시도가 너무 많습니다. 잠시 후 다시 시도해주세요.");
@@ -89,7 +90,7 @@ public class AuthController {
                                     HttpServletRequest request,
                                     HttpServletResponse response) {
         Long userId = (Long) authentication.getPrincipal();
-        String ipAddress = request.getRemoteAddr();
+        String ipAddress = clientIpResolver.resolve(request);
 
         // Blacklist current access token
         String accessToken = CookieUtils.extractCookie(request, ACCESS_TOKEN_COOKIE);

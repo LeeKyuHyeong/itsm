@@ -25,7 +25,9 @@ Part 별 1커밋. 조사 기록·근거는 `D:\dev\checklist-itsm-source-audit.m
   - **운영 DB 반영**: `sql/phase28_p4_batch_job_ddl_seed.sql` (CREATE IF NOT EXISTS + INSERT IGNORE — 운영에 이미 있으면 무변경). `BATCH_*` 테이블 DROP 은 선택(주석)
   - 운영 확인: `SELECT job_name, is_active, last_result FROM tb_batch_job` 의 job_name 이 잡 클래스명과 같은지 · 시뮬레이션 잡 6종의 is_active(운영에 가짜 데이터가 섞이는 중인지) · `SHOW TABLES LIKE 'BATCH_%'`
   - 미수정(체크리스트 §7): `StatisticsAggregationJob` 이 쓰는 `tb_daily_statistics` 를 읽는 코드 0(대시보드는 실시간 집계) / 크론 실행과 수동 실행이 같은 잡에 겹칠 수 있음 / `tb_daily_statistics`·`tb_login_history`·`tb_sim_menu_access_log` DDL 부재 → P6
-- [ ] P1 인증·인가 체인 (로그인 레이트리밋 `getRemoteAddr` 이 프록시 IP — P7 에서 발견, 여기서 수정)
+- [x] P1 인증·인가 체인 — `AuthInterceptor`·`MenuAccessInterceptor` 가 `menu_url`(프론트 라우트)과 API URI 를 대조해 **매칭 0 → 메뉴 기반 인가는 통과 전용, 접근 로그 0건**(감사자 읽기 전용도 미강제) → `ApiMenuMapper`(URI+메서드 → 메뉴 URL, GET=can_read/그 외=can_write, 공용 조회 5종은 읽기 면제) / 로그인 레이트리밋·접근 로그·감사 로그 IP 가 `getRemoteAddr`(컨테이너 nginx IP) → `ClientIpResolver`(신뢰 프록시 + XFF/X-Real-IP) / 시스템 설정·보고서 양식·게시판 설정 서비스에 `@PreAuthorize` 없음 → 관리자 전용 / 역할 부여·회수 이력 미기록 → `tb_user_history`
+  - 운영 확인: 감사자 계정으로 장애 등록 시도 → 403 · PM 이 담당자 선택(GET /users) 정상 · `tb_menu_access_log` 행 생성 · `tb_access_log.ip_address` 가 실제 클라이언트 IP
+  - ⚠️ 동작 변화: 고객사 역할은 변경관리/자산관리 API 403, 외부사용자는 대시보드 API 403(설계표대로). 프론트는 사이드바만 숨기므로 직접 URL 진입 시 에러 페이지 — 첫 화면 리다이렉트 개선은 백로그
 - [ ] P2 프론트↔백엔드 API 계약
 - [ ] P6 데이터 계층
 - [ ] 문서 드리프트

@@ -1,5 +1,7 @@
 package com.itsm.api.service.board;
 
+import com.itsm.core.constant.RoleCode;
+import org.springframework.security.access.prepost.PreAuthorize;
 import com.itsm.api.dto.board.*;
 import com.itsm.core.domain.board.*;
 import com.itsm.core.exception.BusinessException;
@@ -32,6 +34,7 @@ public class BoardService {
                 .toList();
     }
 
+    @PreAuthorize(RoleCode.HAS_ADMIN_ROLE) // 2026-09-16 P1: 양식/게시판 설정은 관리자 전용(ITSM.md 설정관리 표)
     public BoardConfigResponse createConfig(BoardConfigRequest req, Long currentUserId) {
         BoardConfig config = BoardConfig.builder()
                 .boardNm(req.getBoardNm())
@@ -50,6 +53,7 @@ public class BoardService {
         return toConfigResponse(saved);
     }
 
+    @PreAuthorize(RoleCode.HAS_ADMIN_ROLE) // 2026-09-16 P1: 양식/게시판 설정은 관리자 전용(ITSM.md 설정관리 표)
     public BoardConfigResponse updateConfig(Long boardId, BoardConfigRequest req, Long currentUserId) {
         BoardConfig config = findConfigById(boardId);
         config.update(req.getBoardNm(), req.getBoardNmEn(), req.getBoardTypeCd(), req.getAllowExt(),
@@ -59,6 +63,7 @@ public class BoardService {
         return toConfigResponse(config);
     }
 
+    @PreAuthorize(RoleCode.HAS_ADMIN_ROLE) // 2026-09-16 P1: 양식/게시판 설정은 관리자 전용(ITSM.md 설정관리 표)
     public void deleteConfig(Long boardId) {
         BoardConfig config = findConfigById(boardId);
         boardConfigRepository.delete(config);

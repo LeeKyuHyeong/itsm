@@ -26,6 +26,7 @@ import java.util.Locale;
 public class AuditLogAspect {
 
     private final AuditLogRepository auditLogRepository;
+    private final com.itsm.api.security.ClientIpResolver clientIpResolver;
 
     @AfterReturning(pointcut = "@annotation(auditable)", returning = "result")
     public void logAudit(JoinPoint joinPoint, Auditable auditable, Object result) {
@@ -68,8 +69,7 @@ public class AuditLogAspect {
             if (attributes == null) {
                 return null;
             }
-            // TODO(P1): 프록시 뒤라 getRemoteAddr 은 컨테이너 nginx IP — 인증 체인 정리 때 공통 클라이언트 IP 해석기로 교체
-            return attributes.getRequest().getRemoteAddr();
+            return clientIpResolver.resolve(attributes.getRequest()); // 2026-09-16 P1: 프록시 헤더 해석
         } catch (Exception e) {
             log.warn("감사 로그: 클라이언트 IP 추출 실패", e);
             return null;

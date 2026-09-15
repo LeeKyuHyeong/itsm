@@ -27,6 +27,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import org.mockito.ArgumentCaptor;
+import com.itsm.core.domain.user.UserHistory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -317,6 +319,38 @@ class UserServiceTest {
 
         // then
         verify(userRoleRepository).save(any(UserRole.class));
+    }
+
+    @Test
+    @DisplayName("역할 부여도 사용자 이력(tb_user_history)에 남는다 — 2026-09-16 P1: revokeRole 만 남기고 grantRole 은 안 남기던 비대칭")
+    void grantRole_writesUserHistory() {
+        RoleGrantRequest req = new RoleGrantRequest(2L);
+        given(userRepository.existsById(1L)).willReturn(true);
+        given(userRepository.findById(1L)).willReturn(Optional.of(activeUser));
+        given(roleRepository.existsById(2L)).willReturn(true);
+        given(userRoleRepository.existsById(any(UserRoleId.class))).willReturn(false);
+
+        userService.grantRole(1L, req, 1L);
+
+        ArgumentCaptor<UserHistory> captor = ArgumentCaptor.forClass(UserHistory.class);
+        verify(userHistoryRepository).save(captor.capture());
+        assertThat(captor.getValue().getChangedField()).isEqualTo("role");
+        assertThat(captor.getValue().getAfterValue()).isEqualTo("+2");
+        assertThat(captor.getValue().getCreatedBy()).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("역할 회수도 사용자 이력에 남는다")
+    void revokeRole_writesUserHistory() {
+        given(userRepository.findById(1L)).willReturn(Optional.of(activeUser));
+
+        userService.revokeRole(1L, 2L, 1L);
+
+        verify(userRoleRepository).deleteByUserIdAndRoleId(1L, 2L);
+        ArgumentCaptor<UserHistory> captor = ArgumentCaptor.forClass(UserHistory.class);
+        verify(userHistoryRepository).save(captor.capture());
+        assertThat(captor.getValue().getChangedField()).isEqualTo("role");
+        assertThat(captor.getValue().getAfterValue()).isEqualTo("-2");
     }
 
     @Test

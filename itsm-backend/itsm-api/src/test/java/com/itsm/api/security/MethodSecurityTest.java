@@ -8,6 +8,9 @@ import com.itsm.api.service.common.CommonCodeService;
 import com.itsm.api.service.common.NotificationPolicyService;
 import com.itsm.api.service.common.SlaPolicyService;
 import com.itsm.api.service.user.UserService;
+import com.itsm.api.service.common.SystemConfigService;
+import com.itsm.api.service.report.ReportService;
+import com.itsm.api.service.board.BoardService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -39,6 +42,15 @@ class MethodSecurityTest {
 
     @Autowired
     private BatchJobService batchJobService;
+
+    @Autowired
+    private SystemConfigService systemConfigService;
+
+    @Autowired
+    private ReportService reportService;
+
+    @Autowired
+    private BoardService boardService;
 
     @Nested
     @DisplayName("UserService 권한 검증")
@@ -249,6 +261,62 @@ class MethodSecurityTest {
                 try {
                     batchJobService.updateJob(1L,
                             new BatchJobUpdateRequest("0 0 * * * *", "Y", "desc", "Desc"), 1L);
+                } catch (AccessDeniedException e) {
+                    throw e;
+                } catch (Exception e) {
+                    // 비즈니스 예외 무시
+                }
+            }).doesNotThrowAnyException();
+        }
+    }
+
+    // ── 2026-09-16 전수조사 P1: ITSM.md "설정관리 수정 권한" 표에서 관리자 전용인데 @PreAuthorize 가 없던 서비스 ──
+
+    @Nested
+    @DisplayName("SystemConfigService / ReportService(양식) / BoardService(게시판 설정) 권한 검증")
+    class AdminOnlyServicesSecurity {
+
+        @Test
+        @WithMockUser(roles = "USER")
+        @DisplayName("일반 사용자는 시스템 설정 변경이 거부된다 (잠금 횟수·만료일을 아무나 바꾸던 구멍)")
+        void updateSystemConfig_withUserRole_denied() {
+            assertThatThrownBy(() -> systemConfigService.updateConfig("login.fail.lock.count", null, 1L))
+                    .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        @WithMockUser(roles = "AUDITOR")
+        @DisplayName("감사자는 시스템 설정 목록 조회도 거부된다 (설계표: 시스템 설정 ❌)")
+        void getAllSystemConfigs_withAuditor_denied() {
+            assertThatThrownBy(() -> systemConfigService.getAllConfigs())
+                    .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        @WithMockUser(roles = "USER")
+        @DisplayName("일반 사용자는 보고서 양식 생성/수정/삭제가 거부된다")
+        void reportForm_withUserRole_denied() {
+            assertThatThrownBy(() -> reportService.createForm(null, 1L)).isInstanceOf(AccessDeniedException.class);
+            assertThatThrownBy(() -> reportService.updateForm(1L, null, 1L)).isInstanceOf(AccessDeniedException.class);
+            assertThatThrownBy(() -> reportService.deleteForm(1L)).isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        @WithMockUser(roles = "USER")
+        @DisplayName("일반 사용자는 게시판 설정 생성/수정/삭제가 거부된다")
+        void boardConfig_withUserRole_denied() {
+            assertThatThrownBy(() -> boardService.createConfig(null, 1L)).isInstanceOf(AccessDeniedException.class);
+            assertThatThrownBy(() -> boardService.updateConfig(1L, null, 1L)).isInstanceOf(AccessDeniedException.class);
+            assertThatThrownBy(() -> boardService.deleteConfig(1L)).isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        @WithMockUser(roles = "ITSM_ADMIN")
+        @DisplayName("ITSM_ADMIN 은 시스템 설정 변경이 허용된다")
+        void updateSystemConfig_withItsmAdmin_allowed() {
+            assertThatCode(() -> {
+                try {
+                    systemConfigService.updateConfig("login.fail.lock.count", new SystemConfigUpdateRequest("5"), 1L);
                 } catch (AccessDeniedException e) {
                     throw e;
                 } catch (Exception e) {
