@@ -18,6 +18,8 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
@@ -33,6 +35,15 @@ public class AuthController {
     private static final String ACCESS_TOKEN_COOKIE = "accessToken";
     private static final String REFRESH_TOKEN_COOKIE = "refreshToken";
     private static final int REFRESH_TOKEN_MAX_AGE = 7 * 24 * 60 * 60; // 7 days
+
+    /**
+     * 배포 헬스체크 전용 (deploy.yml). 인증 없이 200 — SecurityConfig permitAll + 인터셉터 제외(/api/v1/auth/**).
+     * DB 상태는 보지 않는다: 이미지 교체 후 "새 컨테이너가 요청을 받는가"만 판정하고, DB 장애는 롤백 대상이 아니다.
+     */
+    @GetMapping("/health")
+    public ApiResponse<Map<String, String>> health() {
+        return ApiResponse.success(Map.of("status", "UP"));
+    }
 
     @PostMapping("/login")
     public ApiResponse<LoginResponse> login(@Valid @RequestBody LoginRequest request,

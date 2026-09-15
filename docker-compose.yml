@@ -51,6 +51,8 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost}
+      # .env.example 에 있던 항목이지만 실제로는 컨테이너에 전달되지 않고 있었다 (2026-09-16 P7). 비우면 application-prod.yml 기본값.
+      TRUSTED_PROXIES: ${TRUSTED_PROXIES:-127.0.0.1,::1,10.0.0.0/8,172.16.0.0/12}
     expose:
       - "8080"
     networks:

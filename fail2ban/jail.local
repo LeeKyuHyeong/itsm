@@ -3,6 +3,10 @@ bantime = 3600
 findtime = 600
 maxretry = 5
 banaction = iptables-multiport
+# 서버 자체(배포 헬스체크·로컬 curl)와 도커 브리지 대역은 밴하지 않는다.
+# frontend nginx 가 X-Real-IP 로 실제 클라이언트 IP 를 복원하므로(2026-09-16 P7) 이제 <HOST> 는 진짜 원격 IP 다 —
+# 즉 이 규칙이 실제로 동작한다. 외부 PC 에서 UA 없는 curl 을 3회 보내면 24시간 밴된다는 점에 주의.
+ignoreip = 127.0.0.1/8 ::1 172.16.0.0/12
 
 # Nginx 스캐너 차단 (444 응답 반복 시 ban)
 [nginx-scanner]

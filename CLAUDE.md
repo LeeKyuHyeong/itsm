@@ -30,14 +30,16 @@
 
 ## 운영 Nginx 구조 (중요)
 - 운영 서버에는 **호스트 Nginx**와 **컨테이너 Nginx** 두 레이어가 있다.
-  - 호스트 Nginx (`/etc/nginx/conf.d/default.conf`): SSL 종단 + 리버스 프록시 (Certbot 관리). **ITSM 전용 conf 파일을 별도로 만들지 않는다** — `default.conf`에서 `itsm.kyuhyeong.com` 서버 블록을 Certbot이 관리한다.
-  - 컨테이너 Nginx (`itsm-frontend/nginx.conf`): 정적 파일 서빙 + API 리버스 프록시 + 보안 헤더 + Rate Limiting.
+  - 호스트 Nginx (`/etc/nginx/conf.d/itsm.conf`): SSL 종단 + 리버스 프록시 + HSTS 등 보안 헤더. `deploy.yml`이 **파일이 없을 때 한 번만** `deploy/nginx-itsm.conf`를 복사하고 certbot을 실행한다(2026-09-05 서버 실측: `itsm.conf` 존재 → 이후 배포에서는 건너뜀). 호스트 conf를 바꾸려면 서버에서 직접 수정 + 이 리포의 `deploy/nginx-itsm.conf`도 같이 갱신한다.
+  - 컨테이너 Nginx (`itsm-frontend/nginx.conf`): 정적 파일 서빙 + API 리버스 프록시 + CSP 등 보안 헤더(정적 파일 한정) + Rate Limiting + 스캐너 차단(444) + **X-Real-IP 로 실제 클라이언트 IP 복원**(realip, 2026-09-16). 이게 없으면 `$remote_addr`이 도커 게이트웨이 IP 라 rate limit 이 전 사용자 공용이 되고 fail2ban 이 무력화된다.
 - **요청 흐름**: `브라우저 → 호스트 Nginx (443/SSL) → 컨테이너 Nginx (8084) → Spring API (8080)`
+- **스캐너 차단 목록과 Vue 라우트가 겹치면 안 된다** — `location ~* ^/(…)` 에 `admin`을 넣었다가 `/admin/*` 관리자 화면 새로고침이 444 로 끊겼다(2026-09-16 제거). 차단어를 추가할 때 `router/routes/*.js` 의 path 와 대조한다.
+- **배포 헬스체크는 `GET /api/v1/auth/health` 가 200 일 때만 통과**한다(`HealthEndpointTest` 가 계약). 이 엔드포인트를 지우거나 인증을 걸면 모든 배포가 롤백된다.
 
 ### Nginx 설정 시 주의사항
 - **`add_header`는 반드시 `location` 블록 안에 작성**한다. `server` 블록에 넣으면 모든 location에 적용되어 API upstream의 CORS 헤더를 덮어쓴다.
 - 컨테이너 Nginx에서 보안 헤더(`CSP`, `X-Frame-Options` 등)는 `location /` (정적 파일)에만 적용하고, `location /api/`에는 넣지 않는다 (Spring Security가 처리).
-- 호스트 Nginx에는 `add_header`를 넣지 않는다 — 보안 헤더는 컨테이너 Nginx와 Spring Security에서 처리.
+- 호스트 Nginx(`deploy/nginx-itsm.conf`)의 `add_header`는 `server` 블록에 있고 HSTS 는 여기에만 있다(Spring 은 `X-Forwarded-Proto` 를 해석하지 않아 HSTS 를 붙이지 않는다). 호스트에는 CORS 관련 헤더를 추가하지 않는다 — API 의 CORS 헤더는 Spring 이 내려주고 두 nginx 는 그대로 통과시킨다.
 - **CSP `script-src`에 `'unsafe-eval'` 필수** — `vue-i18n` 런타임 메시지 컴파일러가 `new Function()`을 사용하므로, 없으면 Vue 앱 마운트가 실패한다.
 - `deploy/nginx-itsm.conf`는 소스 관리용이며, 운영 서버에는 `default.conf`를 사용한다. **이 파일을 운영에 복사하지 않는다.**
 
@@ -48,7 +50,7 @@
 - `CORS_ORIGINS`: `https://itsm.kyuhyeong.com`
 - `DOMAIN`: `itsm.kyuhyeong.com`
 - `CERTBOT_EMAIL`: SSL 인증서 발급용 이메일
-- `SERVER_IP`, `SERVER_PORT`, `SERVER_USER`, `SERVER_SSH_KEY`: 운영 서버 SSH 접속 정보
+- `SERVER_HOST`, `SERVER_PORT`, `SERVER_USER`, `SERVER_SSH_KEY`: 운영 서버 SSH 접속 정보 (`SERVER_IP` 는 f318337 에서 `SERVER_HOST` 로 통일됨)
 
 ## 서버 인프라 (SSOT 참조)
 

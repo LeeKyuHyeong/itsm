@@ -8,6 +8,20 @@
 
 추가 작업 없음. Phase 26 적용 후 운영 DB 마이그레이션 필요.
 
+## 소스 전수조사 (2026-09-16) — "구현했는데 실제로는 안 돌던 것"
+
+Part 별 1커밋. 조사 기록·근거는 `D:\dev\checklist-itsm-source-audit.md`(리포 밖).
+
+- [x] P7 인프라·CI/CD — 헬스체크 엔드포인트 부재(401 을 healthy 로 오판) → `/api/v1/auth/health` 신설 + 200 만 통과 / nginx `admin` 차단어가 `/admin/*` 화면을 444 로 끊음 → 제거 + 회귀 테스트 / 컨테이너 nginx 에 realip 없어 rate limit 공용·fail2ban 무력 → `X-Real-IP` 복원 / fail2ban 필터 3개 중 2개 정규식이 로그와 불일치 → 재작성 / CLAUDE.md·.env.example 드리프트
+  - 운영 반영 후 확인: `/admin/menus` F5 → 200, `fail2ban-client status nginx-scanner` 에 실제 원격 IP, `docker compose logs itsm-api | grep health`
+- [ ] P5 추적성 (감사 로그 AOP 미사용, LoginHistory 미기록, 알림 배지 갱신 경로)
+- [ ] P3 설정 화면 → 소비 코드 (동적 폼 미연결, SLA/알림 정책 소비처)
+- [ ] P4 배치·스케줄러
+- [ ] P1 인증·인가 체인 (로그인 레이트리밋 `getRemoteAddr` 이 프록시 IP — P7 에서 발견, 여기서 수정)
+- [ ] P2 프론트↔백엔드 API 계약
+- [ ] P6 데이터 계층
+- [ ] 문서 드리프트
+
 ---
 
 ## 완료된 Phase
