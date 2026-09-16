@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -57,6 +58,29 @@ class JwtAuthFilterTest {
         // then
         assertThat(SecurityContextHolder.getContext().getAuthentication()).isNotNull();
         assertThat(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("토큰의 roles 가 role_cd(ROLE_ 접두사 포함)여도 권한은 ROLE_ 를 한 번만 붙인다")
+    void doesNotDoublePrefixRoleCode() throws Exception {
+        // given — AuthService 는 tb_role.role_cd('ROLE_SUPER_ADMIN') 를 그대로 roles 클레임에 넣는다
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setRequestURI("/api/v1/users");
+        request.addHeader("Authorization", "Bearer admin-token");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        given(jwtTokenProvider.validateToken("admin-token")).willReturn(true);
+        given(jwtTokenProvider.getUserId("admin-token")).willReturn(1L);
+        given(jwtTokenProvider.getLoginId("admin-token")).willReturn("admin");
+        given(jwtTokenProvider.getRoles("admin-token")).willReturn(List.of("ROLE_SUPER_ADMIN", "PM"));
+
+        // when
+        jwtAuthFilter.doFilterInternal(request, response, filterChain);
+
+        // then — hasRole('SUPER_ADMIN') 이 통과하려면 authority 가 정확히 ROLE_SUPER_ADMIN 이어야 한다
+        assertThat(SecurityContextHolder.getContext().getAuthentication().getAuthorities())
+                .extracting(GrantedAuthority::getAuthority)
+                .containsExactly("ROLE_SUPER_ADMIN", "ROLE_PM");
     }
 
     @Test

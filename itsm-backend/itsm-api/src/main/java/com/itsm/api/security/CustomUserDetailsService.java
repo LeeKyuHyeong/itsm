@@ -3,6 +3,7 @@ package com.itsm.api.security;
 import com.itsm.core.domain.user.User;
 import com.itsm.core.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import com.itsm.core.constant.RoleCode;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -29,7 +30,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         }
 
         List<SimpleGrantedAuthority> authorities = user.getUserRoles().stream()
-                .map(userRole -> new SimpleGrantedAuthority("ROLE_" + userRole.getRole().getRoleCd()))
+                .map(userRole -> new SimpleGrantedAuthority(RoleCode.toAuthority(userRole.getRole().getRoleCd())))
                 .toList();
 
         return org.springframework.security.core.userdetails.User.builder()
