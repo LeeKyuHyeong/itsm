@@ -32,7 +32,9 @@ Part 별 1커밋. 조사 기록·근거는 `D:\dev\checklist-itsm-source-audit.m
   - **운영 DB 반영**: `sql/phase29_p2_system_config_menu.sql` (메뉴 1행 + 역할 매핑, 멱등)
   - 운영 확인: SLA/알림정책/회사/부서/사용자 각 1건 저장 · 역할 부여/회수 · 장애 상세에서 자산 연결 · 설정관리 › 시스템 설정 메뉴
   - 미수정(체크리스트 §9): 사용자 이력 화면 없음(`userApi.getHistory` 미사용) / 보고서 작성·양식 관리 화면 없음(API 만) / SLA·공통코드 활성/비활성 토글 UI 없음 / 회사 `address`·부서 `code/parentId` 는 DTO 에 없어 화면 입력이 버려짐
-- [ ] P6 데이터 계층
+- [x] P6 데이터 계층 — `sql/01_ddl.sql` 이 엔티티와 어긋남: `tb_login_history`·`tb_sim_menu_access_log`·`tb_daily_statistics` CREATE 없음, `tb_service_request` phase26 컬럼 5개 없음(새 설치 시 `validate` 기동 실패) → DDL 보강 + `SchemaDdlConsistencyTest`(모든 @Entity/@Column ↔ DDL 대조) / char(1) 규칙 위반 0 / 상태머신은 4개 엔티티 모두 생성자·`changeStatus` 로만 상태 변경(우회 없음) / 리포 루트 `itsm_data.sql` 은 `.gitignore`(`/*.sql`) 된 **로컬 전용 2026-03-14 덤프**(리포에 없음) — 현재 운영 근거로 쓰지 말 것
+  - **운영 DB 반영**: `sql/phase30_p6_schema_drift.sql` (IF NOT EXISTS — 이미 있으면 무변경. 실제로 무언가 만들어지면 그 자체가 기록할 발견)
+  - 덤프에서 확인: 2026-03-14 기준 운영 `tb_batch_job` job_name 15개 = 클래스명(시드와 일치), **시뮬레이션 잡 6종 전부 활성**(장애 30분·접속 15분 주기) → 실사용 전환 시 관리자 화면에서 비활성 필요
 - [ ] 문서 드리프트
 
 ---
