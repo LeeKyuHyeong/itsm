@@ -66,3 +66,36 @@
 - **서버/배포 인프라 SSOT: `D:\server-infra.md`** (로컬 전용, git 미추적 — 리포·운영서버에 없음)
 - 포트·도메인·방화벽·컨테이너 TZ 규칙(`Asia/Seoul` 의무)·배포 반영 매트릭스(푸시 시 서버 자동/수동 반영 범위)·트러블슈팅은 전부 그 문서 참조.
 - 리포별 `server-infra-*.md`는 폐지됨(2026-06-06). **인프라(compose/nginx/포트/배포) 변경 시 `D:\server-infra.md`를 함께 최신화할 것.**
+
+## 검증 설정
+
+> 전역 `~/.claude/CLAUDE.md`의 검증 규칙(AC → 검증 실행 → 기록)이 이 저장소에 적용될 때의 값. 검증 기록은 `docs/verification/`(2026-09-16 기준 아직 없음 — 첫 기록 시 `~/.claude/verification/templates.md` §1 구조로 생성).
+
+- 유형: 본인 작성·운영 중(itsm.kyuhyeong.com). 위 "Development Rules"의 TDD 를 그대로 따른다. 전역 onboarding §1 특성 테스트 절차 해당 없음.
+- 기술 스택: Spring Boot(Java 17) Gradle 멀티모듈(`itsm-backend/`: core·api·batch) + Vue 3/Vite(`itsm-frontend/`) + MariaDB
+- 빌드: `itsm-backend/` `./gradlew build` · `itsm-frontend/` `npm run build` + `npm run lint`
+- 전체 테스트: 백엔드 `itsm-backend/` `./gradlew test --no-daemon` — 2026-09-16 기준 테스트 클래스 98개·`@Test` 729건, H2 `MODE=MySQL`(`application-test.yml`) / 프론트 `itsm-frontend/` `npm run test:run` — spec 24개·`it` 192건(Vitest)
+- 부분 테스트: `./gradlew :itsm-api:test --tests "*HealthEndpointTest"` · `npx vitest run src/components/common/BaseTable.spec.js`
+- 로컬 실행: MySQL/MariaDB `localhost:3306/ITSM`(`sql/01_ddl.sql` → `02_dml.sql` → `03_seed_data.sql`, 계정은 `DB_USERNAME`/`DB_PASSWORD` 환경변수) → `./gradlew :itsm-api:bootRun`(local 프로파일, 8080) → `npm run dev`. 상세는 README "로컬 실행 방법"
+- 사용자 시나리오 검증 방식: 수동 체크리스트(브라우저, 다크/라이트 × ko/en). 권한 AC 는 역할별 계정으로 API 직접 호출까지 확인
+- 프로파일 차이: local(MySQL localhost) / prod(`DB_HOST` MariaDB 컨테이너, 호스트 Nginx + 컨테이너 Nginx 2계층, rate limit·fail2ban·realip) / test(H2). 모든 프로파일 `ddl-auto: validate`
+- 테스트 계정(이름·권한만): 시드는 `admin`(ROLE_SUPER_ADMIN) 1개. 역할 8종(SUPER_ADMIN·ITSM_ADMIN·PM·DEVELOPER·DBA·SERVER·NETWORK·SECURITY)은 `sql/02_dml.sql`. 역할별 검증 계정은 로컬에서 직접 만든다
+- 외부 연동과 Mock 여부: SMTP 메일 → 테스트는 Mockito, 실발송은 🙋 / 배치 알림은 24시간 중복 억제 + 알림 정책 게이트(위 배선 규칙)
+- 배포 방식: `main` push 또는 `workflow_dispatch` → `deploy.yml`(백엔드 테스트 + 프론트 `npm audit`·`test:run` → 이미지 → VPS) → `GET /api/v1/auth/health` 200 아니면 롤백. 배포 후 Smoke: 로그인 → 메뉴 진입 → `/admin/*` 새로고침이 444 가 아님 → 알림 배지 `/notifications/unread-count`
+- 검증 기록 위치: docs/verification/
+
+### P0 핵심 시나리오 (초안 — 개발자 확정 필요)
+1. 인증·인가: 로그인(JWT) → 메뉴 기반 인가(`ApiMenuMapper`, GET=can_read·그 외=can_write) → 권한 없는 API 직접 호출 차단 → 접근 로그
+2. 엔티티 ↔ `sql/01_ddl.sql` 일치(`SchemaDdlConsistencyTest`) + 운영 phase SQL 멱등
+3. 변경 엔드포인트 감사 로그(`@Auditable`, `AuditableWiringTest`)
+4. 배치: `tb_batch_job` 시드 ↔ `@Component` 잡(`BatchJobSeedTest`) → 실행 이력 → 알림
+5. 배포 계약: `/api/v1/auth/health` 200, 컨테이너 nginx 차단어 ↔ Vue 라우트 불겹침(`src/router/nginx-routes.spec.js`)
+
+P1: SR·장애 등 핵심 업무 흐름(상태 전이, 담당자 교체 차단), 알림 · P2: 게시판, 공통코드, 다국어 `_en` 컬럼 · P3: 문구·CSS
+
+### 이 프로젝트만의 규칙
+- 스키마 변경 = 엔티티 + `sql/01_ddl.sql` + 운영 `sql/phaseNN_*.sql`(멱등) 3종 세트. 검증 기록 "DB·설정 변경"에 phase 번호를 적고 사용자에게 알린다(위 "DB 변경 알림 규칙")
+- 테스트 DB 가 H2 `MODE=MySQL` 이라 MariaDB 전용 SQL·`char(1)` 매핑 오류는 테스트가 못 잡는다 → 위 "Entity 검수 규칙" 수행 + 운영 반영 후 🙋
+- 새 API·변경 엔드포인트·배치는 위 "배선 규칙" 3종(`ApiMenuMapper`·`@Auditable`·배치 시드)을 checklist 점검 항목에 넣는다
+- 프론트 UI 변경은 두 테마 × 두 언어 수동 확인을 기록에 명시한다
+- 커밋 전 `TODO.md` 갱신(위 Commit Rules)
