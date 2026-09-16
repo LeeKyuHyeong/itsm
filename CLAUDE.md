@@ -20,7 +20,16 @@
 ## DB 변경 알림 규칙
 - DB 스키마 변경(테이블/컬럼 추가·수정·삭제)이 발생하면 **반드시 사용자에게 변경 내용을 알린다.**
 - 운영 DB 반영용 ALTER/INSERT SQL을 함께 제공한다.
-- `ddl-auto: update`로 자동 생성되는 컬럼이라도 변경 사실은 반드시 고지한다.
+- 모든 프로파일이 `ddl-auto: validate` 다(자동 생성 없음). 엔티티를 바꾸면 **`sql/01_ddl.sql` 도 같이 고치고**, 운영용 `sql/phaseNN_*.sql`(멱등: `IF NOT EXISTS` / `INSERT IGNORE`)을 만든다. `SchemaDdlConsistencyTest` 가 엔티티↔DDL 불일치를 잡는다.
+
+## 전수조사(2026-09-16) 이후 지켜야 할 배선 규칙
+- **새 API 자원**은 `ApiMenuMapper` 에 (경로 패턴 → 메뉴 URL) 매핑을 추가한다. 매핑이 없으면 메뉴 기반 인가·접근 로그 대상이 아니다. 메뉴 URL 은 `sql/02_dml.sql` 시드에 있어야 한다(`ApiMenuMapperTest` 검증).
+- **새 변경 엔드포인트**(POST/PATCH/DELETE)에는 `@Auditable(actionType, targetType)` 을 붙인다(`AuditableWiringTest` 가 컨트롤러별 최소 개수를 검사).
+- **새 배치 잡**은 `@Component` 클래스 추가 + `sql/02_dml.sql` 의 `tb_batch_job` 시드 + 운영용 phase SQL 을 함께 낸다. `job_name` = 클래스 단순명(`BatchJobSeedTest` 검증).
+- **프론트 저장 페이로드**는 백엔드 `*Request` DTO 필드명이어야 한다. 관리자 화면은 `src/utils/adminPayload.js` 매퍼를 거친다. 목록 매핑처럼 `a ?? b` 로 양쪽 이름을 받는 방어는 저장 쪽 불일치를 숨기므로 쓰지 않는다.
+- 알림 식별자는 `notiId`, 배지는 `/notifications/unread-count`. 배치 알림은 24시간 중복 억제 + 알림 정책(`tb_notification_policy`) 게이트를 거친다.
+- 프록시 뒤 클라이언트 IP 는 `ClientIpResolver` 로만 얻는다(`getRemoteAddr` 직접 사용 금지).
+- 배포 헬스체크 계약은 `GET /api/v1/auth/health` = 200 (`HealthEndpointTest`). 컨테이너 nginx 차단어를 추가할 때 Vue 라우트와 겹치지 않게 한다(`nginx-routes.spec.js`).
 
 ## 다국어 & 테마 규칙
 - 이 프로젝트는 **다크/라이트 테마** 및 **한국어(ko)/영어(en) 다국어**를 모두 지원한다.
