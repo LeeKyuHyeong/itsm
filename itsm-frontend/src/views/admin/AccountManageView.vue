@@ -177,6 +177,7 @@
 </template>
 
 <script setup>
+import { toUserCreatePayload, toUserUpdatePayload } from '@/utils/adminPayload.js'
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { userApi } from '@/api/user.js'
@@ -424,16 +425,11 @@ async function saveUser() {
   saving.value = true
   saveError.value = ''
   try {
-    const payload = { ...userForm }
-    if (!payload.companyId) delete payload.companyId
-    if (!payload.departmentId) delete payload.departmentId
-
+    // 2026-09-16 P2: name/phone/departmentId → userNm/tel/deptId
     if (isEditing.value) {
-      delete payload.loginId
-      delete payload.password
-      await userApi.update(editingUserId.value, payload)
+      await userApi.update(editingUserId.value, toUserUpdatePayload(userForm))
     } else {
-      await userApi.create(payload)
+      await userApi.create(toUserCreatePayload(userForm))
     }
     closeUserModal()
     loadUsers()
@@ -473,7 +469,7 @@ async function addRoleToUser(roleCode) {
   if (!role || !roleTarget.value) return
   roleError.value = ''
   try {
-    await userApi.assignRole(roleTarget.value.id, { role })
+    await userApi.assignRole(roleTarget.value.id, { roleCd: role }) // 백엔드가 roleCd 도 받는다 (P2)
     // Update local state
     if (!roleTarget.value.roles) roleTarget.value.roles = []
     roleTarget.value.roles.push(role)

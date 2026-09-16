@@ -28,7 +28,10 @@ Part 별 1커밋. 조사 기록·근거는 `D:\dev\checklist-itsm-source-audit.m
 - [x] P1 인증·인가 체인 — `AuthInterceptor`·`MenuAccessInterceptor` 가 `menu_url`(프론트 라우트)과 API URI 를 대조해 **매칭 0 → 메뉴 기반 인가는 통과 전용, 접근 로그 0건**(감사자 읽기 전용도 미강제) → `ApiMenuMapper`(URI+메서드 → 메뉴 URL, GET=can_read/그 외=can_write, 공용 조회 5종은 읽기 면제) / 로그인 레이트리밋·접근 로그·감사 로그 IP 가 `getRemoteAddr`(컨테이너 nginx IP) → `ClientIpResolver`(신뢰 프록시 + XFF/X-Real-IP) / 시스템 설정·보고서 양식·게시판 설정 서비스에 `@PreAuthorize` 없음 → 관리자 전용 / 역할 부여·회수 이력 미기록 → `tb_user_history`
   - 운영 확인: 감사자 계정으로 장애 등록 시도 → 403 · PM 이 담당자 선택(GET /users) 정상 · `tb_menu_access_log` 행 생성 · `tb_access_log.ip_address` 가 실제 클라이언트 IP
   - ⚠️ 동작 변화: 고객사 역할은 변경관리/자산관리 API 403, 외부사용자는 대시보드 API 403(설계표대로). 프론트는 사이드바만 숨기므로 직접 URL 진입 시 에러 페이지 — 첫 화면 리다이렉트 개선은 백로그
-- [ ] P2 프론트↔백엔드 API 계약
+- [x] P2 프론트↔백엔드 API 계약 — 관리자 화면 4개(SLA·알림정책·조직·계정)가 **저장 페이로드를 화면 필드명 그대로 보내 백엔드 DTO 와 전부 불일치(저장 항상 400)** → `utils/adminPayload.js` 매퍼 / 부서 수정 경로 `/departments/{id}`(백엔드는 `/companies/departments/{id}`) 404 → 교정 / 역할 부여가 코드(`ROLE_PM`)를 보내는데 백엔드는 `roleId` 만 → `roleCd` 도 수용, 회수 경로도 코드 허용 / 주담당자 변경이 `{managerId}` 를 보내는데 백엔드는 `{userId}` → 교정 / 보고서 `PUT`→`PATCH` / 장애↔자산 연결 API 를 부르는 화면 없음(CMDB 설계 핵심) → `IncidentAssetCard` / 시스템 설정 화면 없음 → `SystemConfigView` + 라우트 + 메뉴 시드
+  - **운영 DB 반영**: `sql/phase29_p2_system_config_menu.sql` (메뉴 1행 + 역할 매핑, 멱등)
+  - 운영 확인: SLA/알림정책/회사/부서/사용자 각 1건 저장 · 역할 부여/회수 · 장애 상세에서 자산 연결 · 설정관리 › 시스템 설정 메뉴
+  - 미수정(체크리스트 §9): 사용자 이력 화면 없음(`userApi.getHistory` 미사용) / 보고서 작성·양식 관리 화면 없음(API 만) / SLA·공통코드 활성/비활성 토글 UI 없음 / 회사 `address`·부서 `code/parentId` 는 DTO 에 없어 화면 입력이 버려짐
 - [ ] P6 데이터 계층
 - [ ] 문서 드리프트
 

@@ -46,6 +46,7 @@ public class ApiMenuMapper {
             new Mapping("/api/v1/admin/batch-jobs/**",             "/admin/batch-jobs",          false),
             new Mapping("/api/v1/admin/sla-policies/**",           "/admin/sla",                 false),
             new Mapping("/api/v1/admin/notification-policies/**",  "/admin/notification-policy", false),
+            new Mapping("/api/v1/admin/system-configs/**",         "/admin/system-configs",      false),
             new Mapping("/api/v1/common-codes/**",                 "/admin/common-codes",        true),
             new Mapping("/api/v1/users/**",                        "/admin/accounts",            true),
             new Mapping("/api/v1/companies/**",                    "/admin/organizations",       true)

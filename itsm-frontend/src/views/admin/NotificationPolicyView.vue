@@ -92,6 +92,7 @@
 </template>
 
 <script setup>
+import { toNotificationPolicyCreatePayload, toNotificationPolicyUpdatePayload, toIsActivePayload } from '@/utils/adminPayload.js'
 import { ref, reactive, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { notificationPolicyApi } from '@/api/admin/notificationPolicy.js'
@@ -169,9 +170,9 @@ async function save() {
   saveError.value = ''
   try {
     if (editing.value) {
-      await notificationPolicyApi.update(editing.value.id, { ...form })
+      await notificationPolicyApi.update(editing.value.id, toNotificationPolicyUpdatePayload(form))
     } else {
-      await notificationPolicyApi.create({ ...form })
+      await notificationPolicyApi.create(toNotificationPolicyCreatePayload(form))
     }
     closeModal()
     loadPolicies()
@@ -184,7 +185,7 @@ async function save() {
 
 async function toggleStatus(policy, active) {
   try {
-    await notificationPolicyApi.changeStatus(policy.id, { active })
+    await notificationPolicyApi.changeStatus(policy.id, toIsActivePayload(active))
     loadPolicies()
   } catch (error) {
     toast.error(error.response?.data?.message || t('admin.statusChangeError'))

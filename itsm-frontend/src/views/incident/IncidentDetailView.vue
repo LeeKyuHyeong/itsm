@@ -87,6 +87,14 @@
       </div>
     </div>
 
+    <!-- 연결 자산 (CMDB) -->
+    <IncidentAssetCard
+      :assets="linkedAssets"
+      :can-edit="canEdit"
+      @link-asset="handleLinkAsset"
+      @unlink-asset="handleUnlinkAsset"
+    />
+
     <!-- 댓글 -->
     <IncidentCommentCard
       :comments="comments"
@@ -149,6 +157,7 @@ import BaseModal from '@/components/common/BaseModal.vue'
 import IncidentCommentCard from './components/IncidentCommentCard.vue'
 import IncidentHistoryCard from './components/IncidentHistoryCard.vue'
 import IncidentReportCard from './components/IncidentReportCard.vue'
+import IncidentAssetCard from './components/IncidentAssetCard.vue'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -163,6 +172,7 @@ const assignees = ref([])
 const comments = ref([])
 const histories = ref([])
 const report = ref(null)
+const linkedAssets = ref([]) // 장애 ↔ 자산(CMDB) 연결 (2026-09-16 P2)
 const newComment = ref('')
 const assigneeUserId = ref(null)
 const mainManagerId = ref(null)
@@ -321,6 +331,35 @@ const handleAssignUser = async () => {
   }
 }
 
+const loadAssets = async () => {
+  try {
+    const res = await incidentApi.getAssets(incidentId.value)
+    const data = res.data.data
+    linkedAssets.value = Array.isArray(data) ? data : data?.content || []
+  } catch (e) {
+    linkedAssets.value = []
+  }
+}
+
+const handleLinkAsset = async ({ assetType, assetId }) => {
+  try {
+    await incidentApi.addAsset(incidentId.value, { assetType, assetId })
+    await loadAssets()
+  } catch (e) {
+    toast.error(e.response?.data?.error?.message || t('incident.linkAssetFail'))
+  }
+}
+
+const handleUnlinkAsset = async (assetType, assetId) => {
+  if (!await confirm({ message: t('incident.confirmUnlinkAsset') })) return
+  try {
+    await incidentApi.removeAsset(incidentId.value, assetType, assetId)
+    await loadAssets()
+  } catch (e) {
+    toast.error(t('incident.unlinkAssetFail'))
+  }
+}
+
 const handleRemoveAssignee = async (userId) => {
   if (!await confirm({ message: t('incident.confirmRemoveAssignee') })) return
   try {
@@ -334,7 +373,7 @@ const handleRemoveAssignee = async (userId) => {
 const handleAssignMainManager = async () => {
   if (!mainManagerId.value) return
   try {
-    await incidentApi.assignMainManager(incidentId.value, { managerId: mainManagerId.value })
+    await incidentApi.assignMainManager(incidentId.value, { userId: mainManagerId.value }) // 2026-09-16 P2: 백엔드 UserIdRequest
     showAssignManagerModal.value = false
     mainManagerId.value = null
     await loadDetail()
@@ -387,7 +426,7 @@ const handleSaveReport = async () => {
 
 onMounted(async () => {
   await commonCodeStore.fetchCodes('INCIDENT_TYPE')
-  await Promise.all([loadDetail(), loadAssignees(), loadComments(), loadHistory(), loadReport(), loadReportForm()])
+  await Promise.all([loadDetail(), loadAssignees(), loadComments(), loadHistory(), loadReport(), loadReportForm(), loadAssets()])
 })
 </script>
 

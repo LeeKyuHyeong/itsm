@@ -339,6 +339,54 @@ class UserServiceTest {
         assertThat(captor.getValue().getCreatedBy()).isEqualTo(1L);
     }
 
+    // ── 2026-09-16 전수조사 P2: 프론트(AccountManageView)는 역할을 코드('ROLE_PM')로 보내는데 백엔드는 roleId(Long)만 받아
+    //    역할 부여는 400, 회수는 경로 변수 타입 불일치로 400 이었다 → 코드/ID 둘 다 받는다 ──
+
+    @Test
+    @DisplayName("grantRole - roleCd 로 요청하면 tb_role 에서 ID 를 찾아 부여한다")
+    void grantRole_withRoleCd_resolvesRoleId() {
+        Role pm = Role.builder().roleNm("PM").roleCd("ROLE_PM").build();
+        ReflectionTestUtils.setField(pm, "roleId", 3L);
+        given(roleRepository.findByRoleCd("ROLE_PM")).willReturn(Optional.of(pm));
+        given(userRepository.existsById(1L)).willReturn(true);
+        given(userRepository.findById(1L)).willReturn(Optional.of(activeUser));
+        given(roleRepository.existsById(3L)).willReturn(true);
+        given(userRoleRepository.existsById(any(UserRoleId.class))).willReturn(false);
+
+        userService.grantRole(1L, new RoleGrantRequest(null, "ROLE_PM"), 1L);
+
+        ArgumentCaptor<UserRole> captor = ArgumentCaptor.forClass(UserRole.class);
+        verify(userRoleRepository).save(captor.capture());
+        assertThat(captor.getValue().getRoleId()).isEqualTo(3L);
+    }
+
+    @Test
+    @DisplayName("grantRole - roleId 도 roleCd 도 없으면 INVALID_INPUT_VALUE")
+    void grantRole_withoutRoleRef_throws() {
+        given(userRepository.existsById(1L)).willReturn(true);
+
+        assertThatThrownBy(() -> userService.grantRole(1L, new RoleGrantRequest(null, null), 1L))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(ErrorCode.INVALID_INPUT_VALUE);
+    }
+
+    @Test
+    @DisplayName("resolveRoleId - 숫자면 그대로, 코드면 tb_role 조회, 없으면 ENTITY_NOT_FOUND")
+    void resolveRoleId_numericOrCode() {
+        Role dba = Role.builder().roleNm("DBA").roleCd("ROLE_DBA").build();
+        ReflectionTestUtils.setField(dba, "roleId", 6L);
+        given(roleRepository.findByRoleCd("ROLE_DBA")).willReturn(Optional.of(dba));
+        given(roleRepository.findByRoleCd("ROLE_NOPE")).willReturn(Optional.empty());
+
+        assertThat(userService.resolveRoleId("6")).isEqualTo(6L);
+        assertThat(userService.resolveRoleId("ROLE_DBA")).isEqualTo(6L);
+        assertThatThrownBy(() -> userService.resolveRoleId("ROLE_NOPE"))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(ErrorCode.ENTITY_NOT_FOUND);
+    }
+
     @Test
     @DisplayName("역할 회수도 사용자 이력에 남는다")
     void revokeRole_writesUserHistory() {

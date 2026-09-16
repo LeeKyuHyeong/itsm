@@ -28,6 +28,8 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -244,5 +246,46 @@ class UserControllerTest {
         return new UsernamePasswordAuthenticationToken(
                 userId, null,
                 List.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
+    }
+
+    // ── 2026-09-16 전수조사 P2: 프론트는 역할을 코드('ROLE_PM')로 보내는데 백엔드는 roleId(Long)만 받았다 ──
+
+    @Test
+    @DisplayName("POST /api/v1/users/{id}/roles - roleCd 만 있는 요청도 받는다")
+    void grantRole_withRoleCd_returns200() throws Exception {
+        mockMvc.perform(post("/api/v1/users/1/roles")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"roleCd\":\"ROLE_PM\"}")
+                        .principal(createAuthentication(1L)))
+                .andExpect(status().isOk());
+
+        org.mockito.ArgumentCaptor<RoleGrantRequest> captor = org.mockito.ArgumentCaptor.forClass(RoleGrantRequest.class);
+        verify(userService).grantRole(eq(1L), captor.capture(), eq(1L));
+        assertThat(captor.getValue().getRoleCd()).isEqualTo("ROLE_PM");
+        assertThat(captor.getValue().getRoleId()).isNull();
+    }
+
+    @Test
+    @DisplayName("DELETE /api/v1/users/{id}/roles/{roleRef} - 경로가 역할 코드여도 ID 로 풀어 회수한다")
+    void revokeRole_withRoleCdPath_resolves() throws Exception {
+        given(userService.resolveRoleId("ROLE_PM")).willReturn(3L);
+
+        mockMvc.perform(delete("/api/v1/users/1/roles/ROLE_PM")
+                        .principal(createAuthentication(1L)))
+                .andExpect(status().isOk());
+
+        verify(userService).revokeRole(1L, 3L, 1L);
+    }
+
+    @Test
+    @DisplayName("DELETE /api/v1/users/{id}/roles/{roleRef} - 숫자 ID 경로는 그대로 통한다")
+    void revokeRole_withNumericPath() throws Exception {
+        given(userService.resolveRoleId("3")).willReturn(3L);
+
+        mockMvc.perform(delete("/api/v1/users/1/roles/3")
+                        .principal(createAuthentication(1L)))
+                .andExpect(status().isOk());
+
+        verify(userService).revokeRole(1L, 3L, 1L);
     }
 }

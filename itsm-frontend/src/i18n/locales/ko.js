@@ -107,6 +107,14 @@ export default {
 
   // 장애관리
   incident: {
+    linkedAssets: '연결 자산',
+    linkAsset: '자산 연결',
+    noLinkedAsset: '연결된 자산이 없습니다.',
+    unlinkAsset: '해제',
+    assetType: '자산 유형',
+    linkAssetFail: '자산 연결에 실패했습니다.',
+    unlinkAssetFail: '자산 연결 해제에 실패했습니다.',
+    confirmUnlinkAsset: '이 자산의 연결을 해제하시겠습니까?',
     title: '장애관리',
     list: '장애 목록',
     create: '장애 등록',
@@ -418,6 +426,13 @@ export default {
 
   // 관리자
   admin: {
+    systemConfigManage: '시스템 설정',
+    systemConfigDesc: '값을 바꾸면 서버 재시작 없이 즉시 반영됩니다. 잠금 횟수·비밀번호 만료일·최소 길이는 로그인/비밀번호 변경에 바로 적용됩니다.',
+    configKey: '설정 키',
+    configVal: '값',
+    configDescription: '설명',
+    updatedAt: '수정일시',
+    noConfig: '설정이 없습니다.',
     title: '설정관리',
     menuManage: '메뉴 관리',
     commonCode: '공통코드 관리',

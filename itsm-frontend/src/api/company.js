@@ -20,6 +20,6 @@ export const companyApi = {
     return api.post(`/companies/${companyId}/departments`, data)
   },
   updateDepartment(deptId, data) {
-    return api.patch(`/departments/${deptId}`, data)
+    return api.patch(`/companies/departments/${deptId}`, data) // 2026-09-16 P2: 백엔드 경로는 /companies/departments/{id}
   }
 }

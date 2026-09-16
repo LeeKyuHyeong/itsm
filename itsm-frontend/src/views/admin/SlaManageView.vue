@@ -85,6 +85,7 @@
 </template>
 
 <script setup>
+import { toSlaCreatePayload, toSlaUpdatePayload } from '@/utils/adminPayload.js'
 import { ref, reactive, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { slaApi } from '@/api/admin/sla.js'
@@ -179,13 +180,11 @@ async function save() {
   saving.value = true
   saveError.value = ''
   try {
-    const payload = { ...form }
-    if (!payload.companyId) delete payload.companyId
-
+    // 2026-09-16 P2: 백엔드 DTO 필드명(deadlineHours/warningPct)으로 변환
     if (editing.value) {
-      await slaApi.update(editing.value.id, payload)
+      await slaApi.update(editing.value.id, toSlaUpdatePayload(form))
     } else {
-      await slaApi.create(payload)
+      await slaApi.create(toSlaCreatePayload(form))
     }
     closeModal()
     loadSlaList()

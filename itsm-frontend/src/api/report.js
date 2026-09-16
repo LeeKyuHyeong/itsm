@@ -11,7 +11,7 @@ export const reportApi = {
     return api.get(`/reports/${id}`)
   },
   update(id, data) {
-    return api.put(`/reports/${id}`, data)
+    return api.patch(`/reports/${id}`, data) // 2026-09-16 P2: 백엔드는 PATCH
   },
   delete(id) {
     return api.delete(`/reports/${id}`)
@@ -23,7 +23,7 @@ export const reportApi = {
     return api.post('/report-forms', data)
   },
   updateForm(id, data) {
-    return api.put(`/report-forms/${id}`, data)
+    return api.patch(`/report-forms/${id}`, data) // 2026-09-16 P2: 백엔드는 PATCH
   },
   deleteForm(id) {
     return api.delete(`/report-forms/${id}`)

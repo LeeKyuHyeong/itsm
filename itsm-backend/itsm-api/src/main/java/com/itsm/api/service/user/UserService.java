@@ -174,20 +174,43 @@ public class UserService {
             throw new BusinessException(ErrorCode.ENTITY_NOT_FOUND, "사용자를 찾을 수 없습니다.");
         }
 
+        // 2026-09-16 P2: roleId 또는 roleCd 어느 쪽으로든 지정 가능
+        Long roleId = req.getRoleId();
+        if (roleId == null) {
+            if (req.getRoleCd() == null || req.getRoleCd().isBlank()) {
+                throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE, "roleId 또는 roleCd 가 필요합니다.");
+            }
+            roleId = resolveRoleId(req.getRoleCd());
+        }
+
         // Check role exists
-        if (!roleRepository.existsById(req.getRoleId())) {
+        if (!roleRepository.existsById(roleId)) {
             throw new BusinessException(ErrorCode.ENTITY_NOT_FOUND, "역할을 찾을 수 없습니다.");
         }
 
         // Check not already granted
-        UserRoleId userRoleId = new UserRoleId(userId, req.getRoleId());
+        UserRoleId userRoleId = new UserRoleId(userId, roleId);
         if (userRoleRepository.existsById(userRoleId)) {
             throw new BusinessException(ErrorCode.DUPLICATE_VALUE, "이미 부여된 역할입니다.");
         }
 
-        UserRole userRole = new UserRole(userId, req.getRoleId(), currentUserId);
+        UserRole userRole = new UserRole(userId, roleId, currentUserId);
         userRoleRepository.save(userRole);
-        recordRoleHistory(userId, "+" + req.getRoleId(), currentUserId);
+        recordRoleHistory(userId, "+" + roleId, currentUserId);
+    }
+
+    /** 역할 참조(숫자 ID 또는 role_cd) → roleId (2026-09-16 P2) */
+    @Transactional(readOnly = true)
+    public Long resolveRoleId(String roleRef) {
+        if (roleRef == null || roleRef.isBlank()) {
+            throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE, "역할이 지정되지 않았습니다.");
+        }
+        if (roleRef.chars().allMatch(Character::isDigit)) {
+            return Long.parseLong(roleRef);
+        }
+        return roleRepository.findByRoleCd(roleRef)
+                .map(Role::getRoleId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND, "역할을 찾을 수 없습니다: " + roleRef));
     }
 
     @PreAuthorize(RoleCode.HAS_ADMIN_ROLE)

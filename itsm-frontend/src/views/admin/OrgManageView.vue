@@ -184,6 +184,7 @@
 </template>
 
 <script setup>
+import { toCompanyPayload, toDepartmentPayload } from '@/utils/adminPayload.js'
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { companyApi } from '@/api/company.js'
@@ -311,9 +312,9 @@ async function saveCompany() {
   companySaveError.value = ''
   try {
     if (editingCompany.value) {
-      await companyApi.update(editingCompany.value.id, { ...companyForm })
+      await companyApi.update(editingCompany.value.id, toCompanyPayload(companyForm))
     } else {
-      await companyApi.create({ ...companyForm })
+      await companyApi.create(toCompanyPayload(companyForm))
     }
     closeCompanyModal()
     loadCompanies()
@@ -353,8 +354,7 @@ async function saveDept() {
   deptSaving.value = true
   deptSaveError.value = ''
   try {
-    const payload = { ...deptForm }
-    if (!payload.parentId) delete payload.parentId
+    const payload = toDepartmentPayload(deptForm) // 2026-09-16 P2: DepartmentRequest 는 deptNm 만 받는다
 
     if (editingDept.value) {
       await companyApi.updateDepartment(editingDept.value.id, payload)

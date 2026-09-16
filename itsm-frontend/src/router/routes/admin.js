@@ -50,5 +50,12 @@ export default [
     name: 'BatchJobManage',
     component: () => import('@/views/admin/BatchJobManageView.vue'),
     meta: { requiresAuth: true, roles: adminRoles }
+  },
+  {
+    // 2026-09-16 P2: api 는 있었지만 화면이 없던 시스템 설정
+    path: '/admin/system-configs',
+    name: 'SystemConfigManage',
+    component: () => import('@/views/admin/SystemConfigView.vue'),
+    meta: { requiresAuth: true, roles: adminRoles }
   }
 ]

@@ -103,6 +103,14 @@ export default {
   },
 
   incident: {
+    linkedAssets: 'Linked Assets',
+    linkAsset: 'Link Asset',
+    noLinkedAsset: 'No linked assets.',
+    unlinkAsset: 'Unlink',
+    assetType: 'Asset Type',
+    linkAssetFail: 'Failed to link asset.',
+    unlinkAssetFail: 'Failed to unlink asset.',
+    confirmUnlinkAsset: 'Unlink this asset?',
     title: 'Incident Management',
     list: 'Incident List',
     create: 'Create Incident',
@@ -407,6 +415,13 @@ export default {
   },
 
   admin: {
+    systemConfigManage: 'System Settings',
+    systemConfigDesc: 'Changes apply immediately without a restart. Lock count, password expiry and minimum length take effect on login and password change.',
+    configKey: 'Key',
+    configVal: 'Value',
+    configDescription: 'Description',
+    updatedAt: 'Updated',
+    noConfig: 'No settings.',
     title: 'Settings',
     menuManage: 'Menu Management',
     commonCode: 'Common Code',

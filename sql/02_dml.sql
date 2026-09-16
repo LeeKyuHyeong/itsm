@@ -342,3 +342,18 @@ INSERT INTO tb_batch_job (job_name, job_name_en, job_description, cron_expressio
 ('InspectionSimulationJob', '[Demo] Inspection Simulation', '데모용 정기점검 자동 생성/결과 입력 (기본 비활성)', '0 45 9 * * MON-FRI', 'N', 'N', NOW(), 1),
 ('TrafficSimulationJob', '[Demo] Traffic Simulation', '데모용 로그인/메뉴 접근 이력 생성 (기본 비활성)', '0 */10 8-20 * * *', 'N', 'N', NOW(), 1),
 ('AssetAutoRegisterJob', '[Demo] Asset Auto-register', '데모용 자산 자동 등록 (기본 비활성)', '0 0 7 * * MON', 'N', 'N', NOW(), 1);
+
+-- ============================================================
+-- 11. 시스템 설정 메뉴 (2026-09-16 전수조사 P2) — ITSM.md 메뉴 트리에 있으나 시드·화면이 없던 항목
+--     프론트 라우트 /admin/system-configs, 관리자(SUPER_ADMIN·ITSM_ADMIN) 전용. 멱등: 같은 URL 이 있으면 건너뜀.
+-- ============================================================
+
+INSERT INTO tb_menu (parent_menu_id, menu_nm, menu_nm_en, menu_url, icon, sort_order, is_visible, status, created_at, created_by)
+SELECT 9, '시스템 설정', 'System Settings', '/admin/system-configs', 'mdi-cog', 6, 'Y', 'ACTIVE', NOW(), 1
+WHERE NOT EXISTS (SELECT 1 FROM tb_menu WHERE menu_url = '/admin/system-configs');
+
+INSERT INTO tb_role_menu (role_id, menu_id, can_read, can_write, created_at, created_by)
+SELECT r.role_id, m.menu_id, 'Y', 'Y', NOW(), 1
+FROM tb_menu m JOIN tb_role r ON r.role_id IN (1, 2)
+WHERE m.menu_url = '/admin/system-configs'
+  AND NOT EXISTS (SELECT 1 FROM tb_role_menu rm WHERE rm.role_id = r.role_id AND rm.menu_id = m.menu_id);

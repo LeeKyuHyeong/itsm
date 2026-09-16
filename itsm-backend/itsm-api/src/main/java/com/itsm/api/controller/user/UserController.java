@@ -83,13 +83,15 @@ public class UserController {
         return ApiResponse.success();
     }
 
-    @DeleteMapping("/{userId}/roles/{roleId}")
+    /** roleRef 는 숫자 ID 또는 role_cd ('ROLE_PM') — 프론트는 코드만 안다 (2026-09-16 P2) */
+    @DeleteMapping("/{userId}/roles/{roleRef}")
     @Auditable(actionType = "ROLE_REVOKE", targetType = "USER")
     public ApiResponse<Void> revokeRole(
             @PathVariable Long userId,
-            @PathVariable Long roleId,
+            @PathVariable String roleRef,
             Authentication authentication) {
         Long currentUserId = AuthUtils.getCurrentUserId(authentication);
+        Long roleId = userService.resolveRoleId(roleRef);
         userService.revokeRole(userId, roleId, currentUserId);
         return ApiResponse.success();
     }
